@@ -1,0 +1,24 @@
+{
+  "name": "live-countdown-bot",
+  "version": "1.0.0",
+  "description": "A discord bot that counts down to an event.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/radiantly/live-countdown-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/radiantly/live-countdown-bot/issues"
+  },
+  "homepage": "https://github.com/radiantly/live-countdown-bot#readme",
+  "dependencies": {
+    "chrono-node": "^1.4.6",
+    "discord.js": "^12.2.0"
+  }
+}
