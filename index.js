@@ -6,7 +6,8 @@ const { prefix, token, updateInterval } = require('./config.json');
 const timeDiffForHumans = require('./modules/timeDiffForHumans');
 
 client.once('ready', () => {
-	console.log('Bot initialized.');
+    console.log('Bot initialized.');
+    updateCountdown();
 });
 
 const Servers = {}
@@ -14,8 +15,10 @@ const Servers = {}
 const usage = `\`\`\`
 !help - Shows this help message
 !countdown - Counts down to a specific time given
-E.g: !countdown tomorrow 9 AM IST
-     !countdown May 24 3:47 PM GMT
+E.g: !countdown tomorrow 9 AM PDT
+     !countdown May 24 3:47 PM IST
+A maximum of 3 countdowns can be set per server.
+To set a countdown, the user must have the MANAGE_MESSAGES permission.
 \`\`\``
 
 client.on('message', message => {
@@ -23,10 +26,15 @@ client.on('message', message => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
+    // Customary bot check
     if (command === 'ping')
         return message.channel.send('PONG');
+
+    // Display help message
     if (['help', 'commands', 'usage'].includes(command))
         return message.channel.send(usage);
+    
+    // Start a countdown
     if (command === 'countdown') {
         if (!args.length)
             return message.channel.send(`You didn't provide any arguments, ${message.author}!`);
@@ -34,22 +42,29 @@ client.on('message', message => {
         const date = chrono.parseDate(args.join(" "));
         if(date)
             if(message.guild && message.guild.available) {
+                if(!message.member.hasPermission('MANAGE_MESSAGES'))
+                    return message.reply('You need to have the \`MANAGE_MESSAGES\` permission to set a countdown!');
+
                 if(!Servers.hasOwnProperty(message.guild.id))
                     Servers[message.guild.id] = []
 
                 let Messages = Servers[message.guild.id]
-                return message.channel.send(`Calculating time left.`)
-                    .then(replyMessage => Messages.unshift({message: replyMessage, timeThen: Date.parse(date)}))
+
+                let timeEnd = new Date(date);
+                if(timeEnd < Date.now())
+                    return message.reply(`ehh .. unless you have can warp time to go backwards, there's no way you can count back to \`${timeEnd.toUTCString()}\``);
+                return message.channel.send(`Counting down to \`${timeEnd.toUTCString()}\``)
+                    .then(replyMessage => Messages.unshift({message: replyMessage, timeThen: timeEnd}))
                     .catch(err => console.log(err || err.mesage));
             } else {
                 return message.channel.send('The date/time is valid, but this bot can only be used in servers.');
             }
         else 
-            return message.channel.send(`Invalid date.`)
+            return message.channel.send(`Invalid date/time.`)
     }
 });
 
-setInterval(async () => {
+const updateCountdown = async () => {
     console.log(Servers);
     let timeNow = Date.now();
     for(const Messages of Object.values(Servers)) {
@@ -60,7 +75,7 @@ setInterval(async () => {
                 const timeLeft = timeThen - timeNow;
 
                 if(i > 2) {
-                    message.edit("Coutdown aborted.");
+                    message.edit("Countdown aborted.");
                     Messages.length = 3;
                     break;
                 }
@@ -77,6 +92,7 @@ setInterval(async () => {
             }
         }
     }
-}, updateInterval);
+    setTimeout(updateCountdown, updateInterval);
+}
 
 client.login(token);
