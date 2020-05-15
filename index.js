@@ -9,7 +9,7 @@ client.once('ready', () => {
 	console.log('Bot initialized.');
 });
 
-const Messages = [];
+const Servers = {}
 
 const usage = `\`\`\`
 !help - Shows this help message
@@ -32,31 +32,49 @@ client.on('message', message => {
             return message.channel.send(`You didn't provide any arguments, ${message.author}!`);
         
         const date = chrono.parseDate(args.join(" "));
-        if(date) 
-            return message.channel.send(`Calculating time left.`)
-                .then(replyMessage => Messages.push({message: replyMessage, timeThen: Date.parse(date)}))
-                .catch(err => console.log(err || err.mesage));
+        if(date)
+            if(message.guild && message.guild.available) {
+                if(!Servers.hasOwnProperty(message.guild.id))
+                    Servers[message.guild.id] = []
+
+                let Messages = Servers[message.guild.id]
+                return message.channel.send(`Calculating time left.`)
+                    .then(replyMessage => Messages.unshift({message: replyMessage, timeThen: Date.parse(date)}))
+                    .catch(err => console.log(err || err.mesage));
+            } else {
+                return message.channel.send('The date/time is valid, but this bot can only be used in servers.');
+            }
         else 
             return message.channel.send(`Invalid date.`)
     }
 });
 
 setInterval(async () => {
-    let i = 0;
+    console.log(Servers);
     let timeNow = Date.now();
-    while(i < Messages.length) {
-        try {
-            const { message, timeThen } = Messages[i];
-            const timeLeft = timeThen - timeNow;
-            if(timeLeft <= 0) {
-                await message.edit("Countdown done.");
+    for(const Messages of Object.values(Servers)) {
+        let i = 0;
+        while(i < Messages.length) {
+            try {
+                const { message, timeThen } = Messages[i];
+                const timeLeft = timeThen - timeNow;
+
+                if(i > 2) {
+                    message.edit("Coutdown aborted.");
+                    Messages.length = 3;
+                    break;
+                }
+
+                if(timeLeft <= 0) {
+                    await message.edit("Countdown done.");
+                    Messages.splice(i, 1);
+                    continue;
+                }
+                await message.edit(`Time left: ${timeDiffForHumans(timeLeft)}.`);
+                i++;
+            } catch(ex) {
                 Messages.splice(i, 1);
-                continue;
             }
-            await message.edit(`Time left: ${timeDiffForHumans(timeLeft)}.`);
-            i++;
-        } catch(ex) {
-            Messages.splice(i, 1);
         }
     }
 }, updateInterval);
