@@ -12,14 +12,27 @@ client.once('ready', () => {
 
 const Servers = {}
 
-const usage = `\`\`\`
-!help - Shows this help message
-!countdown - Counts down to a specific time given
-E.g: !countdown tomorrow 9 AM PDT
-     !countdown May 24 3:47 PM IST
-A maximum of 3 countdowns can be set per server.
-To set a countdown, the user must have the MANAGE_MESSAGES permission.
-\`\`\``
+const helpEmbed = new Discord.MessageEmbed()
+    .setColor('#f26522')
+    .setTitle('!help')
+    .setDescription('Usage for the Live Countdown Bot')
+    .addFields(
+        {
+            name: 'Set a countdown',
+            value: '```!countdown <Date/Time to countdown to>\n\n' +
+                   'Examples:\n' +
+                   '!countdown tomorrow 9 AM PDT\n' +
+                   '!countdown May 24 3:47 PM IST```'
+        },
+        {
+            name: 'Notes',
+            value: 'A maximum of 3 countdowns can be set per server.\n' +
+                   'To set a countdown, the user must have the `MANAGE_MESSAGES` permission.\n' +
+                   'Report a bug or request a feature [here]'
+        }
+    )
+    .setTimestamp()
+    .setFooter('Live Countdown Bot');
 
 client.on('message', message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -32,7 +45,7 @@ client.on('message', message => {
 
     // Display help message
     if (['help', 'commands', 'usage'].includes(command))
-        return message.channel.send(usage);
+        return message.channel.send(helpEmbed);
     
     // Start a countdown
     if (command === 'countdown') {
