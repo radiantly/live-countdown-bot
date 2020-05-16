@@ -14,15 +14,17 @@ const Servers = {}
 
 const helpEmbed = new Discord.MessageEmbed()
     .setColor('#f26522')
-    .setTitle('!help')
+    .setTitle(`${prefix}help`)
     .setDescription('Usage for the Live Countdown Bot')
     .addFields(
         {
             name: 'Set a countdown',
-            value: '```!countdown <Date/Time to countdown to>\n\n' +
-                   'Examples:\n' +
-                   '!countdown tomorrow 9 AM PDT\n' +
-                   '!countdown May 24 3:47 PM IST```'
+            value: '```' +
+                   `${prefix}countdown <Date/Time to countdown to>\n\n` +
+                   `Examples:\n` +
+                   `${prefix}countdown tomorrow 9 AM PDT\n` +
+                   `${prefix}countdown May 24 3:47 PM IST` +
+                   '```'
         },
         {
             name: 'Notes',
