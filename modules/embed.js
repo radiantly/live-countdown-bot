@@ -41,7 +41,7 @@ export const generateHelpEmbed = command =>
 export const generateStatsEmbed = client => {
     let { rss } = memoryUsage();
     let memUsage = Math.round(rss / 1024 / 1024 * 100) / 100;
-    let osLoad = Math.round(loadavg()[0] * 100 / cpus().length) / 100;
+    let osLoad = Math.round(loadavg()[0] / cpus().length * 1E4) / 100;
     let upTime = timeDiffForHumans(client.uptime, true);
     statsEmbed.fields = [
         {
