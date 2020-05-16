@@ -19,4 +19,3 @@ jobs:
           repository: radiantly/live-countdown-bot/lcb
           tags: latest
           tag_with_ref: true
-          tag_with_sha: true
