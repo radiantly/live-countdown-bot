@@ -5,13 +5,13 @@ A discord bot that counts down to a given time.
 
 ### Installation
 
-To run,
+To run, you will need Node v14.
 ```sh
 git clone https://github.com/radiantly/live-countdown-bot
 
 # You will need a `config.json` file with your desired prefix and bot token.
 npm install
-node index.js
+npm start
 ```
 
 This project is also packaged as a Docker image. You can either clone and build the image yourself, or pull the built image from GitHub packages. If you have not pulled images from the GitHub Package registry before, you will need to follow the instructions [here](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages) to configure docker.

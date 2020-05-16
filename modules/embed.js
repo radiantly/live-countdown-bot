@@ -1,6 +1,6 @@
-import * as os from 'os';
-import * as process from 'process';
-import { MessageEmbed, version } from 'discord.js';
+import { loadavg, cpus } from 'os';
+import { memoryUsage, version as nodeVersion } from 'process';
+import { MessageEmbed, version as djsVersion } from 'discord.js';
 import timeDiffForHumans from './timeDiffForHumans.js';
 import config from '../config.json';
 
@@ -39,11 +39,10 @@ export const generateHelpEmbed = command =>
     helpEmbed.setTitle(`${prefix}${command}`);
 
 export const generateStatsEmbed = client => {
-    let { rss } = process.memoryUsage();
+    let { rss } = memoryUsage();
     let memUsage = Math.round(rss / 1024 / 1024 * 100) / 100;
-    let osLoad = Math.round(os.loadavg()[0] * 1000) / 10;
+    let osLoad = Math.round(loadavg()[0] * 100 / cpus().length) / 100;
     let upTime = timeDiffForHumans(client.uptime, true);
-    let { node } = process.versions;
     statsEmbed.fields = [
         {
             name: ':fire: CPU usage',
@@ -67,12 +66,12 @@ export const generateStatsEmbed = client => {
         },
         {
             name: ':incoming_envelope: Discord.js',
-            value: `**${version}**`,
+            value: `**${djsVersion}**`,
             inline: true
         },
         {
             name: ':white_check_mark: Node.js',
-            value: `**v${node}**`,
+            value: `**${nodeVersion}**`,
             inline: true
         }
 
