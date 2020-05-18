@@ -1,20 +1,27 @@
-import { Client } from 'discord.js';
+import { Client, Guild, TextChannel, Message } from 'discord.js';
 import chrono from 'chrono-node';
 import config from './config.json';
 import timeDiffForHumans from './modules/timeDiffForHumans.js';
 import { generateHelpEmbed, generateStatsEmbed } from './modules/embed.js';
+import { addCountdown, getMessages, removeMessage, log } from './modules/db.js';
 
-const client = new Client();
-const { prefix, token, updateInterval } = config;
+const activities = [
+    { name: 'the clock tick', type: 'WATCHING' },
+    { name: 'the time fly by', type: 'WATCHING' },
+    { name: 'the clock tick', type: 'LISTENING' },
+    { name: 'with time', type: 'PLAYING' }
+]
+
+const client = new Client({ presence: { activity: activities[Math.floor(Math.random() * activities.length)] } });
+const { prefix, token } = config;
 
 client.once('ready', () => {
-    console.log('Bot initialized.');
-    updateCountdown();
+    log('Bot initialized.');
+    periodicUpdate();
 });
 
-const Servers = {}
-
 client.on('message', message => {
+
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
@@ -22,7 +29,8 @@ client.on('message', message => {
     // Display help message
     if (['help', 'commands', 'usage'].includes(command))
         return message.channel.send(generateHelpEmbed(command));
-    
+
+    // Show process stats
     if (command === 'stats')
         return message.channel.send(generateStatsEmbed(client));
 
@@ -37,17 +45,13 @@ client.on('message', message => {
                 if(!message.member.hasPermission('MANAGE_MESSAGES'))
                     return message.reply('You need to have the \`MANAGE_MESSAGES\` permission to set a countdown!');
 
-                if(!Servers.hasOwnProperty(message.guild.id))
-                    Servers[message.guild.id] = []
-
-                let Messages = Servers[message.guild.id]
-
                 let timeEnd = new Date(date);
                 if(timeEnd < Date.now())
                     return message.reply(`ehh .. unless you have can warp time to go backwards, there's no way you can count back to \`${timeEnd.toUTCString()}\``);
+                
                 return message.channel.send(`Counting down to \`${timeEnd.toUTCString()}\``)
-                    .then(replyMessage => Messages.unshift({message: replyMessage, timeThen: timeEnd}))
-                    .catch(err => console.log(err || err.mesage));
+                    .then(replyMessage => addCountdown(replyMessage, timeEnd))
+                    .catch(err => log(err.message || err));
             } else {
                 return message.channel.send('The date/time is valid, but this bot can only be used in servers.');
             }
@@ -56,35 +60,38 @@ client.on('message', message => {
     }
 });
 
-const updateCountdown = async () => {
-    console.log(Servers);
-    let timeNow = Date.now();
-    for(const Messages of Object.values(Servers)) {
-        let i = 0;
-        while(i < Messages.length) {
-            try {
-                const { message, timeThen } = Messages[i];
-                const timeLeft = timeThen - timeNow;
+const maxCountdowns = 5;
+let index = 0
 
-                if(i > 2) {
-                    message.edit("Countdown aborted.");
-                    Messages.length = 3;
-                    break;
-                }
+let guild = new Guild(client, {});
+let channel = new TextChannel(guild, {});
+let messageToEdit = new Message(client, {}, channel);
 
-                if(timeLeft <= 0) {
-                    await message.edit("Countdown done.");
-                    Messages.splice(i, 1);
-                    continue;
-                }
-                await message.edit(`Time left: ${timeDiffForHumans(timeLeft)} left.`);
-                i++;
-            } catch(ex) {
-                Messages.splice(i, 1);
+const periodicUpdate = async () => {
+    const timeNow = Date.now();
+    const Messages = await getMessages(index);
+    for(const Message of Messages) {
+        try {
+            const { serverId, MessageString } = Message;
+            const { messageId, channelId, timeEnd } = JSON.parse(MessageString);
+            messageToEdit.guild.id = serverId;
+            messageToEdit.channel.id = channelId;
+            messageToEdit.id = messageId
+
+            const timeLeft = Date.parse(timeEnd) - timeNow;
+
+            if(timeLeft <= 0) {
+                await messageToEdit.edit("Countdown done.");
+                removeMessage(serverId, MessageString);
+                continue;
             }
+            await messageToEdit.edit(`Time left: ${timeDiffForHumans(timeLeft)} left.`);
+        } catch (ex) {
+            log(ex);
         }
     }
-    client.setTimeout(updateCountdown, updateInterval);
+    index = index < maxCountdowns ? index + 1 : 0;
+    client.setTimeout(periodicUpdate, Math.max(5000 - (Date.now() - timeNow), 0));
 }
 
 client.login(token);
