@@ -1,5 +1,5 @@
 {
     "prefix": "!",
     "token": "YourVeryLongDiscordBotTokenHere",
-    "updateInterval": 16666
+    "botOwner": "710860868850716666"
 }

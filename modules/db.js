@@ -38,3 +38,7 @@ export const log = async text => {
         console.log(logText)
     await redis.rpush('Logs', logText);
 }
+
+export const getLogs = async () => {
+    return await redis.lrange('Logs', '-10', '-1');
+}

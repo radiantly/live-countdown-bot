@@ -1,9 +1,10 @@
 import { Client, Guild, TextChannel, Message } from 'discord.js';
 import chrono from 'chrono-node';
+import { exit } from 'process';
 import config from './config.json';
 import timeDiffForHumans from './modules/timeDiffForHumans.js';
 import { generateHelpEmbed, generateStatsEmbed } from './modules/embed.js';
-import { addCountdown, getMessages, removeMessage, log } from './modules/db.js';
+import { addCountdown, getMessages, removeMessage, log, getLogs } from './modules/db.js';
 
 const activities = [
     { name: 'the clock tick', type: 'WATCHING' },
@@ -13,7 +14,7 @@ const activities = [
 ]
 
 const client = new Client({ presence: { activity: activities[Math.floor(Math.random() * activities.length)] } });
-const { prefix, token } = config;
+const { prefix, token, botOwner } = config;
 
 client.once('ready', () => {
     log('Bot initialized.');
@@ -57,6 +58,16 @@ client.on('message', message => {
             }
         else 
             return message.channel.send(`Invalid date/time.`)
+    }
+
+    if (message.author?.id === botOwner) {
+        if (command === 'logs')
+            getLogs()
+                .then(results => message.channel.send('```' + results.join('\n') + '```'))
+                .catch(err => log(err));
+        
+        if (command === 'kill')
+            exit();
     }
 });
 
