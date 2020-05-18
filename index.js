@@ -16,15 +16,27 @@ const activities = [
 const client = new Client({ presence: { activity: activities[Math.floor(Math.random() * activities.length)] } });
 const { prefix, token, botOwner } = config;
 
+const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const inlineCommandPattern = new RegExp(`^(.*)${escapedPrefix}(${escapedPrefix}[^${escapedPrefix}]+)${escapedPrefix}(.*)$`, 'sm');
 client.once('ready', () => {
     log('Bot initialized.');
     periodicUpdate();
 });
 
 client.on('message', message => {
+    // Check if author is a bot
+    if (message.author.bot) return;
 
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
-    const args = message.content.slice(prefix.length).split(/ +/);
+    // Check if we're allowed to send messages in the channel
+    if (message.guild?.me?.permissionsIn(message.channel.id).has('SEND_MESSAGES') === false) return;
+    
+    const inlineContent = message.content.match(inlineCommandPattern);
+    const inline = inlineContent?.length === 4;
+
+    if (!inline && !message.content.startsWith(prefix)) return;
+
+    const content = inline ? inlineContent[2] : message.content;
+    const args = content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
     // Display help message
@@ -46,13 +58,17 @@ client.on('message', message => {
                 if(!message.member.hasPermission('MANAGE_MESSAGES'))
                     return message.reply('You need to have the \`MANAGE_MESSAGES\` permission to set a countdown!');
 
-                let timeEnd = new Date(date);
-                if(timeEnd < Date.now())
+                const timeEnd = new Date(date);
+                const timeNow = Date.now();
+                if(timeEnd < timeNow + 10000)
                     return message.reply(`ehh .. unless you have can warp time to go backwards, there's no way you can count back to \`${timeEnd.toUTCString()}\``);
                 
-                return message.channel.send(`Counting down to \`${timeEnd.toUTCString()}\``)
-                    .then(replyMessage => addCountdown(replyMessage, timeEnd))
-                    .catch(err => log(err.message || err));
+                if(inline)
+                    return message.channel.send(`${inlineContent[1]}${timeDiffForHumans(timeEnd - timeNow)}${inlineContent[3]}`)
+                        .then(replyMessage => addCountdown(replyMessage, timeEnd, inlineContent));
+                else
+                    return message.channel.send(`Counting down to \`${timeEnd.toUTCString()}\``)
+                        .then(replyMessage => addCountdown(replyMessage, timeEnd));
             } else {
                 return message.channel.send('The date/time is valid, but this bot can only be used in servers.');
             }
@@ -81,10 +97,10 @@ let messageToEdit = new Message(client, {}, channel);
 const periodicUpdate = async () => {
     const timeNow = Date.now();
     const Messages = await getMessages(index);
-    for(const Message of Messages) {
+    for(const { serverId, MessageString } of Messages) {
         try {
-            const { serverId, MessageString } = Message;
-            const { messageId, channelId, timeEnd } = JSON.parse(MessageString);
+            const MessageObj = JSON.parse(MessageString);
+            const { messageId, channelId, timeEnd } = MessageObj;
             messageToEdit.guild.id = serverId;
             messageToEdit.channel.id = channelId;
             messageToEdit.id = messageId
@@ -92,13 +108,20 @@ const periodicUpdate = async () => {
             const timeLeft = Date.parse(timeEnd) - timeNow;
 
             if(timeLeft <= 0) {
-                await messageToEdit.edit("Countdown done.");
+                const finalText = MessageObj.hasOwnProperty('content') ? 
+                                  `${MessageObj.content[0]}no minutes${MessageObj.content[1]}` :
+                                  "Countdown done.";
+                await messageToEdit.edit(finalText);
                 removeMessage(serverId, MessageString);
                 continue;
             }
-            await messageToEdit.edit(`Time left: ${timeDiffForHumans(timeLeft)} left.`);
+            const editedText = MessageObj.hasOwnProperty('content') ?
+                               `${MessageObj.content[0]}${timeDiffForHumans(timeLeft)}${MessageObj.content[1]}` :
+                               `Time left: ${timeDiffForHumans(timeLeft)} left.`;
+            await messageToEdit.edit(editedText);
         } catch (ex) {
             log(ex);
+            removeMessage(serverId, MessageString);
         }
     }
     index = index < maxCountdowns ? index + 1 : 0;

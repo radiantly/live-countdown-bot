@@ -16,12 +16,16 @@ const helpEmbed = new MessageEmbed()
                    `${prefix}countdown <Date/Time to countdown to>\n\n` +
                    `Examples:\n` +
                    `${prefix}countdown tomorrow 9 AM PDT\n` +
-                   `${prefix}countdown May 24 3:47 PM IST` +
+                   `${prefix}countdown May 24 3:47 PM IST\n\n` +
+                   `Inline mode:\n` +
+                   `Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT! left.\n` +
+                   `There are !!countdown 11:59 PM EST! left to capture flags!\n` +
                    '```'
         },
         {
             name: 'Notes',
             value: 'A maximum of 3 countdowns can be set per server.\n' +
+                   `In inline mode, the command is between two ${prefix} characters\n` +
                    'To set a countdown, the user must have the `MANAGE_MESSAGES` permission.\n' +
                    `Report a bug or request a feature [here](https://github.com/radiantly/live-countdown-bot 'GitHub repo')`
         }
