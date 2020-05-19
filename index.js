@@ -50,8 +50,17 @@ client.on('message', message => {
     // Start a countdown
     if (command === 'countdown') {
         if (!args.length)
-            return message.channel.send(`You didn't provide any arguments, ${message.author}!`);
+            return message.reply(`You didn't provide any arguments, ${message.author}!`);
         
+        let MessageObj = {}
+        if (args[0].startsWith('tag')) {
+            const subcommand = args.shift().toLowerCase().replace(/-/g, '');
+            MessageObj.tag = subcommand === 'tageveryone' ? '@everyone' :
+                             subcommand === 'taghere' ? '@here' :
+                             subcommand === 'tagme' ? `<@${message.author.id}>` : '';
+            if(!MessageObj.tag)
+                return message.reply('Invalid tag specifier :thinking:');
+        }
         const date = chrono.parseDate(args.join(" "));
         if(date)
             if(message.guild?.available) {
@@ -63,16 +72,26 @@ client.on('message', message => {
                 if(timeEnd < timeNow + 10000)
                     return message.reply(`ehh .. unless you have can warp time to go backwards, there's no way you can count back to \`${timeEnd.toUTCString()}\``);
                 
-                if(inline)
-                    return message.channel.send(`${inlineContent[1]}${timeDiffForHumans(timeEnd - timeNow)}${inlineContent[3]}`)
-                        .then(replyMessage => addCountdown(replyMessage, timeEnd, inlineContent));
-                else
-                    return message.channel.send(`Counting down to \`${timeEnd.toUTCString()}\``)
-                        .then(replyMessage => addCountdown(replyMessage, timeEnd));
+                let reply = `Time left: ${timeDiffForHumans(timeLeft)} left.`;
+                if(inline) {
+                    MessageObj.content = [ inlineContent[1], inlineContent[3] ];
+                    reply = `${inlineContent[1]}${timeDiffForHumans(timeEnd - timeNow)}${inlineContent[3]}`
+                }
+                return message.channel.send(reply)
+                    .then(replyMessage => {
+                        if(!replyMessage?.id || !replyMessage.guild?.id || !replyMessage.channel?.id) return;
+                        MessageObj = {
+                            messageId: replyMessage.id, 
+                            channelId: replyMessage.channel.id,
+                            timeEnd: timeEnd,
+                            ...MessageObj
+                        }
+                        addCountdown(replyMessage.guild.id, MessageObj);
+                    });
             } else {
                 return message.channel.send('The date/time is valid, but this bot can only be used in servers.');
             }
-        else 
+        else
             return message.channel.send(`Invalid date/time.`)
     }
 
@@ -111,9 +130,11 @@ const periodicUpdate = async () => {
                 const timeLeft = Date.parse(timeEnd) - timeNow;
 
                 if(timeLeft <= 0) {
-                    const finalText = MessageObj.hasOwnProperty('content') ? 
+                    let finalText = MessageObj.hasOwnProperty('content') ? 
                                     `${MessageObj.content[0]}no minutes${MessageObj.content[1]}` :
                                     "Countdown done.";
+                    if(MessageObj.tag)
+                        finalText += ` ${MessageObj.tag}`
                     await messageToEdit.edit(finalText);
                     removeMessage(serverId, MessageString);
                     continue;

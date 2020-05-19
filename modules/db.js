@@ -8,17 +8,8 @@ const updateServerSet = async (server, pendingMessages) => {
     redis.zadd('Servers', pendingMessages, server);
 }
 
-export const addCountdown = async (message, timeEnd, inlineContent) => {
+export const addCountdown = async (server, MessageObj) => {
     try {
-        if(!message?.id || !message.guild?.id || !message.channel?.id) return;
-        const server = message.guild.id;
-        let MessageObj = {
-            messageId: message.id, 
-            channelId: message.channel.id, 
-            timeEnd: timeEnd 
-        }
-        if(inlineContent)
-            MessageObj.content = [ inlineContent[1], inlineContent[3] ];
         await redis.lpush(server, JSON.stringify(MessageObj));
         await updateServerSet(server);
     } catch(ex) {
