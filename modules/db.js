@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 
-const redis = new Redis();
+export const redis = new Redis();
 
 const updateServerSet = async (server, pendingMessages) => {
     if(!pendingMessages)
@@ -49,9 +49,9 @@ export const trimMessages = async index => {
 
 export const log = async text => {
     const logText = `${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Kolkata' })} ${text}`;
-    if(process.env.NODE_ENV !== 'production')
-        console.log(logText)
-    await redis.rpush('Logs', logText);
+    console.log(logText);
+    if (redis.status === 'ready')
+        await redis.rpush('Logs', logText);
 }
 
 export const getLogs = async () => {

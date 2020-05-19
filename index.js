@@ -4,14 +4,14 @@ import process from 'process';
 import config from './config.json';
 import timeDiffForHumans from './modules/timeDiffForHumans.js';
 import { generateHelpEmbed, generateStatsEmbed } from './modules/embed.js';
-import { addCountdown, getMessages, removeMessage, trimMessages, log, getLogs } from './modules/db.js';
+import { redis, addCountdown, getMessages, removeMessage, trimMessages, log, getLogs } from './modules/db.js';
 
 const activities = [
     { name: 'the clock tick', type: 'WATCHING' },
     { name: 'the time fly by', type: 'WATCHING' },
     { name: 'the clock tick', type: 'LISTENING' },
     { name: 'with time', type: 'PLAYING' }
-]
+];
 
 const client = new Client({ presence: { activity: activities[Math.floor(Math.random() * activities.length)] } });
 const { prefix, token, botOwner, maxCountdowns } = config;
@@ -92,7 +92,7 @@ client.on('message', message => {
                 return message.channel.send('The date/time is valid, but this bot can only be used in servers.');
             }
         else
-            return message.channel.send(`Invalid date/time.`)
+            return message.channel.send(`Invalid date/time.`);
     }
 
     if (message.author?.id === botOwner) {
@@ -125,7 +125,7 @@ const periodicUpdate = async () => {
                 const { messageId, channelId, timeEnd } = MessageObj;
                 messageToEdit.guild.id = serverId;
                 messageToEdit.channel.id = channelId;
-                messageToEdit.id = messageId
+                messageToEdit.id = messageId;
 
                 const timeLeft = Date.parse(timeEnd) - timeNow;
 
@@ -154,5 +154,9 @@ const periodicUpdate = async () => {
 }
 
 process.on('unhandledRejection', reason => log(reason));
-client.login(token);
 
+redis.once('ready', () => client.login(token));
+redis.on('error', err => {
+    log(err);
+    process.exit();
+});
