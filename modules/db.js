@@ -2,8 +2,9 @@ import Redis from 'ioredis';
 
 const redis = new Redis();
 
-const updateServerSet = async server => {
-    const pendingMessages = await redis.llen(server);
+const updateServerSet = async (server, pendingMessages) => {
+    if(!pendingMessages)
+        pendingMessages = await redis.llen(server);
     redis.zadd('Servers', pendingMessages, server);
 }
 
@@ -44,6 +45,14 @@ export const removeMessage = async (server, value) => {
         await updateServerSet(server);
     } catch(ex) {
         log(ex);
+    }
+}
+
+export const trimMessages = async index => {
+    const servers = await redis.zrangebyscore('Servers', index + 1, '+inf');
+    for(const server of servers) {
+        await redis.ltrim(server, 0, index - 1);
+        updateServerSet(server, index);
     }
 }
 

@@ -1,5 +1,6 @@
 {
     "prefix": "!",
     "token": "YourVeryLongDiscordBotTokenHere",
-    "botOwner": "710860868850716666"
+    "botOwner": "710860868850716666",
+    "maxCountdowns": "5"
 }

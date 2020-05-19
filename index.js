@@ -1,10 +1,10 @@
 import { Client, Guild, TextChannel, Message } from 'discord.js';
 import chrono from 'chrono-node';
-import { exit } from 'process';
+import process from 'process';
 import config from './config.json';
 import timeDiffForHumans from './modules/timeDiffForHumans.js';
 import { generateHelpEmbed, generateStatsEmbed } from './modules/embed.js';
-import { addCountdown, getMessages, removeMessage, log, getLogs } from './modules/db.js';
+import { addCountdown, getMessages, removeMessage, trimMessages, log, getLogs } from './modules/db.js';
 
 const activities = [
     { name: 'the clock tick', type: 'WATCHING' },
@@ -14,7 +14,7 @@ const activities = [
 ]
 
 const client = new Client({ presence: { activity: activities[Math.floor(Math.random() * activities.length)] } });
-const { prefix, token, botOwner } = config;
+const { prefix, token, botOwner, maxCountdowns } = config;
 
 const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const inlineCommandPattern = new RegExp(`^(.*)${escapedPrefix}(${escapedPrefix}[^${escapedPrefix}]+)${escapedPrefix}(.*)$`, 'sm');
@@ -83,11 +83,10 @@ client.on('message', message => {
                 .catch(err => log(err));
         
         if (command === 'kill')
-            exit();
+            process.exit();
     }
 });
 
-const maxCountdowns = 5;
 let index = 0
 
 let guild = new Guild(client, {});
@@ -96,36 +95,43 @@ let messageToEdit = new Message(client, {}, channel);
 
 const periodicUpdate = async () => {
     const timeNow = Date.now();
-    const Messages = await getMessages(index);
-    for(const { serverId, MessageString } of Messages) {
-        try {
-            const MessageObj = JSON.parse(MessageString);
-            const { messageId, channelId, timeEnd } = MessageObj;
-            messageToEdit.guild.id = serverId;
-            messageToEdit.channel.id = channelId;
-            messageToEdit.id = messageId
+    if(index >= maxCountdowns) {
+        await trimMessages(index);
+        index = 0;
+    } else {
+        const Messages = await getMessages(index);
+        for(const { serverId, MessageString } of Messages) {
+            try {
+                const MessageObj = JSON.parse(MessageString);
+                const { messageId, channelId, timeEnd } = MessageObj;
+                messageToEdit.guild.id = serverId;
+                messageToEdit.channel.id = channelId;
+                messageToEdit.id = messageId
 
-            const timeLeft = Date.parse(timeEnd) - timeNow;
+                const timeLeft = Date.parse(timeEnd) - timeNow;
 
-            if(timeLeft <= 0) {
-                const finalText = MessageObj.hasOwnProperty('content') ? 
-                                  `${MessageObj.content[0]}no minutes${MessageObj.content[1]}` :
-                                  "Countdown done.";
-                await messageToEdit.edit(finalText);
+                if(timeLeft <= 0) {
+                    const finalText = MessageObj.hasOwnProperty('content') ? 
+                                    `${MessageObj.content[0]}no minutes${MessageObj.content[1]}` :
+                                    "Countdown done.";
+                    await messageToEdit.edit(finalText);
+                    removeMessage(serverId, MessageString);
+                    continue;
+                }
+                const editedText = MessageObj.hasOwnProperty('content') ?
+                                `${MessageObj.content[0]}${timeDiffForHumans(timeLeft)}${MessageObj.content[1]}` :
+                                `Time left: ${timeDiffForHumans(timeLeft)} left.`;
+                await messageToEdit.edit(editedText);
+            } catch (ex) {
+                log(ex);
                 removeMessage(serverId, MessageString);
-                continue;
             }
-            const editedText = MessageObj.hasOwnProperty('content') ?
-                               `${MessageObj.content[0]}${timeDiffForHumans(timeLeft)}${MessageObj.content[1]}` :
-                               `Time left: ${timeDiffForHumans(timeLeft)} left.`;
-            await messageToEdit.edit(editedText);
-        } catch (ex) {
-            log(ex);
-            removeMessage(serverId, MessageString);
         }
+        index = Messages.length ? index + 1 : 0;
     }
-    index = index < maxCountdowns ? index + 1 : 0;
     client.setTimeout(periodicUpdate, Math.max(5000 - (Date.now() - timeNow), 0));
 }
 
+process.on('unhandledRejection', reason => log(reason));
 client.login(token);
+

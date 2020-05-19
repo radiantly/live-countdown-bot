@@ -4,7 +4,7 @@ import { MessageEmbed, version as djsVersion } from 'discord.js';
 import timeDiffForHumans from './timeDiffForHumans.js';
 import config from '../config.json';
 
-const { prefix } = config;
+const { prefix, maxCountdowns } = config;
 
 const helpEmbed = new MessageEmbed()
     .setColor('#f26522')
@@ -24,7 +24,7 @@ const helpEmbed = new MessageEmbed()
         },
         {
             name: 'Notes',
-            value: 'A maximum of 3 countdowns can be set per server.\n' +
+            value: `A maximum of ${maxCountdowns} countdowns can be set per server.\n` +
                    `In inline mode, the command is between two ${prefix} characters\n` +
                    'To set a countdown, the user must have the `MANAGE_MESSAGES` permission.\n' +
                    `Report a bug or request a feature [here](https://github.com/radiantly/live-countdown-bot 'GitHub repo')`
