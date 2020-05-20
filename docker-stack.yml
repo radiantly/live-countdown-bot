@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+
+  bot:
+    build: .
+    image: docker.pkg.github.com/radiantly/live-countdown-bot/lcb:latest
+    environment:
+      NODE_ENV: production
+      REDIS_HOST: redis
+    secrets:
+      - source: botconfig
+        target: /usr/src/app/config.json
+    depends_on:
+      - redis
+    deploy:
+      replicas: 1
+      restart_policy:
+        delay: 10s
+
+  redis:
+    image: redis
+    hostname: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - datavolume:/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        delay: 10s
+
+volumes:
+  datavolume:
+
+secrets:
+  botconfig:
+    file: ./config.json

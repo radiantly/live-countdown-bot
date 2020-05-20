@@ -155,8 +155,5 @@ const periodicUpdate = async () => {
 
 process.on('unhandledRejection', reason => log(reason));
 
+// Only bother starting client if redis starts up
 redis.once('ready', () => client.login(token));
-redis.on('error', err => {
-    log(err);
-    process.exit();
-});

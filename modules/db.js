@@ -1,6 +1,18 @@
 import Redis from 'ioredis';
+import { env } from 'process';
 
-export const redis = new Redis();
+const redis_options = {}
+
+if(env.REDIS_HOST) 
+    redis_options.host = env.REDIS_HOST
+
+export const redis = new Redis(redis_options);
+
+// Catch errors
+redis.on('error', err => log(err));
+
+// Give redis some time to start up
+setTimeout(() => redis.on('error', () => process.exit(63)), 10000);
 
 const updateServerSet = async (server, pendingMessages) => {
     if(!pendingMessages)
