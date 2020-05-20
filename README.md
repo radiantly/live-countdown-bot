@@ -1,26 +1,72 @@
-# live-countdown-bot
+# Live Countdown bot
 ![Docker Image build](https://github.com/radiantly/live-countdown-bot/workflows/Docker%20image%20build/badge.svg)
 
-A discord bot that counts down to a given time.
+A discord bot that counts down to a given time. What's the secret? It does this by continuously editing the message as each minute passes by.
 
-### Installation
+#### Features:
+  * Open-source
+  * Easy to use
+  * Author is a friendly guy
+  * Only `SEND_MESSAGES` permission required
+  * You probably can't live without it once you've used it
 
-To run, you will need Node v14.
-```sh
-git clone https://github.com/radiantly/live-countdown-bot
+### Usage
 
-# You will need a `config.json` file with your desired prefix and bot token.
-npm install
-npm start
+#### `!help`
+Shows the help message
+
+#### `!countdown`
+Syntax: `!countdown [tagme|taghere|tageveryone] <Date/time to countdown to>`
+
+Commands can also be inlined, by wrapping it between two exclamation marks.
+
+Syntax: `.. !!countdown [tagme|taghere|tageveryone] <Date/time to countdown to>! ..`
+
+Examples:
+```
+!countdown 10mins
+!countdown tagme May 24 3:47 PM PDT
+
+Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT! left.
+There is !!countdown taghere 11:59 PM EST! left to capture flags!
 ```
 
-This project is also packaged as a Docker image. You can either clone and build the image yourself, or pull the built image from GitHub packages. If you have not pulled images from the GitHub Package registry before, you will need to follow the instructions [here](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages) to configure docker.
-```sh
-docker pull docker.pkg.github.com/radiantly/live-countdown-bot/lcb:latest
+## Running locally
 
-docker run -d \
---rm \
---name lcb \
---mount type=bind,source="$(pwd)/config.json",target=/usr/src/app/config.json \
-docker.pkg.github.com/radiantly/live-countdown-bot/lcb:latest
+### 1. Using Docker
+
+If you have `docker-compose` installed:
+```sh
+# Clone the repo
+git clone https://github.com/radiantly/live-countdown-bot && cd live-countdown-bot
+
+# Copy config.json.sample and add your bot token
+cp config.json.sample config.json
+
+docker-compose up
 ```
+If running in production, you can use Docker Swarm mode.
+```sh
+# Create a config.json with your bot token
+curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/config.json.sample -o config.json
+
+# Download docker-stack.yml
+curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/config.json.sample -O
+
+# If you have not pulled images from the GitHub Package registry before, you will need to follow the instructions at https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages to allow docker to pull packages from GitHub packages
+# docker swarm init
+docker stack deploy -c docker-stack.yml app --with-registry-auth
+```
+### 2. Without using docker
+  * Step 1: Install Node v14 and Redis
+  * Step 2: ???
+  * Step 3: Clone this repo
+  * Step 4: Add `config.json` with your bot token
+  * Step 5: `npm i`
+  * Step 6: `npm start`
+
+Disclaimer: Author has not gone down this treacherous path.
+
+## Contributing
+
+Feel free to open an issue/pull request.
