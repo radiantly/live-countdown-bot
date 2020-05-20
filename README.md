@@ -4,8 +4,8 @@
 A discord bot that counts down to a given time. What's the secret? It does this by continuously editing the message as each minute passes by.
 
 #### Features:
-  * Open-source
   * Easy to use
+  * Open-source
   * Author is a friendly guy
   * Only `SEND_MESSAGES` permission required
   * You probably can't live without it once you've used it
@@ -43,17 +43,19 @@ git clone https://github.com/radiantly/live-countdown-bot && cd live-countdown-b
 # Copy config.json.sample and add your bot token
 cp config.json.sample config.json
 
-docker-compose up
+docker-compose -f docker-stack.yml up
 ```
 If running in production, you can use Docker Swarm mode.
 ```sh
 # Create a config.json with your bot token
 curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/config.json.sample -o config.json
+# vim config.json
 
 # Download docker-stack.yml
-curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/config.json.sample -O
+curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/docker-stack.yml -O
 
-# If you have not pulled images from the GitHub Package registry before, you will need to follow the instructions at https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages to allow docker to pull packages from GitHub packages
+# If you have not pulled images from the GitHub Package registry before:
+# cat ~/github_packages.token | docker login https://docker.pkg.github.com -u radiantly --password-stdin
 # docker swarm init
 docker stack deploy -c docker-stack.yml app --with-registry-auth
 ```
