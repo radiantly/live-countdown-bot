@@ -68,14 +68,14 @@ client.on('message', message => {
                     return message.reply('You need to have the \`MANAGE_MESSAGES\` permission to set a countdown!');
 
                 const timeEnd = new Date(date);
-                const timeNow = Date.now();
-                if(timeEnd < timeNow + 10000)
+                const timeLeft = timeEnd - Date.now();
+                if(timeLeft < 10000)
                     return message.reply(`ehh .. unless you have can warp time to go backwards, there's no way you can count back to \`${timeEnd.toUTCString()}\``);
                 
                 let reply = `Time left: ${timeDiffForHumans(timeLeft)} left.`;
                 if(inline) {
                     MessageObj.content = [ inlineContent[1], inlineContent[3] ];
-                    reply = `${inlineContent[1]}${timeDiffForHumans(timeEnd - timeNow)}${inlineContent[3]}`
+                    reply = `${inlineContent[1]}${timeDiffForHumans(timeLeft)}${inlineContent[3]}`
                 }
                 return message.channel.send(reply)
                     .then(replyMessage => {
