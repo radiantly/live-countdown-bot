@@ -61,7 +61,12 @@ client.on('message', message => {
             if(!MessageObj.tag)
                 return message.reply('Invalid tag specifier :thinking:');
         }
-        const date = chrono.parseDate(args.join(" "));
+        const argstring = args.join(" ");
+
+        if(argstring === '\u221E' || argstring === '\u267E\uFE0F')
+            return message.channel.send("Time left: 42.");
+
+        const date = chrono.parseDate(argstring);
         if(date)
             if(message.guild?.available) {
                 if(!message.member.hasPermission('MANAGE_MESSAGES'))
