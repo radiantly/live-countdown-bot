@@ -3,6 +3,7 @@ import chrono from 'chrono-node';
 import process from 'process';
 import config from './config.json';
 import timeDiffForHumans from './modules/timeDiffForHumans.js';
+import { react } from './modules/reactionHelper.js';
 import { generateHelpEmbed, generateStatsEmbed } from './modules/embed.js';
 import { redis, addCountdown, getMessages, removeMessage, trimMessages, log, getLogs } from './modules/db.js';
 
@@ -44,13 +45,13 @@ client.on('message', message => {
         return message.channel.send(generateHelpEmbed(command));
 
     // Show process stats
-    if (command === 'stats')
+    if (command === 'botstats')
         return message.channel.send(generateStatsEmbed(client));
 
     // Start a countdown
     if (command === 'countdown') {
         if (!args.length)
-            return message.reply(`You didn't provide any arguments, ${message.author}!`);
+            return react(message);
         
         let MessageObj = {}
         if (args[0].startsWith('tag')) {
@@ -59,23 +60,23 @@ client.on('message', message => {
                              subcommand === 'taghere' ? '@here' :
                              subcommand === 'tagme' ? `<@${message.author.id}>` : '';
             if(!MessageObj.tag)
-                return message.reply('Invalid tag specifier :thinking:');
+                return react(message);
         }
         const argstring = args.join(" ");
 
         if(argstring === '\u221E' || argstring === '\u267E\uFE0F')
-            return message.channel.send("Time left: 42.");
+            return react(message, 42);
 
         const date = chrono.parseDate(argstring);
         if(date)
             if(message.guild?.available) {
                 if(!message.member.hasPermission('MANAGE_MESSAGES'))
-                    return message.reply('You need to have the \`MANAGE_MESSAGES\` permission to set a countdown!');
+                    return react(message, 'lock');
 
                 const timeEnd = new Date(date);
                 const timeLeft = timeEnd - Date.now();
                 if(timeLeft < 10000)
-                    return message.reply(`ehh .. unless you have can warp time to go backwards, there's no way you can count back to \`${timeEnd.toUTCString()}\``);
+                    return react(message, 'invalidTimeRev');
                 
                 let reply = `Time left: ${timeDiffForHumans(timeLeft)} left.`;
                 if(inline) {
@@ -97,7 +98,7 @@ client.on('message', message => {
                 return message.channel.send('The date/time is valid, but this bot can only be used in servers.');
             }
         else
-            return message.channel.send(`Invalid date/time.`);
+            return react(message, 'invalidTime');
     }
 
     if (message.author?.id === botOwner) {
