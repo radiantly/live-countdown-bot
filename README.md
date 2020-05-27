@@ -13,7 +13,10 @@ A discord bot that counts down to a given time. What's the secret? It does this 
 ### Usage
 
 #### `!help`
-Shows the help message
+Shows the help message.
+
+#### `!botstats`
+Shows some bot statistics including uptime and software versions.
 
 #### `!countdown`
 Syntax: `!countdown [tagme|taghere|tageveryone] <Date/time to countdown to>`
