@@ -5,7 +5,7 @@ import config from './config.json';
 import timeDiffForHumans from './modules/timeDiffForHumans.js';
 import { react } from './modules/reactionHelper.js';
 import { generateHelpEmbed, generateStatsEmbed } from './modules/embed.js';
-import { redis, addCountdown, getMessages, removeMessage, trimMessages, log, getLogs } from './modules/db.js';
+import { redis, getCountdownLen, addCountdown, getMessages, removeMessage, trimMessages, log, getLogs } from './modules/db.js';
 
 const activities = [
     { name: 'the clock tick', type: 'WATCHING' },
@@ -24,7 +24,7 @@ client.once('ready', () => {
     periodicUpdate();
 });
 
-client.on('message', message => {
+client.on('message', async message => {
     // Check if author is a bot
     if (message.author.bot) return;
 
@@ -70,8 +70,13 @@ client.on('message', message => {
         const date = chrono.parseDate(argstring);
         if(date)
             if(message.guild?.available) {
-                if(!message.member.hasPermission('MANAGE_MESSAGES'))
-                    return react(message, 'lock');
+                let priority = true;
+                if(!message.member.hasPermission('MANAGE_MESSAGES')) {
+                    const countdowns = await getCountdownLen(message.guild.id);
+                    if(countdowns >= maxCountdowns) 
+                        return react(message, 'lock');
+                    priority = false;
+                }
 
                 const timeEnd = new Date(date);
                 const timeLeft = timeEnd - Date.now();
@@ -92,7 +97,7 @@ client.on('message', message => {
                             timeEnd: timeEnd,
                             ...MessageObj
                         }
-                        addCountdown(replyMessage.guild.id, MessageObj);
+                        addCountdown(replyMessage.guild.id, MessageObj, priority);
                     });
             } else {
                 return message.channel.send('The date/time is valid, but this bot can only be used in servers.');

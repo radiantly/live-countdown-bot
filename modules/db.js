@@ -14,15 +14,19 @@ redis.on('error', err => log(err));
 // Give redis some time to start up
 setTimeout(() => redis.on('error', () => process.exit(63)), 10000);
 
+export const getCountdownLen = async server => await redis.llen(server);
 const updateServerSet = async (server, pendingMessages) => {
     if(!pendingMessages)
         pendingMessages = await redis.llen(server);
     redis.zadd('Servers', pendingMessages, server);
 }
 
-export const addCountdown = async (server, MessageObj) => {
+export const addCountdown = async (server, MessageObj, priority) => {
     try {
-        await redis.lpush(server, JSON.stringify(MessageObj));
+        if(priority)
+            await redis.lpush(server, JSON.stringify(MessageObj));
+        else
+            await redis.rpush(server, JSON.stringify(MessageObj));
         await updateServerSet(server);
     } catch(ex) {
         log(ex);

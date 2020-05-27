@@ -4,7 +4,8 @@ const reactionObj = {
     cross: ['❌'],
     lock: ['🔒'],
     invalidTime: ['🕐', '❌'],
-    invalidTimeRev: ['🕜', '❌']
+    invalidTimeRev: ['🕜', '❌'],
+    notAllowed: ['🚫']
 }
 
 export const react = async (message, reaction='cross') => {
