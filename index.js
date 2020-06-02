@@ -1,4 +1,4 @@
-import { Client, Guild, TextChannel, Message } from 'discord.js';
+import { Client, Guild, TextChannel, DMChannel, Message } from 'discord.js';
 import chrono from 'chrono-node';
 import process from 'process';
 import config from './config.json';
@@ -34,7 +34,10 @@ client.on('message', async message => {
     const inlineContent = message.content.match(inlineCommandPattern);
     const inline = inlineContent?.length === 4;
 
-    if (!inline && !message.content.startsWith(prefix)) return;
+    // Check if inline command or starts with prefix
+    if (!inline && !message.content.startsWith(prefix))
+        // If DM, guide them to !help
+        return message.channel instanceof DMChannel && message.channel.send('Try `!help`\nInvite from https://top.gg/bot/710486805836988507');
 
     const content = inline ? inlineContent[2] : message.content;
     const args = content.slice(prefix.length).split(/ +/);

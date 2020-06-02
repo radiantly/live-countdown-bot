@@ -22,3 +22,19 @@ jobs:
           repository: radiantly/live-countdown-bot/lcb
           tags: latest
           tag_with_ref: true
+  deploy_to_server:
+    name: Deploy to Docker Swarm
+    runs-on: ubuntu-latest
+    needs: push_to_registry
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Deploy
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+          docker stack deploy -c docker-stack.yml app --with-registry-auth
+        env:
+          DOCKER_HOST: "ssh://${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
