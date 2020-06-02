@@ -1,4 +1,4 @@
-name: Docker image build
+name: Docker build
 on:
   push:
     branches: [ master ]
@@ -35,6 +35,9 @@ jobs:
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
           eval "$(ssh-agent -s)"
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-          docker stack deploy -c docker-stack.yml app --with-registry-auth
+          docker service rm app_bot || true
+          docker secret rm botconfig || true
+          printf '${{ secrets.BOT_CONFIG }}' | docker secret create botconfig -
+          docker stack deploy -c docker-stack.yml --with-registry-auth --prune app
         env:
           DOCKER_HOST: "ssh://${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"

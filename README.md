@@ -1,5 +1,5 @@
 # Live Countdown bot
-![Docker Image build](https://github.com/radiantly/live-countdown-bot/workflows/Docker%20image%20build/badge.svg)
+![Docker build](https://github.com/radiantly/live-countdown-bot/workflows/Docker%20build/badge.svg)
 [![Bot status](https://top.gg/api/widget/status/710486805836988507.svg)](https://top.gg/bot/710486805836988507)
 
 A discord bot that counts down to a given time. What's the secret? It does this by continuously editing the message as each minute passes by.
@@ -47,13 +47,12 @@ git clone https://github.com/radiantly/live-countdown-bot && cd live-countdown-b
 # Copy config.json.sample and add your bot token
 cp config.json.sample config.json
 
-docker-compose -f docker-stack.yml up
+docker-compose up --build
 ```
 If running in production, you can use Docker Swarm mode.
 ```sh
 # Create a config.json with your bot token
-curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/config.json.sample -o config.json
-# vim config.json
+cat config.json | docker secret create botconfig -
 
 # Download docker-stack.yml
 curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/docker-stack.yml -O
@@ -61,7 +60,7 @@ curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/docke
 # If you have not pulled images from the GitHub Package registry before:
 # cat ~/github_packages.token | docker login https://docker.pkg.github.com -u radiantly --password-stdin
 # docker swarm init
-docker stack deploy -c docker-stack.yml app --with-registry-auth
+docker stack deploy -c docker-stack.yml --with-registry-auth app
 ```
 ### 2. Without using docker
   * Step 1: Install Node v14 and Redis
