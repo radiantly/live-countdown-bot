@@ -1,5 +1,6 @@
 # Live Countdown bot
 ![Docker Image build](https://github.com/radiantly/live-countdown-bot/workflows/Docker%20image%20build/badge.svg)
+[![Bot status](https://top.gg/api/widget/status/710486805836988507.svg)](https://top.gg/bot/710486805836988507)
 
 A discord bot that counts down to a given time. What's the secret? It does this by continuously editing the message as each minute passes by.
 
@@ -7,7 +8,7 @@ A discord bot that counts down to a given time. What's the secret? It does this 
   * Easy to use
   * Open-source
   * Author is a friendly guy
-  * Only `SEND_MESSAGES` permission required
+  * Countdown to events on your Discord server
   * You probably can't live without it once you've used it
 
 ### Usage
