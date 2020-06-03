@@ -1,4 +1,4 @@
-import { Client, Guild, TextChannel, DMChannel, Message } from 'discord.js';
+import { Client, Intents, Guild, TextChannel, DMChannel, Message, DiscordAPIError } from 'discord.js';
 import chrono from 'chrono-node';
 import process from 'process';
 import config from './config.json';
@@ -13,8 +13,15 @@ const activities = [
     { name: 'the clock tick', type: 'LISTENING' },
     { name: 'with time', type: 'PLAYING' }
 ];
+const activity = activities[Math.floor(Math.random() * activities.length)];
 
-const client = new Client({ presence: { activity: activities[Math.floor(Math.random() * activities.length)] } });
+const requiredIntents = new Intents(['DIRECT_MESSAGES', 'GUILDS', 'GUILD_MESSAGES']);
+
+const client = new Client({ 
+    ws: { intents: requiredIntents },
+    presence: { activity: activity } 
+});
+
 const { prefix, token, botOwner, maxCountdowns } = config;
 
 const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -122,10 +129,6 @@ client.on('message', async message => {
 
 let index = 0
 
-let guild = new Guild(client, {});
-let channel = new TextChannel(guild, {});
-let messageToEdit = new Message(client, {}, channel);
-
 const periodicUpdate = async () => {
     const timeNow = Date.now();
     if(index >= maxCountdowns) {
@@ -137,9 +140,9 @@ const periodicUpdate = async () => {
             try {
                 const MessageObj = JSON.parse(MessageString);
                 const { messageId, channelId, timeEnd } = MessageObj;
-                messageToEdit.guild.id = serverId;
-                messageToEdit.channel.id = channelId;
-                messageToEdit.id = messageId;
+                const guild = new Guild(client, { id: serverId });
+                const channel = new TextChannel(guild, { id: channelId });
+                const messageToEdit = new Message(client, { id: messageId }, channel);
 
                 const timeLeft = Date.parse(timeEnd) - timeNow;
 
@@ -157,9 +160,10 @@ const periodicUpdate = async () => {
                                 `${MessageObj.content[0]}${timeDiffForHumans(timeLeft)}${MessageObj.content[1]}` :
                                 `Time left: ${timeDiffForHumans(timeLeft)} left.`;
                 await messageToEdit.edit(editedText);
-            } catch (ex) {
-                log(ex);
-                removeMessage(serverId, MessageString);
+            } catch (error) {
+                log(error);
+                if(error instanceof DiscordAPIError)
+                    removeMessage(serverId, MessageString);
             }
         }
         index = Messages.length ? index + 1 : 0;
