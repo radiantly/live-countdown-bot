@@ -1,10 +1,10 @@
 name: Docker build
 on:
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
-      - '**'
-      - '!**.md'
+      - "**"
+      - "!**.md"
 
 jobs:
   push_to_registry:

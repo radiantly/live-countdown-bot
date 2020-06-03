@@ -1,6 +1,6 @@
 {
-    "prefix": "!",
-    "token": "YourVeryLongDiscordBotTokenHere",
-    "botOwner": "710860868850716666",
-    "maxCountdowns": "5"
+  "prefix": "!",
+  "token": "YourVeryLongDiscordBotTokenHere",
+  "botOwner": "710860868850716666",
+  "maxCountdowns": "5"
 }

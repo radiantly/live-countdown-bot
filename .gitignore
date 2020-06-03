@@ -1,6 +1,9 @@
 # Config file
 config.json
 
+# VSCode settings
+.vscode
+
 # Logs
 logs
 *.log

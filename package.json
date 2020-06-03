@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node --experimental-json-modules index.js",
+    "check-formatting": "prettier --check \"**/*.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -13,7 +14,7 @@
     "url": "git+https://github.com/radiantly/live-countdown-bot.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "radiantly",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/radiantly/live-countdown-bot/issues"
@@ -23,5 +24,15 @@
     "chrono-node": "^1.4.6",
     "discord.js": "^12.2.0",
     "ioredis": "^4.17.1"
+  },
+  "devDependencies": {
+    "husky": "^4.2.5",
+    "prettier": "2.0.5",
+    "pretty-quick": "^2.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }
