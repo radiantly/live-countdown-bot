@@ -17,4 +17,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
       - name: Check code formatting
-        run: npm run check-formatting
+        run: |
+          npm ci
+          npm run check-formatting
