@@ -1,6 +1,8 @@
 # Live Countdown bot
 
-![Docker build](https://github.com/radiantly/live-countdown-bot/workflows/Docker%20build/badge.svg)
+[![Docker build](https://github.com/radiantly/live-countdown-bot/workflows/Docker%20build/badge.svg)](https://github.com/radiantly/live-countdown-bot/actions?query=workflow%3A%22Docker+build%22)
+[![Code quality](https://img.shields.io/badge/Quality-Ninja-critical)](https://javascript.info/ninja-code)
+![Code style](https://img.shields.io/badge/Style-Prettier-ff69b4)
 [![Bot status](https://top.gg/api/widget/status/710486805836988507.svg)](https://top.gg/bot/710486805836988507)
 
 A discord bot that counts down to a given time. What's the secret? It does this by continuously editing the message as each minute passes by.
