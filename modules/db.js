@@ -64,5 +64,5 @@ export const log = async text => {
 };
 
 export const getLogs = async () => {
-  return await redis.lrange("Logs", "-10", "-1");
+  return await redis.lrange("Logs", "-20", "-1");
 };

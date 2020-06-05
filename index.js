@@ -12,7 +12,12 @@ import process from "process";
 import config from "./config.json";
 import timeDiffForHumans from "./modules/timeDiffForHumans.js";
 import { react } from "./modules/reactionHelper.js";
-import { generateHelpEmbed, generateStatsEmbed } from "./modules/embed.js";
+import {
+  generateHelpEmbed,
+  generateHelpFallback,
+  generateStatsEmbed,
+  generateJoinEmbed,
+} from "./modules/embed.js";
 import {
   redis,
   getCountdownLen,
@@ -35,6 +40,7 @@ const activity = activities[Math.floor(Math.random() * activities.length)];
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
 const client = new Client({
+  messageCacheMaxSize: 20,
   ws: { intents: requiredIntents },
   presence: { activity: activity },
 });
@@ -75,7 +81,9 @@ client.on("message", async message => {
 
   // Display help message
   if (["help", "commands", "usage"].includes(command))
-    return message.channel.send(generateHelpEmbed(command));
+    return message.guild?.me?.permissionsIn(message.channel.id).has("EMBED_LINKS") === false
+      ? message.channel.send(generateHelpFallback())
+      : message.channel.send(generateHelpEmbed(command));
 
   // Show process stats
   if (command === "botstats") return message.channel.send(generateStatsEmbed(client));
@@ -142,6 +150,15 @@ client.on("message", async message => {
 
     if (command === "kill") process.exit();
   }
+});
+
+client.on("guildCreate", guild => {
+  if (guild.systemChannel) guild.systemChannel.send(generateJoinEmbed());
+  log(`Bot has been added to ${guild.name}`);
+});
+
+client.on("guildDelete", guild => {
+  log(`Bot has been removed from ${guild.name}`);
 });
 
 let index = 0;

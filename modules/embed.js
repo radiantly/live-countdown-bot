@@ -28,8 +28,8 @@ const helpEmbed = new MessageEmbed()
         "```\n" +
         `${prefix}countdown 10mins\n` +
         `${prefix}countdown tagme May 24 3:47 PM PDT\n\n` +
-        `Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT! left.\n` +
-        `There is !!countdown taghere 11:59 PM EST! left to capture flags!\n` +
+        `Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} left.\n` +
+        `There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to capture flags!\n` +
         "```",
     },
     {
@@ -42,6 +42,32 @@ const helpEmbed = new MessageEmbed()
   )
   .setTimestamp()
   .setFooter("Live Countdown Bot");
+
+export const generateHelpFallback = () =>
+  `So, how do you use the Live Countdown Bot?
+
+A basic command looks like \`${prefix}countdown 10mins\`
+And voila! A message pops up counting down!
+
+You could also tag yourself (or annoy everyone in the server):
+\`${prefix}countdown tagme Jun 5 17:30 EST\`
+
+Here's the syntax:
+\`${prefix}countdown [tagme|taghere|tageveryone] <Date/Time to countdown to>\`
+
+You can inline commands too, by wrapping it between two ${prefix}
+\`I will be king in ${prefix}${prefix}countdown tageveryone Aug 29 13:37 GMT${prefix}. Prepare a banquet by then!\`
+
+A few more examples:
+\`\`\`
+${prefix}countdown Dec 25, 12:00 CST
+${prefix}countdown tagme May 24 3:47 PM PDT
+Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} left.
+There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to capture flags!
+\`\`\`
+Links:
+Bot page - https://top.gg/bot/710486805836988507
+GitHub - https://github.com/radiantly/live-countdown-bot`;
 
 const statsEmbed = new MessageEmbed()
   .setColor("#f26522")
@@ -73,7 +99,7 @@ export const generateStatsEmbed = client => {
       inline: true,
     },
     {
-      name: ":red_circle: Ping",
+      name: ":red_circle: Latency",
       value: `**${client.ws.ping}ms**`,
       inline: true,
     },
@@ -90,3 +116,12 @@ export const generateStatsEmbed = client => {
   ];
   return statsEmbed;
 };
+
+const joinEmbed = new MessageEmbed()
+  .setTitle(`Glad to be a part of your server :heart:`)
+  .setDescription(
+    "You're probably looking for `!help`\n" +
+      "\nLinks: [Bot page](https://top.gg/bot/710486805836988507 'Visit the bot page at top.gg'), [GitHub](https://github.com/radiantly/live-countdown-bot 'Visit the GitHub repository')."
+  );
+
+export const generateJoinEmbed = () => joinEmbed;
