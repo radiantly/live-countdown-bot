@@ -1,0 +1,25 @@
+name: Tests
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**.js"
+  pull_request:
+    branches: [master]
+    paths:
+      - "**.js"
+
+jobs:
+  check-formatting:
+    name: Check code formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: "14"
+      - run: npm ci
+      - name: Check formatting
+        run: npm run check-formatting
+      - name: Run Tests
+        run: npm test
