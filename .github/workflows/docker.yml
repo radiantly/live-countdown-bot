@@ -19,6 +19,7 @@ jobs:
           username: radiantly
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: radiantly/lcb
+          build_args: COMMIT_SHA=${{ github.sha }},REF=${{ github.ref }}
           tags: latest
           tag_with_ref: true
       - name: Push to GitHub Packages
@@ -28,6 +29,7 @@ jobs:
           password: ${{ github.token }}
           registry: docker.pkg.github.com
           repository: radiantly/live-countdown-bot/lcb
+          build_args: COMMIT_SHA=${{ github.sha }},REF=${{ github.ref }}
           tags: latest
           tag_with_ref: true
   deploy_to_server:

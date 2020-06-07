@@ -4,6 +4,9 @@ config.json
 # VSCode settings
 .vscode
 
+# Production certs and config
+prod
+
 # Logs
 logs
 *.log

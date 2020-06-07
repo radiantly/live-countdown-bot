@@ -1,9 +1,14 @@
-FROM node:14.3.0-buster-slim
+FROM node:14.4.0-buster-slim
 
 WORKDIR /usr/src/app
 
+ARG COMMIT_SHA=""
+ARG REF="master"
+
 ENV NODE_ENV production
 ENV REDIS_HOST localhost
+ENV COMMIT_SHA ${COMMIT_SHA}
+ENV REF ${REF}
 
 COPY package*.json ./
 

@@ -1,5 +1,5 @@
 import { loadavg, cpus } from "os";
-import { memoryUsage, version as nodeVersion } from "process";
+import { env, memoryUsage, version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
 import timeDiffForHumans from "./timeDiffForHumans.js";
 import config from "../config.json";
@@ -73,7 +73,11 @@ const statsEmbed = new MessageEmbed()
   .setColor("#f26522")
   .setTitle("Stats")
   .setTimestamp()
-  .setFooter("Live Countdown Bot");
+  .setFooter(
+    env.REF && env.COMMIT_SHA
+      ? `Build: ${env.REF}@${env.COMMIT_SHA.substring(0, 7)}`
+      : "Live Countdown Bot"
+  );
 
 export const generateHelpEmbed = command => helpEmbed.setTitle(`${prefix}${command}`);
 
