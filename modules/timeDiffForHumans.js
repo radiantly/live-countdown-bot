@@ -13,7 +13,7 @@ const shortStrings = {
   and: "&",
 };
 
-const timeDiffForHumans = (ms, short = false) => {
+export const timeDiffForHumans = (ms, short = false) => {
   let strings = short ? shortStrings : longStrings;
 
   if (ms < 60000) return strings.lessThanAMinute;
@@ -34,5 +34,3 @@ const timeDiffForHumans = (ms, short = false) => {
 
   return finalWords.join(" ");
 };
-
-export default timeDiffForHumans;

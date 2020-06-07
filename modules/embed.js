@@ -1,7 +1,7 @@
 import { loadavg, cpus } from "os";
 import { env, memoryUsage, version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
-import timeDiffForHumans from "./timeDiffForHumans.js";
+import { timeDiffForHumans } from "./timeDiffForHumans.js";
 import config from "../config.json";
 
 const { prefix, maxCountdowns } = config;
@@ -27,7 +27,7 @@ const helpEmbed = new MessageEmbed()
       value:
         "```\n" +
         `${prefix}countdown 10mins\n` +
-        `${prefix}countdown tagme May 24 3:47 PM PDT\n\n` +
+        `${prefix}countdown tagme May 24 2021 3:47 PM PDT\n\n` +
         `Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} left.\n` +
         `There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to capture flags!\n` +
         "```",
@@ -50,7 +50,7 @@ A basic command looks like \`${prefix}countdown 10mins\`
 And voila! A message pops up counting down!
 
 You could also tag yourself (or annoy everyone in the server):
-\`${prefix}countdown tagme Jun 5 17:30 EST\`
+\`${prefix}countdown tagme Jun 5 2021 17:30 EST\`
 
 Here's the syntax:
 \`${prefix}countdown [tagme|taghere|tageveryone] <Date/Time to countdown to>\`
@@ -61,7 +61,7 @@ You can inline commands too, by wrapping it between two ${prefix}
 A few more examples:
 \`\`\`
 ${prefix}countdown Dec 25, 12:00 CST
-${prefix}countdown tagme May 24 3:47 PM PDT
+${prefix}countdown tagme May 24 2021 3:47 PM PDT
 Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} left.
 There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to capture flags!
 \`\`\`
@@ -75,7 +75,7 @@ const statsEmbed = new MessageEmbed()
   .setTimestamp()
   .setFooter(
     env.REF && env.COMMIT_SHA
-      ? `Build: ${env.REF}@${env.COMMIT_SHA.substring(0, 7)}`
+      ? `Build: ${env.REF.replace(/^.*\//, "")}@${env.COMMIT_SHA.substring(0, 7)}`
       : "Live Countdown Bot"
   );
 

@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { env } from "process";
+import { env, exit } from "process";
 
 const redis_options = {};
 
@@ -11,7 +11,7 @@ export const redis = new Redis(redis_options);
 redis.on("error", err => log(err));
 
 // Give redis some time to start up
-setTimeout(() => redis.on("error", () => process.exit(63)), 10000);
+setTimeout(() => redis.on("error", () => exit(63)), 10000);
 
 export const getCountdownLen = async server => await redis.llen(server);
 const updateServerSet = async (server, pendingMessages) => {
