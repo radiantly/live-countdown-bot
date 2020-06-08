@@ -10,8 +10,8 @@ on:
       - "**.js"
 
 jobs:
-  check-formatting:
-    name: Check code formatting
+  run-tests:
+    name: Check code formatting and run tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

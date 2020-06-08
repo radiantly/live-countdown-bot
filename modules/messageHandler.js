@@ -3,7 +3,12 @@ import chrono from "chrono-node";
 import { exit } from "process";
 import { timeDiffForHumans } from "./timeDiffForHumans.js";
 import { react } from "./reactionHelper.js";
-import { generateHelpEmbed, generateHelpFallback, generateStatsEmbed } from "./embed.js";
+import {
+  generateHelpEmbed,
+  generateHelpFallback,
+  generateStatsEmbed,
+  sendStatsFallback,
+} from "./embed.js";
 import { getCountdownLen, addCountdown, log, getLogs } from "./db.js";
 import config from "../config.json";
 
@@ -44,7 +49,10 @@ export const messageHandler = async message => {
       : message.channel.send(generateHelpEmbed(command));
 
   // Show process stats
-  if (command === "botstats") return message.channel.send(generateStatsEmbed(message.client));
+  if (command === "botstats")
+    return message.guild?.me?.permissionsIn(message.channel.id).has("EMBED_LINKS") === false
+      ? sendStatsFallback(message)
+      : message.channel.send(generateStatsEmbed(message.client));
 
   // Start a countdown
   if (command === "countdown") {

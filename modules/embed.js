@@ -37,10 +37,11 @@ const helpEmbed = new MessageEmbed()
       value:
         `A maximum of ${maxCountdowns} countdowns can be set per server.\n` +
         "To set a countdown, the user must have the `MANAGE_MESSAGES` permission.\n" +
-        `Report a bug or request a feature [here](https://github.com/radiantly/live-countdown-bot 'GitHub repo')`,
+        "Report a bug or request a feature at the support server " +
+        "[here](https://discord.com/invite/dxafzkG 'Join the support server!'). " +
+        "Invite from [here](https://top.gg/bot/710486805836988507).",
     }
   )
-  .setTimestamp()
   .setFooter("Live Countdown Bot");
 
 export const generateHelpFallback = () =>
@@ -67,19 +68,28 @@ There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to captu
 \`\`\`
 Links:
 Bot page - https://top.gg/bot/710486805836988507
-GitHub - https://github.com/radiantly/live-countdown-bot`;
+Join the support server over at https://discord.com/invite/dxafzkG`;
 
 const statsEmbed = new MessageEmbed()
   .setColor("#f26522")
   .setTitle("Stats")
-  .setTimestamp()
   .setFooter(
     env.REF && env.COMMIT_SHA
       ? `Build: ${env.REF.replace(/^.*\//, "")}@${env.COMMIT_SHA.substring(0, 7)}`
       : "Live Countdown Bot"
   );
 
-export const generateHelpEmbed = command => helpEmbed.setTitle(`${prefix}${command}`);
+export const generateHelpEmbed = command =>
+  helpEmbed.setTitle(`${prefix}${command}`).setTimestamp();
+
+export const sendStatsFallback = async message => {
+  const pingMessage = await message.channel.send("Hey?");
+  pingMessage.edit(
+    `All good! Latency is ${
+      pingMessage.createdTimestamp - message.createdTimestamp
+    }ms. API Latency is ${message.client.ws.ping}ms.`
+  );
+};
 
 export const generateStatsEmbed = client => {
   let { rss } = memoryUsage();
@@ -118,14 +128,5 @@ export const generateStatsEmbed = client => {
       inline: true,
     },
   ];
-  return statsEmbed;
+  return statsEmbed.setTimestamp();
 };
-
-const joinEmbed = new MessageEmbed()
-  .setTitle(`Glad to be a part of your server :heart:`)
-  .setDescription(
-    "You're probably looking for `!help`\n" +
-      "\nLinks: [Bot page](https://top.gg/bot/710486805836988507 'Visit the bot page at top.gg'), [GitHub](https://github.com/radiantly/live-countdown-bot 'Visit the GitHub repository')."
-  );
-
-export const generateJoinEmbed = () => joinEmbed;

@@ -2,7 +2,6 @@ import { Client, Intents, Guild, TextChannel, Message, DiscordAPIError } from "d
 import process from "process";
 import config from "./config.json";
 import { timeDiffForHumans } from "./modules/timeDiffForHumans.js";
-import { generateJoinEmbed } from "./modules/embed.js";
 import { redis, getMessages, removeMessage, trimMessages, log } from "./modules/db.js";
 import { messageHandler } from "./modules/messageHandler.js";
 
@@ -32,7 +31,10 @@ client.once("ready", () => {
 client.on("message", messageHandler);
 
 client.on("guildCreate", guild => {
-  if (guild.systemChannel) guild.systemChannel.send(generateJoinEmbed());
+  if (guild.systemChannel)
+    guild.systemChannel.send(
+      "**Glad to be a part of your server** :heart:\nYou're probably looking for `!help`"
+    );
   log(`Bot has been added to ${guild.name}`);
 });
 
