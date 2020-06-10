@@ -29,16 +29,14 @@ export const addCountdown = async (server, MessageObj, priority) => {
   }
 };
 
-export const getMessages = async index => {
+export async function* getMessages(index) {
   const servers = await redis.zrangebyscore("Servers", index + 1, "+inf");
-  const messages = [];
   for (const server of servers) {
     const MessageString = await redis.lindex(server, index);
-    if (MessageString) messages.push({ serverId: server, MessageString: MessageString });
+    if (MessageString) yield { serverId: server, MessageString: MessageString };
     else await updateServerSet(server);
   }
-  return messages;
-};
+}
 
 export const removeMessage = async (server, value) => {
   try {

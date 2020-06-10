@@ -50,8 +50,7 @@ const periodicUpdate = async () => {
     await trimMessages(index);
     index = 0;
   } else {
-    const Messages = await getMessages(index);
-    for (const { serverId, MessageString } of Messages) {
+    for await (const { serverId, MessageString } of getMessages(index)) {
       try {
         const MessageObj = JSON.parse(MessageString);
         const { messageId, channelId, timeEnd } = MessageObj;
@@ -79,7 +78,7 @@ const periodicUpdate = async () => {
         if (error instanceof DiscordAPIError) removeMessage(serverId, MessageString);
       }
     }
-    index = Messages.length ? index + 1 : 0;
+    index += 1;
   }
   client.setTimeout(periodicUpdate, Math.max(5000 - (Date.now() - timeNow), 0));
 };
