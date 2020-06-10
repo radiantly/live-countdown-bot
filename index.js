@@ -31,7 +31,7 @@ client.once("ready", () => {
 client.on("message", messageHandler);
 
 client.on("guildCreate", guild => {
-  if (guild.systemChannel)
+  if (guild.systemChannel && guild.me?.permissionsIn(guild.systemChannel.id).has("SEND_MESSAGES"))
     guild.systemChannel.send(
       "**Glad to be a part of your server** :heart:\nYou're probably looking for `!help`"
     );
