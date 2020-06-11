@@ -6,7 +6,8 @@ import { redis, getMessages, removeMessage, trimMessages, log } from "./modules/
 import { messageHandler } from "./modules/messageHandler.js";
 
 const activities = [
-  { name: "the clock tick", type: "WATCHING" },
+  { name: "https://bit.ly/live-bot", type: "WATCHING" },
+  { name: "for !help", type: "WATCHING" },
   { name: "the time fly by", type: "WATCHING" },
   { name: "the clock tick", type: "LISTENING" },
   { name: "with time", type: "PLAYING" },
