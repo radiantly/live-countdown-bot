@@ -52,7 +52,7 @@ export const messageHandler = async message => {
   if (command === "botstats")
     return message.guild?.me?.permissionsIn(message.channel.id).has("EMBED_LINKS") === false
       ? sendStatsFallback(message)
-      : message.channel.send(generateStatsEmbed(message.client));
+      : message.channel.send(await generateStatsEmbed(message.client));
 
   // Start a countdown
   if (command === "countdown") {

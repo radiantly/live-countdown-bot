@@ -2,6 +2,7 @@ import { loadavg, cpus } from "os";
 import { env, memoryUsage, version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
 import { timeDiffForHumans } from "./timeDiffForHumans.js";
+import { getRedisMemUsage } from "./db.js";
 import config from "../config.json";
 
 const { prefix, maxCountdowns } = config;
@@ -91,7 +92,7 @@ export const sendStatsFallback = async message => {
   );
 };
 
-export const generateStatsEmbed = client => {
+export const generateStatsEmbed = async client => {
   let { rss } = memoryUsage();
   let memUsage = Math.round((rss / 1024 / 1024) * 100) / 100;
   let osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
@@ -104,7 +105,7 @@ export const generateStatsEmbed = client => {
     },
     {
       name: ":level_slider: Memory",
-      value: `**${memUsage}MB**`,
+      value: `**${await getRedisMemUsage()}** + **${memUsage}M**`,
       inline: true,
     },
     {

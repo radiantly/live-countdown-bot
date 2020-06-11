@@ -55,6 +55,12 @@ export const trimMessages = async index => {
   }
 };
 
+export const getRedisMemUsage = async () => {
+  const info = await redis.info();
+  const mem = info.match(/used_memory_rss_human:(.*)/);
+  return mem?.length === 2 ? mem[1] : "???";
+};
+
 export const log = async text => {
   const logText = `${new Date().toLocaleString("en-GB", { timeZone: "Asia/Kolkata" })} ${text}`;
   console.log(logText);
