@@ -2,7 +2,7 @@ import { loadavg, cpus } from "os";
 import { env, memoryUsage, version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
 import { timeDiffForHumans } from "./timeDiffForHumans.js";
-import { getRedisMemUsage } from "./db.js";
+import { getTotalCountdowns, getRedisInfo } from "./db.js";
 import config from "../config.json";
 
 const { prefix, maxCountdowns } = config;
@@ -71,15 +71,6 @@ Links:
 Bot page - https://top.gg/bot/710486805836988507
 Join the support server over at https://discord.com/invite/dxafzkG`;
 
-const statsEmbed = new MessageEmbed()
-  .setColor("#f26522")
-  .setTitle("Stats")
-  .setFooter(
-    env.REF && env.COMMIT_SHA
-      ? `Build: ${env.REF.replace(/^.*\//, "")}@${env.COMMIT_SHA.substring(0, 7)}`
-      : "Live Countdown Bot"
-  );
-
 export const generateHelpEmbed = command =>
   helpEmbed.setTitle(`${prefix}${command}`).setTimestamp();
 
@@ -92,42 +83,64 @@ export const sendStatsFallback = async message => {
   );
 };
 
+const statsFooterText =
+  env.REF && env.COMMIT_SHA
+    ? `Build: ${env.REF.replace(/^.*\//, "")}@${env.COMMIT_SHA.substring(0, 7)}`
+    : "Live Countdown Bot";
+
 export const generateStatsEmbed = async client => {
-  let { rss } = memoryUsage();
-  let memUsage = Math.round((rss / 1024 / 1024) * 100) / 100;
-  let osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
-  let upTime = timeDiffForHumans(client.uptime, true);
-  statsEmbed.fields = [
-    {
-      name: ":fire: CPU usage",
-      value: `**${osLoad}%**`,
-      inline: true,
-    },
-    {
-      name: ":level_slider: Memory",
-      value: `**${await getRedisMemUsage()}** + **${memUsage}M**`,
-      inline: true,
-    },
-    {
-      name: ":clock2: Uptime",
-      value: `**${upTime}**`,
-      inline: true,
-    },
-    {
-      name: ":red_circle: Latency",
-      value: `**${client.ws.ping}ms**`,
-      inline: true,
-    },
-    {
-      name: ":incoming_envelope: Discord.js",
-      value: `**${djsVersion}**`,
-      inline: true,
-    },
-    {
-      name: ":white_check_mark: Node.js",
-      value: `**${nodeVersion}**`,
-      inline: true,
-    },
-  ];
-  return statsEmbed.setTimestamp();
+  const { rss } = memoryUsage();
+  const memUsage = Math.round((rss / 1024 / 1024) * 100) / 100;
+  const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
+  const upTime = timeDiffForHumans(client.uptime, true);
+  const { redisVersion, redisMemUsage } = await getRedisInfo();
+  const totalCountdowns = await getTotalCountdowns();
+  const totalServers = client.guilds.cache.size;
+  return new MessageEmbed()
+    .setColor("#f26522")
+    .setTitle("Stats")
+    .addFields(
+      {
+        name: ":fire: CPU usage",
+        value: `**${osLoad}%**`,
+        inline: true,
+      },
+      {
+        name: ":level_slider: Memory",
+        value: `**${redisMemUsage}** + **${memUsage}M**`,
+        inline: true,
+      },
+      {
+        name: ":clock2: Uptime",
+        value: `**${upTime}**`,
+        inline: true,
+      },
+      {
+        name: ":red_circle: Latency",
+        value: `**${client.ws.ping}ms**`,
+        inline: true,
+      },
+      {
+        name: ":incoming_envelope: Discord.js",
+        value: `**v${djsVersion}**`,
+        inline: true,
+      },
+      {
+        name: ":white_check_mark: Node.js",
+        value: `**${nodeVersion}**`,
+        inline: true,
+      },
+      {
+        name: ":timer: Countdowns",
+        value: `**${totalCountdowns}** in **${totalServers}**`,
+        inline: true,
+      },
+      {
+        name: ":red_envelope: Redis",
+        value: `**v${redisVersion}**`,
+        inline: true,
+      }
+    )
+    .setFooter(statsFooterText)
+    .setTimestamp();
 };

@@ -55,10 +55,16 @@ export const trimMessages = async index => {
   }
 };
 
-export const getRedisMemUsage = async () => {
+export const getTotalCountdowns = async () => await redis.zcount("Servers", "1", "+inf");
+
+export const getRedisInfo = async () => {
   const info = await redis.info();
+  const version = info.match(/redis_version:(.*)/);
   const mem = info.match(/used_memory_rss_human:(.*)/);
-  return mem?.length === 2 ? mem[1] : "???";
+  return {
+    redisVersion: version?.length === 2 ? version[1] : "???",
+    redisMemUsage: mem?.length === 2 ? mem[1] : "???",
+  };
 };
 
 export const log = async text => {

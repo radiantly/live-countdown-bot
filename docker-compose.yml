@@ -13,7 +13,7 @@ services:
       - redis
 
   redis:
-    image: redis
+    image: redis:6.0
     hostname: redis
     command: ["redis-server", "--appendonly", "yes"]
     ports:

@@ -15,7 +15,7 @@ services:
         delay: 10s
 
   redis:
-    image: redis
+    image: redis:6.0
     hostname: redis
     command: ["redis-server", "--appendonly", "yes"]
     ports:
