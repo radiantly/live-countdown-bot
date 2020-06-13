@@ -2,7 +2,14 @@ import { Client, Intents, Guild, TextChannel, Message, DiscordAPIError } from "d
 import process from "process";
 import config from "./config.json";
 import { timeDiffForHumans } from "./modules/timeDiffForHumans.js";
-import { redis, getMessages, removeMessage, trimMessages, log } from "./modules/db.js";
+import {
+  redis,
+  removeCountdowns,
+  getMessages,
+  removeMessage,
+  trimMessages,
+  log,
+} from "./modules/db.js";
 import { messageHandler } from "./modules/messageHandler.js";
 
 const activities = [
@@ -36,11 +43,11 @@ client.on("guildCreate", guild => {
     guild.systemChannel.send(
       "**Glad to be a part of your server** :heart:\nYou're probably looking for `!help`"
     );
-  log(`Bot has been added to ${guild.name}`);
+  log(`Added to ${guild.name} (${guild.id})`);
 });
 
-client.on("guildDelete", guild => {
-  log(`Bot has been removed from ${guild.name}`);
+client.on("guildDelete", async guild => {
+  log(`Removed from ${guild.name}: ${await removeCountdowns(guild.id)}`);
 });
 
 let index = 0;

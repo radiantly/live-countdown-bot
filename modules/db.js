@@ -55,6 +55,14 @@ export const trimMessages = async index => {
   }
 };
 
+export const removeCountdowns = async server => {
+  return (await redis.zrem("Servers", server))
+    ? (await redis.del(server))
+      ? `${server} has been deleted and removed from Set.`
+      : `${server} deleted from Set, but no list found.`
+    : `Server "${server}" not found.`;
+};
+
 export const getTotalCountdowns = async () => await redis.zcount("Servers", "1", "+inf");
 
 export const getRedisInfo = async () => {

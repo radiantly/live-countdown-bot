@@ -9,7 +9,7 @@ import {
   generateStatsEmbed,
   sendStatsFallback,
 } from "./embed.js";
-import { getCountdownLen, addCountdown, log, getLogs } from "./db.js";
+import { getCountdownLen, addCountdown, log, removeCountdowns, getLogs } from "./db.js";
 import config from "../config.json";
 
 const { prefix, botOwner, maxCountdowns } = config;
@@ -121,6 +121,9 @@ export const messageHandler = async message => {
   }
 
   if (message.author?.id === botOwner) {
+    if (command === "flush" && args.length === 1)
+      message.channel.send(await removeCountdowns(args[0]));
+
     if (command === "logs")
       getLogs()
         .then(results => message.channel.send("```" + results.join("\n") + "```"))
