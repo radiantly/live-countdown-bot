@@ -76,9 +76,11 @@ export const getRedisInfo = async () => {
 };
 
 export const log = async text => {
-  const logText = `${new Date().toLocaleString("en-GB", { timeZone: "Asia/Kolkata" })} ${text}`;
-  console.log(logText);
-  if (redis.status === "ready") await redis.rpush("Logs", logText);
+  try {
+    const logText = `${new Date().toLocaleString("en-GB", { timeZone: "Asia/Kolkata" })} ${text}`;
+    console.log(logText);
+    if (redis.status === "ready") await redis.rpush("Logs", logText);
+  } catch {}
 };
 
 export const getLogs = async () => {

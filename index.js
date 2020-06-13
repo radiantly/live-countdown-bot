@@ -95,3 +95,14 @@ process.on("unhandledRejection", reason => log(reason));
 
 // Only bother starting client if redis starts up
 redis.once("ready", () => client.login(token));
+
+// Quit gracefully
+const quitGracefully = async () => {
+  setImmediate(() => process.exit());
+  await log("Destroying client.");
+  client.destroy();
+};
+
+process.on("SIGTERM", quitGracefully);
+process.on("SIGINT", quitGracefully);
+process.on("SIGHUP", quitGracefully);
