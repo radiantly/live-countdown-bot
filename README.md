@@ -1,9 +1,11 @@
 # Live Countdown bot
 
+[![Invite me](https://img.shields.io/static/v1?style=flat&logo=discord&logoColor=FFF&label=&message=invite%20me&color=7289DA)](https://discord.com/api/oauth2/authorize?client_id=710486805836988507&permissions=2048&scope=bot)
+[![Bot status](https://top.gg/api/widget/status/710486805836988507.svg?noavatar=true)](https://top.gg/bot/710486805836988507)
 [![Docker build](https://github.com/radiantly/live-countdown-bot/workflows/Docker%20build/badge.svg)](https://github.com/radiantly/live-countdown-bot/actions?query=workflow%3A%22Docker+build%22)
 [![Code quality](https://img.shields.io/badge/Quality-Ninja-critical)](https://javascript.info/ninja-code)
-![Code style](https://img.shields.io/badge/Style-Prettier-ff69b4)
-[![Bot status](https://top.gg/api/widget/status/710486805836988507.svg)](https://top.gg/bot/710486805836988507)
+[![Code style](https://img.shields.io/badge/Style-Prettier-ff69b4)](https://github.com/prettier/prettier)
+[![Server count](https://top.gg/api/widget/servers/710486805836988507.svg?noavatar=true)](https://top.gg/bot/710486805836988507)
 
 A discord bot that counts down to a given time. What's the secret? It does this by continuously editing the message as each minute passes by.
 
@@ -63,15 +65,13 @@ If running in production, you can use Docker Swarm mode.
 
 ```sh
 # Create a config.json with your bot token
-cat config.json | docker secret create botconfig -
+docker secret create botconfig config.json
 
 # Download docker-stack.yml
 curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/docker-stack.yml -O
 
-# If you have not pulled images from the GitHub Package registry before:
-# cat ~/github_packages.token | docker login https://docker.pkg.github.com -u radiantly --password-stdin
 # docker swarm init
-docker stack deploy -c docker-stack.yml --with-registry-auth app
+docker stack deploy -c docker-stack.yml --prune app
 ```
 
 ### 2. Without using docker
