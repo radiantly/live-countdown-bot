@@ -29,21 +29,19 @@ const helpEmbed = new MessageEmbed()
         "```\n" +
         `${prefix}countdown 10mins\n` +
         `${prefix}countdown tagme May 24 2021 3:47 PM PDT\n\n` +
-        `Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} left.\n` +
+        `Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} left.\n\n` +
         `There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to capture flags!\n` +
         "```",
     },
     {
       name: "Notes",
       value:
-        `A maximum of ${maxCountdowns} countdowns can be set per server.\n` +
-        "To set a countdown, the user must have the `MANAGE_MESSAGES` permission.\n" +
-        "Report a bug or request a feature at the support server " +
-        "[here](https://discord.com/invite/dxafzkG 'Join the support server!'). " +
+        `There can be a maximum of ${maxCountdowns} active countdowns per server.\n` +
+        "Find the support server [here](https://discord.com/invite/dxafzkG 'Join the support server!'). " +
         "Invite from [here](https://top.gg/bot/710486805836988507).",
     }
   )
-  .setFooter("Live Countdown Bot");
+  .setFooter("Made with ❤️ by LordBusiness#4990");
 
 export const generateHelpFallback = () =>
   `So, how do you use the Live Countdown Bot?

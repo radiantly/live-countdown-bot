@@ -101,6 +101,7 @@ const quitGracefully = async () => {
   setImmediate(() => process.exit());
   await log("Destroying client.");
   client.destroy();
+  redis.quit();
 };
 
 process.on("SIGTERM", quitGracefully);
