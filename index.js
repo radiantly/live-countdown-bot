@@ -1,5 +1,5 @@
 import { Client, Intents, Guild, TextChannel, Message, DiscordAPIError } from "discord.js";
-import process from "process";
+import process, { env } from "process";
 import config from "./config.json";
 import { timeDiffForHumans } from "./modules/timeDiffForHumans.js";
 import {
@@ -11,6 +11,7 @@ import {
   log,
 } from "./modules/db.js";
 import { messageHandler } from "./modules/messageHandler.js";
+import { postServerCount } from "./modules/post.js";
 
 const activities = [
   { name: "https://bit.ly/live-bot", type: "WATCHING" },
@@ -34,6 +35,9 @@ const { token, maxCountdowns } = config;
 client.once("ready", () => {
   log("Bot initialized.");
   periodicUpdate();
+
+  // Post server counts to bot lists hourly.
+  if (env.NODE_ENV === "production") client.setInterval(postServerCount, 60 * 60 * 1000, client);
 });
 
 client.on("message", messageHandler);
