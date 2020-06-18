@@ -120,6 +120,8 @@ export const messageHandler = async message => {
     else return react(message, "invalidTime");
   }
 
+  if (command === "whoistherealtechguy") return message.channel.send("<@553965304993153049>");
+
   if (message.author?.id === botOwner) {
     if (command === "flush" && args.length === 1)
       message.channel.send(await removeCountdowns(args[0]));
