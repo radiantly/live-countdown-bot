@@ -7,6 +7,7 @@ import {
   removeCountdowns,
   getMessages,
   removeMessage,
+  removeMessageWithId,
   trimMessages,
   log,
 } from "./modules/db.js";
@@ -26,8 +27,8 @@ const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGE
 
 const client = new Client({
   messageCacheMaxSize: 20,
-  ws: { intents: requiredIntents },
   presence: { activity: activity },
+  ws: { intents: requiredIntents },
 });
 
 const { token, maxCountdowns } = config;
@@ -41,6 +42,13 @@ client.once("ready", () => {
 });
 
 client.on("message", messageHandler);
+
+client.on("messageDelete", message => {
+  const { id: messageId, guild, client, author } = message;
+  if (author?.id !== client.user?.id || !guild?.available) return;
+
+  removeMessageWithId(guild.id, messageId);
+});
 
 client.on("guildCreate", guild => {
   if (guild.systemChannel && guild.me?.permissionsIn(guild.systemChannel.id).has("SEND_MESSAGES"))
@@ -62,10 +70,11 @@ const periodicUpdate = async () => {
     await trimMessages(index);
     index = 0;
   } else {
-    for await (const { serverId, MessageString } of getMessages(index)) {
+    for await (const { server: serverId, MessageString } of getMessages(index)) {
       try {
         const MessageObj = JSON.parse(MessageString);
         const { messageId, channelId, timeEnd } = MessageObj;
+
         const guild = new Guild(client, { id: serverId });
         const channel = new TextChannel(guild, { id: channelId });
         const messageToEdit = new Message(client, { id: messageId }, channel);

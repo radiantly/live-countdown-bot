@@ -21,8 +21,8 @@ const inlineCommandPattern = new RegExp(
 );
 
 export const messageHandler = async message => {
-  // Check if author is a bot
-  if (message.author.bot) return;
+  // Check if partial message or if author is a bot
+  if (message.partial || message.author.bot) return;
 
   // Check if we're allowed to send messages in the channel
   if (message.guild?.me?.permissionsIn(message.channel.id).has("SEND_MESSAGES") === false) return;

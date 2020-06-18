@@ -33,18 +33,22 @@ export async function* getMessages(index) {
   const servers = await redis.zrangebyscore("Servers", index + 1, "+inf");
   for (const server of servers) {
     const MessageString = await redis.lindex(server, index);
-    if (MessageString) yield { serverId: server, MessageString: MessageString };
+    if (MessageString) yield { server, MessageString };
     else await updateServerSet(server);
   }
 }
 
 export const removeMessage = async (server, value) => {
-  try {
-    await redis.lrem(server, 0, value);
-    await updateServerSet(server);
-  } catch (ex) {
-    log(ex);
-  }
+  await redis.lrem(server, 0, value);
+  await updateServerSet(server);
+};
+
+export const removeMessageWithId = async (server, messageId) => {
+  const countdowns = await redis.lrange(server, 0, -1);
+  if (countdowns?.length)
+    for (const MessageString of countdowns)
+      if (JSON.parse(MessageString).messageId === messageId)
+        return removeMessage(server, MessageString);
 };
 
 export const trimMessages = async index => {
