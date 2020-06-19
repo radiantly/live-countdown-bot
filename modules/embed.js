@@ -37,8 +37,9 @@ const helpEmbed = new MessageEmbed()
       name: "Notes",
       value:
         `There can be a maximum of ${maxCountdowns} active countdowns per server.\n` +
-        "Find the support server [here](https://discord.com/invite/dxafzkG 'Join the support server!'). " +
-        "Invite from [here](https://top.gg/bot/710486805836988507).",
+        "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
+        "Find my support server [here](https://discord.com/invite/dxafzkG 'Join the support server!'). " +
+        "Invite me from [here](https://top.gg/bot/710486805836988507).",
     }
   )
   .setFooter("Made with ❤️ by LordBusiness#4990");
@@ -66,20 +67,12 @@ Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} 
 There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to capture flags!
 \`\`\`
 Links:
-Bot page - https://top.gg/bot/710486805836988507
-Join the support server over at https://discord.com/invite/dxafzkG`;
+Bot page - https://top.gg/bot/710486805836988507`;
 
 export const generateHelpEmbed = command =>
   helpEmbed.setTitle(`${prefix}${command}`).setTimestamp();
 
-export const sendStatsFallback = async message => {
-  const pingMessage = await message.channel.send("Hey?");
-  pingMessage.edit(
-    `All good! Latency is ${
-      pingMessage.createdTimestamp - message.createdTimestamp
-    }ms. API Latency is ${message.client.ws.ping}ms.`
-  );
-};
+export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
 
 const statsFooterText =
   env.REF && env.COMMIT_SHA

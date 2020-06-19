@@ -43,6 +43,13 @@ client.once("ready", () => {
 
 client.on("message", messageHandler);
 
+client.on("messageUpdate", (oldMessage, message) => {
+  if (message.partial || message.author.bot) return;
+
+  const messageReply = message[Symbol.for("messageReply")];
+  if (messageReply && !messageReply.deleted) messageHandler(message, messageReply);
+});
+
 client.on("messageDelete", message => {
   const { id: messageId, guild, client, author } = message;
   if (author?.id !== client.user?.id || !guild?.available) return;

@@ -39,8 +39,9 @@ export async function* getMessages(index) {
 }
 
 export const removeMessage = async (server, value) => {
-  await redis.lrem(server, 0, value);
+  const removedElements = await redis.lrem(server, 0, value);
   await updateServerSet(server);
+  return removedElements;
 };
 
 export const removeMessageWithId = async (server, messageId) => {
@@ -48,7 +49,7 @@ export const removeMessageWithId = async (server, messageId) => {
   if (countdowns?.length)
     for (const MessageString of countdowns)
       if (JSON.parse(MessageString).messageId === messageId)
-        return removeMessage(server, MessageString);
+        return await removeMessage(server, MessageString);
 };
 
 export const trimMessages = async index => {
