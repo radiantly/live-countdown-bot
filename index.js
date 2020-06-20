@@ -26,7 +26,7 @@ const activity = activities[Math.floor(Math.random() * activities.length)];
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
 const client = new Client({
-  messageCacheMaxSize: 20,
+  messageCacheMaxSize: 15,
   presence: { activity: activity },
   ws: { intents: requiredIntents },
 });
@@ -82,9 +82,11 @@ const periodicUpdate = async () => {
         const MessageObj = JSON.parse(MessageString);
         const { messageId, channelId, timeEnd } = MessageObj;
 
-        const guild = new Guild(client, { id: serverId });
-        const channel = new TextChannel(guild, { id: channelId });
-        const messageToEdit = new Message(client, { id: messageId }, channel);
+        const channel = client.channels.cache.get(channelId);
+        if (!channel?.viewable) return removeMessage(serverId, MessageString);
+
+        let messageToEdit = channel.messages.cache.get(messageId);
+        if (!messageToEdit) messageToEdit = new Message(client, { id: messageId }, channel);
 
         const timeLeft = Date.parse(timeEnd) - timeNow;
 

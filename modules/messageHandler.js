@@ -136,9 +136,8 @@ export const messageHandler = async (message, messageReply) => {
     return sendReply(reply).then(replyMessage => {
       if (!replyMessage?.id || !replyMessage.guild?.id || !replyMessage.channel?.id) return;
 
-      // Delete message initiating countdown if the bot has MANAGE_MESSAGES permission
-      if (message.guild.me?.permissionsIn(message.channel.id).has("MANAGE_MESSAGES"))
-        message.delete({ reason: "Countdown initiate" });
+      // Delete message initiating countdowm if possible
+      if (message.deletable) message.delete({ reason: "Countdown initiate" });
 
       MessageObj = {
         messageId: replyMessage.id,
