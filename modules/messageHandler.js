@@ -55,12 +55,12 @@ export const messageHandler = async (message, messageReply) => {
   const inline = inlineContent?.length === 4;
 
   // Check if inline command or starts with prefix
-  if (!inline && !message.content.startsWith(prefix))
+  if (!inline && !message.content.startsWith(prefix)) {
     // If DM, guide them to !help
-    return (
-      message.channel instanceof DMChannel &&
-      sendReply("Try `!help`\nInvite from https://top.gg/bot/710486805836988507")
-    );
+    if (message.channel instanceof DMChannel)
+      return await sendReply("Try `!help`\nInvite from https://top.gg/bot/710486805836988507");
+    return;
+  }
 
   const content = inline ? inlineContent[2] : message.content;
   const args = content.slice(prefix.length).split(/ +/);
@@ -69,19 +69,19 @@ export const messageHandler = async (message, messageReply) => {
   // Display help message
   if (["help", "commands", "usage"].includes(command))
     return message.guild?.me?.permissionsIn(message.channel.id).has("EMBED_LINKS") === false
-      ? sendReply(generateHelpFallback())
-      : sendReply(generateHelpEmbed(command));
+      ? await sendReply(generateHelpFallback())
+      : await sendReply(generateHelpEmbed(command));
 
   // Show process stats
   if (command === "botstats")
     return message.guild?.me?.permissionsIn(message.channel.id).has("EMBED_LINKS") === false
-      ? sendReply(generateStatsFallback(message.client))
-      : sendReply(await generateStatsEmbed(message.client));
+      ? await sendReply(generateStatsFallback(message.client))
+      : await sendReply(await generateStatsEmbed(message.client));
 
   // Start a countdown
   if (command === "countdown") {
     if (!args.length)
-      return sendReply(
+      return await sendReply(
         "Syntax: `!countdown <Date/time to countdown to>`\n" +
           "*Edit your message to see this error go away*"
       );
@@ -93,25 +93,25 @@ export const messageHandler = async (message, messageReply) => {
       MessageObj.tag = subcommand === "tageveryone" ? "@everyone" :
                        subcommand === "taghere" ? "@here" :
                        subcommand === "tagme" ? `<@${message.author.id}>` : "";
-      if (!MessageObj.tag) return sendReply("Accepted tags: tagme/taghere/tageveryone");
+      if (!MessageObj.tag) return await sendReply("Accepted tags: tagme/taghere/tageveryone");
     }
     const argstring = args.join(" ");
 
     if (["infinity", "\u221E", "\u267E\uFE0F"].includes(argstring.toLowerCase()))
-      return sendReply("Seriously? -_-");
+      return await sendReply("Seriously? -_-");
 
     const date = chrono.parseDate(argstring);
     if (!date)
-      return sendReply("Invalid date/time!\n*Edit your message to see this error go away*");
+      return await sendReply("Invalid date/time!\n*Edit your message to see this error go away*");
 
     if (!message.guild?.available)
-      return sendReply("The date/time is valid, but this bot can only be used in servers.");
+      return await sendReply("The date/time is valid, but this bot can only be used in servers.");
 
     let priority = true;
     if (!message.member.hasPermission("MANAGE_MESSAGES")) {
       const countdowns = await getCountdownLen(message.guild.id);
       if (countdowns >= maxCountdowns)
-        return sendReply(
+        return await sendReply(
           "Max countdowns exceeded. You must have the `MANAGE_MESSAGES` permission to set any more."
         );
       priority = false;
@@ -120,7 +120,7 @@ export const messageHandler = async (message, messageReply) => {
     const timeEnd = new Date(date);
     const timeLeft = timeEnd - Date.now();
     if (timeLeft < 10000)
-      return sendReply(
+      return await sendReply(
         "You are trying to set a countdown to a date/time in the past. " +
           "A common reason for this is the lack of year.\n" +
           "*Edit your message to see this error go away*"
@@ -133,7 +133,7 @@ export const messageHandler = async (message, messageReply) => {
     }
 
     message[Symbol.for("active")] = true;
-    return sendReply(reply).then(replyMessage => {
+    return await sendReply(reply).then(replyMessage => {
       if (!replyMessage?.id || !replyMessage.guild?.id || !replyMessage.channel?.id) return;
 
       // Delete message initiating countdowm if possible
@@ -149,15 +149,14 @@ export const messageHandler = async (message, messageReply) => {
     });
   }
 
-  if (command === "whoistherealtechguy") return sendReply("<@553965304993153049>");
+  if (command === "whoistherealtechguy") return await sendReply("<@553965304993153049>");
 
   if (message.author?.id === botOwner) {
-    if (command === "flush" && args.length === 1) sendReply(await removeCountdowns(args[0]));
+    if (command === "flush" && args.length === 1)
+      return await sendReply(await removeCountdowns(args[0]));
 
     if (command === "logs")
-      getLogs()
-        .then(results => sendReply("```" + results.join("\n") + "```"))
-        .catch(err => log(err));
+      return await getLogs().then(results => sendReply("```" + results.join("\n") + "```"));
 
     if (command === "kill") exit();
   }

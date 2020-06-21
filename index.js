@@ -26,7 +26,7 @@ const activity = activities[Math.floor(Math.random() * activities.length)];
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
 const client = new Client({
-  messageCacheMaxSize: 15,
+  messageCacheMaxSize: 10,
   presence: { activity: activity },
   ws: { intents: requiredIntents },
 });
@@ -41,7 +41,11 @@ client.once("ready", () => {
   if (env.NODE_ENV === "production") client.setInterval(postServerCount, 60 * 60 * 1000, client);
 });
 
-client.on("message", messageHandler);
+client.on("message", async message => {
+  await messageHandler(message);
+  if (message.author?.id !== client.user?.id && !message[Symbol.for("messageReply")])
+    message.channel.messages.cache.delete(message.id);
+});
 
 client.on("messageUpdate", (oldMessage, message) => {
   if (message.partial || message.author.bot) return;
@@ -113,7 +117,8 @@ const periodicUpdate = async () => {
   client.setTimeout(periodicUpdate, Math.max(5000 - (Date.now() - timeNow), 0));
 };
 
-process.on("unhandledRejection", reason => log(reason));
+if (env.NODE_ENV !== "production") client.on("warn", console.warn);
+process.on("unhandledRejection", log);
 
 // Only bother starting client if redis starts up
 redis.once("ready", () => client.login(token));
