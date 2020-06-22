@@ -22,12 +22,16 @@ const activities = [
   { name: "with time", type: "PLAYING" },
 ];
 const activity = activities[Math.floor(Math.random() * activities.length)];
+const presence =
+  env.NODE_ENV === "debug"
+    ? { activity: { name: "maintenance", type: "WATCHING" }, status: "dnd" }
+    : { activity, status: "online" };
 
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
 const client = new Client({
   messageCacheMaxSize: 10,
-  presence: { activity: activity },
+  presence,
   ws: { intents: requiredIntents },
 });
 
@@ -73,6 +77,10 @@ client.on("guildDelete", async guild => {
   log(`Removed from ${guild.name}: ${await removeCountdowns(guild.id)}`);
 });
 
+client.on("rateLimit", rateLimitInfo => {
+  console.log(rateLimitInfo);
+});
+
 let index = 0;
 
 const periodicUpdate = async () => {
@@ -107,6 +115,7 @@ const periodicUpdate = async () => {
           ? `${MessageObj.content[0]}${timeDiffForHumans(timeLeft)}${MessageObj.content[1]}`
           : `Time left: ${timeDiffForHumans(timeLeft)} left.`;
         await messageToEdit.edit(editedText);
+        await new Promise(resolve => setTimeout(resolve, 200));
       } catch (error) {
         log(error);
         if (error instanceof DiscordAPIError) removeMessage(serverId, MessageString);
@@ -117,7 +126,7 @@ const periodicUpdate = async () => {
   client.setTimeout(periodicUpdate, Math.max(5000 - (Date.now() - timeNow), 0));
 };
 
-if (env.NODE_ENV !== "production") client.on("warn", console.warn);
+if (env.NODE_ENV === "debug") client.on("debug", console.info);
 process.on("unhandledRejection", log);
 
 // Only bother starting client if redis starts up
