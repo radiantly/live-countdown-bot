@@ -16,6 +16,7 @@ import {
   removeMessageWithId,
   getLogs,
 } from "./db.js";
+import { getTag } from "./countdownHelper.js";
 import config from "../config.json";
 
 const { prefix, botOwner, maxCountdowns } = config;
@@ -87,15 +88,13 @@ export const messageHandler = async (message, messageReply) => {
       );
 
     let MessageObj = {};
-    if (args[0].startsWith("tag")) {
-      const subcommand = args.shift().toLowerCase().replace(/-/g, "");
-      // prettier-ignore
-      MessageObj.tag = subcommand === "tageveryone" ? "@everyone" :
-                       subcommand === "taghere" ? "@here" :
-                       subcommand === "tagme" ? `<@${message.author.id}>` : "";
-      if (!MessageObj.tag) return await sendReply("Accepted tags: tagme/taghere/tageveryone");
-    }
-    const argstring = args.join(" ");
+
+    const tagObj = getTag(args.join(" "), message);
+
+    if (tagObj.error) return await sendReply(tagObj.error);
+
+    const { command: argstring, tag } = tagObj;
+    if (tag) MessageObj.tag = tag;
 
     if (["infinity", "\u221E", "\u267E\uFE0F"].includes(argstring.toLowerCase()))
       return await sendReply("Seriously? -_-");
