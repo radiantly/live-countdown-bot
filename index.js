@@ -78,13 +78,14 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("rateLimit", rateLimitInfo => {
-  console.log(rateLimitInfo);
+  log(rateLimitInfo);
 });
 
 let index = 0;
-
+let lastRun = 0;
 const periodicUpdate = async () => {
   const timeNow = Date.now();
+  lastRun = timeNow;
   if (index >= maxCountdowns) {
     await trimMessages(index);
     index = 0;
@@ -100,7 +101,7 @@ const periodicUpdate = async () => {
         let messageToEdit = channel.messages.cache.get(messageId);
         if (!messageToEdit) messageToEdit = new Message(client, { id: messageId }, channel);
 
-        const timeLeft = Date.parse(timeEnd) - timeNow;
+        const timeLeft = Date.parse(timeEnd) - Date.now();
 
         if (timeLeft <= 0) {
           let finalText = MessageObj.hasOwnProperty("content")
@@ -125,6 +126,13 @@ const periodicUpdate = async () => {
   }
   client.setTimeout(periodicUpdate, Math.max(5000 - (Date.now() - timeNow), 0));
 };
+
+setInterval(() => {
+  if (lastRun && lastRun + 7 * 60 * 1000 < Date.now()) {
+    log(`Had to restart countdown ${Date.now() - lastRun}`);
+    periodicUpdate();
+  }
+}, 10 * 60 * 1000);
 
 if (env.NODE_ENV === "debug") client.on("debug", console.info);
 process.on("unhandledRejection", log);
