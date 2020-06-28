@@ -17,6 +17,7 @@ import {
   getLogs,
 } from "./db.js";
 import { getTag } from "./countdownHelper.js";
+import { runTime } from "../index.js";
 import config from "../config.json";
 
 const { prefix, botOwner, maxCountdowns } = config;
@@ -155,7 +156,9 @@ export const messageHandler = async (message, messageReply) => {
       return await sendReply(await removeCountdowns(args[0]));
 
     if (command === "logs")
-      return await getLogs().then(results => sendReply("```" + results.join("\n") + "```"));
+      return await getLogs().then(results =>
+        sendReply(runTime.join(" | ") + "\n```" + results.join("\n") + "```")
+      );
 
     if (command === "kill") exit();
   }

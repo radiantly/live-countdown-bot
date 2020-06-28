@@ -82,10 +82,10 @@ client.on("rateLimit", rateLimitInfo => {
 });
 
 let index = 0;
-let lastRun = 0;
+let runStart = 0;
+export const runTime = new Array(maxCountdowns);
 const periodicUpdate = async () => {
-  const timeNow = Date.now();
-  lastRun = timeNow;
+  runStart = Date.now();
   if (index >= maxCountdowns) {
     await trimMessages(index);
     index = 0;
@@ -122,14 +122,15 @@ const periodicUpdate = async () => {
         if (error instanceof DiscordAPIError) removeMessage(serverId, MessageString);
       }
     }
+    runTime[index] = Date.now() - runStart;
     index += 1;
   }
-  client.setTimeout(periodicUpdate, Math.max(5000 - (Date.now() - timeNow), 0));
+  client.setTimeout(periodicUpdate, Math.max(5000 - (Date.now() - runStart), 0));
 };
 
 setInterval(() => {
-  if (lastRun && lastRun + 7 * 60 * 1000 < Date.now()) {
-    log(`Had to restart countdown ${Date.now() - lastRun}`);
+  if (runStart && runStart + 7 * 60 * 1000 < Date.now()) {
+    log(`Had to restart countdown ${Date.now() - runStart}`);
     periodicUpdate();
   }
 }, 10 * 60 * 1000);
