@@ -28,6 +28,9 @@ const inlineCommandPattern = new RegExp(
   "sm"
 );
 
+const maxTimeEnd = new Date();
+maxTimeEnd.setFullYear(maxTimeEnd.getFullYear() + 2);
+
 // messageReply is only populated during a messageUpdate event
 export const messageHandler = async (message, messageReply) => {
   // Check if partial message or if author is a bot
@@ -124,6 +127,11 @@ export const messageHandler = async (message, messageReply) => {
         "You are trying to set a countdown to a date/time in the past. " +
           "A common reason for this is the lack of year.\n" +
           "*Edit your message to see this error go away*"
+      );
+
+    if (timeEnd > maxTimeEnd)
+      return await sendReply(
+        ":eyes: That's too far away in the future. Currently, countdowns are limited to 2 years."
       );
 
     let reply = `Time left: ${timeDiffForHumans(timeLeft)} left.`;
