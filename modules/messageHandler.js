@@ -168,6 +168,14 @@ export const messageHandler = async (message, messageReply) => {
         sendReply(runTime.join(" | ") + "\n```" + results.join("\n") + "```")
       );
 
+    if (command === "eval") {
+      try {
+        return await sendReply(`${eval(args.join(""))}`);
+      } catch (ex) {
+        return await sendReply(`Error: ${ex}`);
+      }
+    }
+
     if (command === "kill") exit();
   }
 };
