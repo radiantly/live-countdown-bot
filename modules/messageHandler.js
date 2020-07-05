@@ -103,8 +103,8 @@ export const messageHandler = async (message, messageReply) => {
     if (["infinity", "\u221E", "\u267E\uFE0F"].includes(argstring.toLowerCase()))
       return await sendReply("Seriously? -_-");
 
-    const date = chrono.parseDate(argstring);
-    if (!date)
+    const timeEnd = chrono.parseDate(argstring);
+    if (!timeEnd)
       return await sendReply("Invalid date/time!\n*Edit your message to see this error go away*");
 
     if (!message.guild?.available)
@@ -120,14 +120,18 @@ export const messageHandler = async (message, messageReply) => {
       priority = false;
     }
 
-    const timeEnd = new Date(date);
-    const timeLeft = timeEnd - Date.now();
-    if (timeLeft < 10000)
+    const timeStart = message.editedAt || message.createdAt;
+    const timeLeft = timeEnd - timeStart;
+
+    if (timeLeft < 0)
       return await sendReply(
         "You are trying to set a countdown to a date/time in the past. " +
           "A common reason for this is the lack of year.\n" +
           "*Edit your message to see this error go away*"
       );
+
+    if (timeLeft < 59000)
+      return await sendReply("Too short! Countdowns must be higher than a minute!");
 
     if (timeEnd > maxTimeEnd)
       return await sendReply(
