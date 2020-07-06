@@ -1,4 +1,4 @@
-import { Client, Intents, Guild, TextChannel, Message, DiscordAPIError } from "discord.js";
+import { Client, Intents, Message, DiscordAPIError } from "discord.js";
 import process, { env } from "process";
 import config from "./config.json";
 import { timeDiffForHumans } from "./modules/timeDiffForHumans.js";
@@ -35,7 +35,7 @@ const client = new Client({
   ws: { intents: requiredIntents },
 });
 
-const { token, maxCountdowns } = config;
+const { token, maxCountdowns, botOwner } = config;
 
 client.once("ready", () => {
   log("Bot initialized.");
@@ -131,7 +131,12 @@ const periodicUpdate = async () => {
 setInterval(() => {
   if (runStart && runStart + 7 * 60 * 1000 < Date.now()) {
     log(`Had to restart countdown ${Date.now() - runStart}`);
-    periodicUpdate();
+    client.users
+      .fetch(botOwner)
+      .then(user => user.createDM())
+      .then(DMChannel => DMChannel.send("Had to restart. Check logs."))
+      .then(message => quitGracefully())
+      .catch(err => log(err));
   }
 }, 10 * 60 * 1000);
 
