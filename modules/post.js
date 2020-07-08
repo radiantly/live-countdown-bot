@@ -18,6 +18,9 @@ const postJSON = (url, jsonString, headers) => {
     response => {
       if (response.statusCode !== 200) log(`${response.statusCode} from ${url}`);
       response.resume();
+      response.on("end", () => {
+        if (!response.complete) log(`Connection to ${url} was terminated.`);
+      });
     }
   );
   req.on("error", e => log(e));
@@ -36,17 +39,17 @@ export const postServerCount = client => {
 
   // bots.ondiscord.xyz
   // const botsOnDiscordData = JSON.stringify({ guildCount: serverCount });
-  // post(`https://bots.ondiscord.xyz/bot-api/bots/${botId}/guilds`, botsOnDiscordData, {
+  // postJSON(`https://bots.ondiscord.xyz/bot-api/bots/${botId}/guilds`, botsOnDiscordData, {
   //   Authorization: botsOnDiscordAPIkey,
   // });
 
   const discordBotsggData = JSON.stringify({ guildCount: serverCount });
-  post(`https://discord.bots.gg/bots/${botId}/stats`, discordBotsggData, {
+  postJSON(`https://discord.bots.gg/api/v1/bots/${botId}/stats`, discordBotsggData, {
     Authorization: discordBotsggAPIkey,
   });
 
   const discordBotscoData = JSON.stringify({ serverCount });
-  post(`https://api.discordbots.co/v1/public/bot/${botId}/stats`, discordBotscoData, {
+  postJSON(`https://api.discordbots.co/v1/public/bot/${botId}/stats`, discordBotscoData, {
     Authorization: discordBotscoAPIkey,
   });
 };
