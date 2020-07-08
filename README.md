@@ -55,8 +55,8 @@ If you have `docker-compose` installed:
 # Clone the repo
 git clone https://github.com/radiantly/live-countdown-bot && cd live-countdown-bot
 
-# Copy config.json.sample and add your bot token
-cp config.json.sample config.json
+# Copy config.sample.json and add your bot token
+cp config.sample.json config.json
 
 docker-compose up --build
 ```

@@ -2,7 +2,7 @@ import { request } from "https";
 import { log } from "./db.js";
 import config from "../config.json";
 
-const { topggAPIkey } = config;
+const { topggAPIkey, discordBotsggAPIkey, discordBotscoAPIkey } = config;
 
 const postJSON = (url, jsonString, headers) => {
   const req = request(
@@ -34,13 +34,19 @@ export const postServerCount = client => {
     Authorization: topggAPIkey,
   });
 
+  // bots.ondiscord.xyz
   // const botsOnDiscordData = JSON.stringify({ guildCount: serverCount });
   // post(`https://bots.ondiscord.xyz/bot-api/bots/${botId}/guilds`, botsOnDiscordData, {
   //   Authorization: botsOnDiscordAPIkey,
   // });
 
-  // const discordBotsggData = botsOnDiscordData;
-  // post(`https://discord.bots.gg/bots/${botId}/stats`, discordBotsggData, {
-  //   Authorization: discordBotsggAPIkey,
-  // });
+  const discordBotsggData = JSON.stringify({ guildCount: serverCount });
+  post(`https://discord.bots.gg/bots/${botId}/stats`, discordBotsggData, {
+    Authorization: discordBotsggAPIkey,
+  });
+
+  const discordBotscoData = JSON.stringify({ serverCount });
+  post(`https://api.discordbots.co/v1/public/bot/${botId}/stats`, discordBotscoData, {
+    Authorization: discordBotscoAPIkey,
+  });
 };
