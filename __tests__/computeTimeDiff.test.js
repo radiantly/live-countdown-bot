@@ -1,4 +1,4 @@
-import { computeTimeDiff } from "../modules/timeDiffForHumans.js";
+import { computeTimeDiff } from "../modules/computeTimeDiff.js";
 
 describe("Time diff for humans", () => {
   test("diff < 1 min", () => {
@@ -44,14 +44,14 @@ describe("Time diff for humans", () => {
 
 describe("Compute nextUpdate", () => {
   test("final update", () => {
-    expect(computeTimeDiff(-1000).nextUpdate).toEqual(0);
-    expect(computeTimeDiff(0, true).nextUpdate).toEqual(0);
-    expect(computeTimeDiff(100).nextUpdate).toEqual(0);
-    expect(computeTimeDiff(1000, true).nextUpdate).toEqual(0);
+    expect(computeTimeDiff(-1000).timeLeftForNextUpdate).toEqual(0);
+    expect(computeTimeDiff(0, true).timeLeftForNextUpdate).toEqual(0);
+    expect(computeTimeDiff(100).timeLeftForNextUpdate).toEqual(0);
+    expect(computeTimeDiff(1000, true).timeLeftForNextUpdate).toEqual(0);
   });
 
   test("when some time is left", () => {
-    expect(computeTimeDiff(3540000, true).nextUpdate).toEqual(3480000);
-    expect(computeTimeDiff(3540061, true).nextUpdate).toEqual(3480000);
+    expect(computeTimeDiff(3540000, true).timeLeftForNextUpdate).toEqual(3480000);
+    expect(computeTimeDiff(3540061, true).timeLeftForNextUpdate).toEqual(3480000);
   });
 });
