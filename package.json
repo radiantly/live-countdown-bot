@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node --experimental-json-modules index.js",
+    "start": "node index.js",
     "check-formatting": "prettier --check \"**/*.js\"",
-    "test": "env NODE_ENV=test jest"
+    "test": "NODE_ENV=test jest"
   },
   "repository": {
     "type": "git",
