@@ -32,7 +32,7 @@ describe("test db functions", () => {
   });
 
   test("shard update", () => {
-    expect(db.prepare("SELECT Guild FROM GuildInfo WHERE Shard = 2").raw().all().sort()).toEqual(
+    expect(db.prepare("SELECT Guild FROM GuildInfo WHERE Client = 2").raw().all().sort()).toEqual(
       [["719541990580289557"], ["703884760531075183"]].sort()
     );
   });

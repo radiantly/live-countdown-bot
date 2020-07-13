@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-export const db = new Database(process.env.NODE_ENV == "test" ? ":memory:" : "app.db");
+export const db = new Database(process.env.NODE_ENV === "test" ? ":memory:" : "app.db");
 
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
@@ -8,7 +8,7 @@ db.prepare(
   `
   CREATE TABLE IF NOT EXISTS GuildInfo (
     Guild TEXT PRIMARY KEY NOT NULL,
-    Shard INTEGER NOT NULL
+    Client INTEGER NOT NULL
   )
 `
 ).run();
@@ -41,12 +41,56 @@ db.prepare(
 
 db.prepare("VACUUM").run();
 
-const upsertGuildShard = db.prepare(`
-  INSERT INTO GuildInfo (Guild, Shard) VALUES (@guildId, @shardId)
-    ON CONFLICT(Guild) DO UPDATE SET Shard = excluded.Shard;
+// Stmt = SQL Query Statement
+
+const upsertGuildShardStmt = db.prepare(`
+  INSERT INTO GuildInfo (Guild, Client) VALUES (@guildId, @clientId)
+    ON CONFLICT(Guild) DO UPDATE SET Client = excluded.Client;
 `);
 
-export const initGuilds = db.transaction((guildCache, shardId) => {
-  guildCache.each(guild => upsertGuildShard.run({ guildId: guild.id, shardId }));
+export const initGuilds = db.transaction((guildCache, clientId) => {
+  guildCache.each(guild => upsertGuildShardStmt.run({ guildId: guild.id, clientId }));
 });
 
+const selectAllCountdownsStmt = db.prepare("SELECT COUNT(*) FROM CountdownInfo;");
+export const getTotalCountdowns = () => selectAllCountdownsStmt.get();
+
+const selectCountdownsInGuildStmt = db.prepare(
+  "SELECT COUNT(*) FROM CountdownInfo WHERE GUILD = ?"
+);
+export const getCountdownsInServer = server => selectCountdownsInGuildStmt.run(server);
+
+const insertCountdownStmt = db.prepare(`
+  INSERT INTO CountdownInfo (Guild, Channel, OriginalMessage, ReplyMessage, NextUpdate, Priority, CountObj)
+  VALUES (@guildId, @channelId, @origMsgId, @replyMsgId, @nextUpdate, @priority, @countObj)
+`);
+export const addCountdown = data => insertCountdownStmt.run(data);
+
+const updateRecomputedCountdownStmt = db.prepare(`
+  UPDATE CountdownInfo
+  SET NextUpdate = @NextUpdate,
+      Priority = @Priority
+  WHERE ReplyMessage = @ReplyMessage
+`);
+export const updateRecomputedCountdown = data => updateRecomputedCountdownStmt.run(data);
+
+const deleteOldestRowStmt = db.prepare(`
+  DELETE FROM CountdownInfo
+  WHERE Guild = ?
+  ORDER BY Timestamp
+  LIMIT 1
+`);
+export const removeOldestCountdowninGuild = server => deleteOldestRowStmt.run(server);
+
+const deleteMessageStmt = db.prepare("DELETE FROM CountdownInfo WHERE ReplyMessage = ?");
+export const removeMessageWithReplyId = messageId => deleteMessageStmt.run(messageId);
+
+const selectNextInQueueStmt = db.prepare(`
+  SELECT Channel, ReplyMessage, CountObj
+  FROM CountdownInfo
+  INNER JOIN GuildInfo USING (Guild)
+  WHERE Client = ?
+  ORDER BY NextUpdate, Priority
+  LIMIT 1
+`);
+export const getNextInQueue = clientId => selectNextInQueueStmt.get(clientId);
