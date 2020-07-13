@@ -68,9 +68,9 @@ export const addCountdown = data => insertCountdownStmt.run(data);
 
 const updateRecomputedCountdownStmt = db.prepare(`
   UPDATE CountdownInfo
-  SET NextUpdate = @NextUpdate,
-      Priority = @Priority
-  WHERE ReplyMessage = @ReplyMessage
+  SET NextUpdate = @nextUpdate,
+      Priority = @priority
+  WHERE ReplyMessage = @replyMsgId
 `);
 export const updateRecomputedCountdown = data => updateRecomputedCountdownStmt.run(data);
 

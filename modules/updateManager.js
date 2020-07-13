@@ -1,51 +1,48 @@
+import { Message } from "discord.js";
 import { getNextInQueue, removeMessageWithReplyId, updateRecomputedCountdown } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 
 export const updateCountdowns = (client, clientId) => {
   const countdownObj = getNextInQueue(clientId);
   console.log(countdownObj);
-  if (!countdownObj) setTimeout(updateCountdowns, 10000, client, clientId);
-  const { Channel, ReplyMessage, CountObj } = countdownObj;
-  const { parts, timers } = JSON.parse(CountObj);
+  if (!countdownObj) return setTimeout(updateCountdowns, 10000, client, clientId);
+  const { Channel: channelId, ReplyMessage: replyMsgId, CountObj: countObj } = countdownObj;
+  const { parts, timers } = JSON.parse(countObj);
 
-  const channel = client.channels.cache.get(Channel);
-  if (!channel?.viewable) removeMessageWithReplyId(ReplyMessage);
+  const channel = client.channels.cache.get(channelId);
+  if (!channel?.viewable) removeMessageWithReplyId(replyMsgId);
 
-  let messageToEdit = channel.messages.cache.get(messageId);
-  if (!messageToEdit) messageToEdit = new Message(client, { id: messageId }, channel);
+  let messageToEdit = channel.messages.cache.get(replyMsgId);
+  if (!messageToEdit) messageToEdit = new Message(client, { id: replyMsgId }, channel);
 
+  // Check if inline message
   if (parts) {
-    let nextUpdate = timers[0].timeEnd;
-    let priority = 0;
-
-    const assembled = timers.map((timer, index) => {
-      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timer.timeEnd - Date.now());
-      if (!timeLeftForNextUpdate) priority = 10;
-      console.log(timer, timeLeftForNextUpdate);
-      const timerNextUpdate = timer.timeEnd - timeLeftForNextUpdate;
-      nextUpdate = Math.min(nextUpdate, timerNextUpdate);
-      return inline.parts[index] + humanDiff;
+    const { assembledMessage, priority, nextUpdate } = assembleInlineMessage(timers, parts);
+    updateRecomputedCountdown({
+      replyMsgId,
+      nextUpdate,
+      priority,
     });
-    assembled.push(inline.parts[inline.parts.length - 1]);
+    messageToEdit.edit(assembledMessage);
   } else {
+    // If not inline, it must be a normal message
     const timeEnd = new Date(timers[0].timeEnd);
     const timeLeft = timeEnd - Date.now();
     let editText;
-    if (timeLeft < 1000) {
+    if (timeLeft < 5000) {
       editText = "Countdown done.";
       if (timers[0].tag) editText += timers[0].tag;
-      // Remove message
+      removeMessageWithReplyId(replyMsgId);
     } else {
       const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft);
       editText = `Time left: ${humanDiff} left.`;
       updateRecomputedCountdown({
-        ReplyMessage,
-        NextUpdate: timeEnd - timeLeftForNextUpdate,
-        Priority: timeLeftForNextUpdate ? 0 : 10,
+        replyMsgId,
+        nextUpdate: timeEnd - timeLeftForNextUpdate,
+        priority: timeLeftForNextUpdate ? 0 : 10,
       });
     }
     messageToEdit.edit(editText);
   }
-  saveRecomputed();
-  setImmediate(updateCountdowns, client);
+  setTimeout(updateCountdowns, 10000, client, clientId);
 };
