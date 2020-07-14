@@ -7,4 +7,4 @@ const manager = new ShardingManager("./modules/bot.js", { token });
 
 manager.spawn();
 
-manager.on("shardCreate", shard => console.log(`Launched shard id: ${shard.id}`));
+manager.on("shardCreate", shard => console.log(`Launched client (${shard.id}).`));

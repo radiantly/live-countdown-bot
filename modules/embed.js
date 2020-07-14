@@ -1,50 +1,12 @@
 import { loadavg, cpus } from "os";
 import { env, memoryUsage, version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
-import { timeDiffForHumans } from "./timeDiffForHumans.js";
-import { getTotalCountdowns, getRedisInfo } from "./db.js";
-import config from "../config.json";
+import { computeTimeDiff } from "./computeTimeDiff.js";
+import config from "../config.js";
 
-const { prefix, maxCountdowns } = config;
+const { channelMax } = config;
 
-const helpEmbed = new MessageEmbed()
-  .setColor("#f26522")
-  .setDescription("Usage for the Live Countdown Bot")
-  .addFields(
-    {
-      name: "Set a countdown",
-      value: `\`${prefix}countdown <Date/Time to countdown to>\``,
-    },
-    {
-      name: "To tag:",
-      value: `\`${prefix}countdown [tagme|taghere|tageveryone] <Date/Time to countdown to>\``,
-    },
-    {
-      name: `Inline mode: (put command between two ${prefix} characters)`,
-      value: `\` .. ${prefix}${prefix}countdown <Date/Time to countdown to>${prefix} .. \``,
-    },
-    {
-      name: "Examples:",
-      value:
-        "```\n" +
-        `${prefix}countdown 10mins\n` +
-        `${prefix}countdown tagme May 24 2021 3:47 PM PDT\n\n` +
-        `Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} left.\n\n` +
-        `There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to capture flags!\n` +
-        "```",
-    },
-    {
-      name: "Notes",
-      value:
-        `There can be a maximum of ${maxCountdowns} active countdowns per server.\n` +
-        "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
-        "Find my support server [here](https://discord.com/invite/dxafzkG 'Join the support server!'). " +
-        "Invite me from [here](https://top.gg/bot/710486805836988507).",
-    }
-  )
-  .setFooter("Made with ❤️ by LordBusiness#4990");
-
-export const generateHelpFallback = () =>
+export const generateHelpFallback = prefix =>
   `So, how do you use the Live Countdown Bot?
 
 A basic command looks like \`${prefix}countdown 10mins\`
@@ -56,21 +18,59 @@ You could also tag yourself (or annoy everyone in the server):
 Here's the syntax:
 \`${prefix}countdown [tagme|taghere|tageveryone] <Date/Time to countdown to>\`
 
-You can inline commands too, by wrapping it between two ${prefix}
-\`I will be king in ${prefix}${prefix}countdown tageveryone Aug 29 13:37 GMT${prefix}. Prepare a banquet by then!\`
+You can inline commands too, by wrapping it between two !
+\`I will be king in !!countdown tageveryone Aug 29 13:37 GMT!. Prepare a banquet by then!\`
 
 A few more examples:
 \`\`\`
 ${prefix}countdown Dec 25, 12:00 CST
 ${prefix}countdown tagme May 24 2021 3:47 PM PDT
-Time till I'm 13 yrs old: ${prefix}${prefix}countdown Aug 31, 10PM GMT${prefix} left.
-There is ${prefix}${prefix}countdown taghere 11:59 PM EST${prefix} left to capture flags!
+Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT$! left.
+There is !!countdown taghere 11:59 PM EST$! left to capture flags!
 \`\`\`
 Links:
 Bot page - https://top.gg/bot/710486805836988507`;
 
-export const generateHelpEmbed = command =>
-  helpEmbed.setTitle(`${prefix}${command}`).setTimestamp();
+export const generateHelpEmbed = prefix =>
+  new MessageEmbed()
+    .setTitle(`${prefix}help`)
+    .setColor("#f26522")
+    .setDescription("Usage for the Live Countdown Bot")
+    .addFields(
+      {
+        name: "Set a countdown",
+        value: `\`${prefix}countdown <Date/Time to countdown to>\``,
+      },
+      {
+        name: "To tag:",
+        value: `\`${prefix}countdown [tagme|taghere|tageveryone] <Date/Time to countdown to>\``,
+      },
+      {
+        name: `Inline mode: (put command between two ! characters)`,
+        value: `\` .. !!countdown <Date/Time to countdown to>! .. \``,
+      },
+      {
+        name: "Examples:",
+        value:
+          "```\n" +
+          `${prefix}countdown 10mins\n` +
+          `${prefix}countdown tagme May 24 2021 3:47 PM PDT\n\n` +
+          `Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT! left.\n\n` +
+          `There is !!countdown taghere 11:59 PM EST! left to capture flags!\n` +
+          "```",
+      },
+      {
+        name: "Notes",
+        value:
+          `There can be a maximum of ${channelMax} active countdowns per channel.\n` +
+          "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
+          `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
+          "Find my support server [here](https://discord.com/invite/dxafzkG 'Join the support server!'). " +
+          "Invite me from [here](https://top.gg/bot/710486805836988507).",
+      }
+    )
+    .setFooter("Made with ❤️ by LordBusiness#4990")
+    .setTimestamp();
 
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
 
@@ -79,13 +79,13 @@ const statsFooterText =
     ? `Build: ${env.REF.replace(/^.*\//, "")}@${env.COMMIT_SHA.substring(0, 7)}`
     : "Live Countdown Bot";
 
-export const generateStatsEmbed = async client => {
+export const generateStatsEmbed = client => {
   const { rss } = memoryUsage();
   const memUsage = Math.round((rss / 1024 / 1024) * 100) / 100;
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
-  const upTime = timeDiffForHumans(client.uptime, true);
-  const { redisVersion, redisMemUsage } = await getRedisInfo();
-  const totalCountdowns = await getTotalCountdowns();
+  const upTime = computeTimeDiff(client.uptime, true).humanDiff;
+  const [redisVersion, redisMemUsage] = ["6.0.5", "5"];
+  const totalCountdowns = "200";
   const totalServers = client.guilds.cache.size;
   return new MessageEmbed()
     .setColor("#f26522")

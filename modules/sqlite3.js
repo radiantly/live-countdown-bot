@@ -8,7 +8,8 @@ db.prepare(
   `
   CREATE TABLE IF NOT EXISTS GuildInfo (
     Guild TEXT PRIMARY KEY NOT NULL,
-    Client INTEGER NOT NULL
+    Client INTEGER NOT NULL,
+    Prefix TEXT DEFAULT "!" NOT NULL
   )
 `
 ).run();
@@ -51,6 +52,13 @@ const upsertGuildShardStmt = db.prepare(`
 export const initGuilds = db.transaction((guildCache, clientId) => {
   guildCache.each(guild => upsertGuildShardStmt.run({ guildId: guild.id, clientId }));
 });
+export const addGuild = (guildId, clientId) => upsertGuildShardStmt.run({ guildId, clientId });
+
+const selectPrefixStmt = db.prepare("SELECT Prefix from GuildInfo WHERE Guild = ?");
+export const getPrefixFromDb = guildId => selectPrefixStmt.get(guildId);
+
+const updatePrefixStmt = db.prepare("UPDATE GuildInfo SET Prefix = @prefix WHERE Guild = @guildId");
+export const updatePrefixInDb = data => updatePrefixStmt.run(data);
 
 const selectAllCountdownsStmt = db.prepare("SELECT COUNT(*) FROM CountdownInfo;");
 export const getTotalCountdowns = () => selectAllCountdownsStmt.get();
