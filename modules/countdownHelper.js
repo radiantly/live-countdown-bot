@@ -105,22 +105,37 @@ export const computeCountdown = (command, message) => {
 };
 
 export const assembleInlineMessage = (timers, parts) => {
-  let nextUpdate = timers[0].timeEnd;
+  let nextUpdate = null;
   let priority = 0;
 
   const assembled = timers.map((timer, index) => {
-    const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timer.timeEnd - Date.now());
+    const timeEnd = new Date(timer.timeEnd);
+    const timeLeft = timeEnd - Date.now();
 
-    // If next update is the last one, prioritize it
-    if (!timeLeftForNextUpdate) priority = 10;
-    console.log(timer, timeLeftForNextUpdate);
+    let diff;
 
-    // Get nextUpdate time
-    const timerNextUpdate = timer.timeEnd - timeLeftForNextUpdate;
-    nextUpdate = Math.min(nextUpdate, timerNextUpdate);
+    // if countdown is done
+    if (timeLeft < 10000) {
+      diff = "no minutes";
+    } else {
+      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft);
 
-    return parts[index] + humanDiff;
+      diff = humanDiff;
+
+      // If next update is the last one, prioritize it
+      if (!timeLeftForNextUpdate) priority = 10;
+      console.log(timer, timeLeftForNextUpdate);
+
+      if (!nextUpdate) nextUpdate = timeEnd;
+
+      // Get nextUpdate time
+      const timerNextUpdate = timeEnd - timeLeftForNextUpdate;
+      nextUpdate = Math.min(nextUpdate, timerNextUpdate);
+    }
+
+    return parts[index] + diff;
   });
+  // console.log(assembled);
   assembled.push(parts[parts.length - 1]);
 
   return { assembledMessage: assembled.join(""), nextUpdate, priority };

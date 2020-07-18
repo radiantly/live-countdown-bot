@@ -1,6 +1,10 @@
 import Database from "better-sqlite3";
 export const db = new Database(process.env.NODE_ENV === "test" ? ":memory:" : "app.db");
 
+import config from "../config.js";
+
+const { channelMax } = config;
+
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
 
@@ -28,7 +32,15 @@ db.prepare(
     FOREIGN KEY (Guild)
       REFERENCES GuildInfo (Guild)
         ON DELETE CASCADE
-  );
+  )
+`
+).run();
+
+db.prepare(
+  `
+  CREATE INDEX IF NOT EXISTS GuildChannelIndex ON CountdownInfo (
+    Guild, Channel
+  )
 `
 ).run();
 
@@ -44,6 +56,7 @@ db.prepare("VACUUM").run();
 
 // Stmt = SQL Query Statement
 
+// Add guilds to GuildInfo table
 const upsertGuildShardStmt = db.prepare(`
   INSERT INTO GuildInfo (Guild, Client) VALUES (@guildId, @clientId)
     ON CONFLICT(Guild) DO UPDATE SET Client = excluded.Client;
@@ -53,26 +66,49 @@ export const initGuilds = db.transaction((guildCache, clientId) => {
   guildCache.each(guild => upsertGuildShardStmt.run({ guildId: guild.id, clientId }));
 });
 export const addGuild = (guildId, clientId) => upsertGuildShardStmt.run({ guildId, clientId });
+// --x--
 
-const selectPrefixStmt = db.prepare("SELECT Prefix from GuildInfo WHERE Guild = ?");
-export const getPrefixFromDb = guildId => selectPrefixStmt.get(guildId);
+// Get or set prefix for each guild
+const selectPrefixStmt = db.prepare("SELECT Prefix from GuildInfo WHERE Guild = @guildId");
+export const getPrefixFromDb = guildId => selectPrefixStmt.get({ guildId });
 
 const updatePrefixStmt = db.prepare("UPDATE GuildInfo SET Prefix = @prefix WHERE Guild = @guildId");
 export const updatePrefixInDb = data => updatePrefixStmt.run(data);
+// --x--
+
+// Adding countdown section
+const trimCountdownsInChannelStmt = db.prepare(`
+  DELETE FROM CountdownInfo
+  WHERE Guild = @guildId AND Channel = @channelId
+  ORDER BY Timestamp DESC
+  LIMIT 10 OFFSET @channelMax
+`);
+const insertCountdownStmt = db.prepare(`
+  INSERT INTO CountdownInfo (Guild, Channel, OriginalMessage, ReplyMessage, NextUpdate, Priority, CountObj)
+  VALUES (@guildId, @channelId, @origMsgId, @replyMsgId, @nextUpdate, @priority, @countObj)
+`);
+export const addCountdown = data => {
+  insertCountdownStmt.run(data);
+  const { guildId, channelId } = data;
+  trimCountdownsInChannelStmt.run({ guildId, channelId, channelMax });
+};
+// --x--
+
+const selectCountdownsInChannelStmt = db.prepare(
+  "SELECT COUNT(*) FROM CountdownInfo WHERE Guild = ? AND Channel = ?"
+);
+export const getCountdownsInChannel = (guildId, channelId) => {
+  selectCountdownsInChannelStmt.get(guildId, channelId);
+  trimChannelCountdowns(guildId, channelId);
+};
 
 const selectAllCountdownsStmt = db.prepare("SELECT COUNT(*) FROM CountdownInfo;");
 export const getTotalCountdowns = () => selectAllCountdownsStmt.get();
 
 const selectCountdownsInGuildStmt = db.prepare(
-  "SELECT COUNT(*) FROM CountdownInfo WHERE GUILD = ?"
+  "SELECT COUNT(*) FROM CountdownInfo WHERE Guild = ?"
 );
-export const getCountdownsInServer = server => selectCountdownsInGuildStmt.run(server);
-
-const insertCountdownStmt = db.prepare(`
-  INSERT INTO CountdownInfo (Guild, Channel, OriginalMessage, ReplyMessage, NextUpdate, Priority, CountObj)
-  VALUES (@guildId, @channelId, @origMsgId, @replyMsgId, @nextUpdate, @priority, @countObj)
-`);
-export const addCountdown = data => insertCountdownStmt.run(data);
+export const getCountdownsInServer = server => selectCountdownsInGuildStmt.get(server);
 
 const updateRecomputedCountdownStmt = db.prepare(`
   UPDATE CountdownInfo
@@ -94,7 +130,7 @@ const deleteMessageStmt = db.prepare("DELETE FROM CountdownInfo WHERE ReplyMessa
 export const removeMessageWithReplyId = messageId => deleteMessageStmt.run(messageId);
 
 const selectNextInQueueStmt = db.prepare(`
-  SELECT Channel, ReplyMessage, CountObj
+  SELECT Channel, ReplyMessage, NextUpdate, CountObj
   FROM CountdownInfo
   INNER JOIN GuildInfo USING (Guild)
   WHERE Client = ?

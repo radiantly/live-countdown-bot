@@ -1,5 +1,5 @@
 const longStrings = {
-  lessThanAMinute: "Less than a minute",
+  lessThanAMinute: "less than a minute",
   minute: "minute",
   hour: "hour",
   day: "day",
@@ -58,8 +58,12 @@ export const computeTimeDiff = (timeLeftms, short = false) => {
   if (finalWords.length > 5) finalWords[1] += ",";
   if (finalWords.length > 2) finalWords.splice(-2, 0, strings.and);
 
+  let timeLeftForNextUpdate = timeLeftms - (timeLeftms % trackUpdate[track]);
+  if (timeLeftms <= timeLeftForNextUpdate + 10000) timeLeftForNextUpdate -= trackUpdate[track];
   return {
-    timeLeftForNextUpdate: timeLeftms - (timeLeftms % trackUpdate[track]) - trackUpdate[track],
+    timeLeftForNextUpdate,
     humanDiff: finalWords.join(" "),
   };
 };
+
+computeTimeDiff(3540000, true);

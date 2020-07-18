@@ -2,9 +2,9 @@ import { computeTimeDiff } from "../modules/computeTimeDiff.js";
 
 describe("Time diff for humans", () => {
   test("diff < 1 min", () => {
-    expect(computeTimeDiff(-1000).humanDiff).toEqual("Less than a minute");
+    expect(computeTimeDiff(-1000).humanDiff).toEqual("less than a minute");
     expect(computeTimeDiff(0, true).humanDiff).toEqual("< 1min");
-    expect(computeTimeDiff(100).humanDiff).toEqual("Less than a minute");
+    expect(computeTimeDiff(100).humanDiff).toEqual("less than a minute");
     expect(computeTimeDiff(1000, true).humanDiff).toEqual("< 1min");
   });
 
