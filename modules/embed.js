@@ -53,20 +53,19 @@ export const generateHelpEmbed = prefix =>
       {
         name: "Examples:",
         value:
-          "```\n" +
-          `${prefix}countdown 10mins\n` +
-          `${prefix}countdown tagme May 24 2021 3:47 PM PDT\n\n` +
-          `Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT! left.\n\n` +
-          `There is !!countdown taghere 11:59 PM EST! left to capture flags!\n` +
-          "```",
+          `\`${prefix}countdown 10mins\`\n` +
+          `\`${prefix}countdown tagme 1 hour 43mins\`\n` +
+          `\`${prefix}countdown Sep 24 3:47 PM PDT\`\n` +
+          `\`Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT! left.\`\n` +
+          `\`There is !!countdown taghere 11:59 PM EST! left to capture flags!\`\n`,
       },
       {
         name: "Notes",
         value:
-          `There can be a maximum of ${channelMax} active countdowns per channel.\n` +
+          `There can be ${channelMax} active countdowns per channel.\n` +
           "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
           `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
-          "Find my support server [here](https://discord.com/invite/dxafzkG 'Join the support server!'). " +
+          "Find my support server [here](https://discord.com/invite/tytftA3 'Join the support server!'). " +
           "Invite me from [here](https://top.gg/bot/710486805836988507).",
       }
     )

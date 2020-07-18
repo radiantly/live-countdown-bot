@@ -23,8 +23,7 @@
   "dependencies": {
     "better-sqlite3": "^7.1.0",
     "chrono-node": "^1.4.6",
-    "discord.js": "^12.2.0",
-    "ioredis": "^4.17.1"
+    "discord.js": "^12.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
