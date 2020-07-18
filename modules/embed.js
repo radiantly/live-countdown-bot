@@ -1,6 +1,7 @@
 import { loadavg, cpus } from "os";
 import { env, memoryUsage, version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
+import { version as sqliteVersion } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import config from "../config.js";
 
@@ -84,8 +85,6 @@ export const generateStatsEmbed = client => {
   const memUsage = Math.round((rss / 1024 / 1024) * 100) / 100;
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
   const upTime = computeTimeDiff(client.uptime, true).humanDiff;
-  const [redisVersion, redisMemUsage] = ["6.0.5", "5"];
-  const totalCountdowns = "200";
   const totalServers = client.guilds.cache.size;
   return new MessageEmbed()
     .setColor("#f26522")
@@ -98,7 +97,7 @@ export const generateStatsEmbed = client => {
       },
       {
         name: ":level_slider: Memory",
-        value: `**${redisMemUsage}** + **${memUsage}M**`,
+        value: `**${memUsage}M**`,
         inline: true,
       },
       {
@@ -122,13 +121,13 @@ export const generateStatsEmbed = client => {
         inline: true,
       },
       {
-        name: ":timer: Countdowns",
-        value: `**${totalCountdowns}** in **${totalServers}**`,
+        name: ":timer: Servers",
+        value: `**${totalServers}**`,
         inline: true,
       },
       {
-        name: ":red_envelope: Redis",
-        value: `**v${redisVersion}**`,
+        name: ":red_envelope: SQLite3",
+        value: `**v${sqliteVersion}**`,
         inline: true,
       }
     )

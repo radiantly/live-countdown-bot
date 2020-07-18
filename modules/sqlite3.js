@@ -54,6 +54,8 @@ db.prepare(
 
 db.prepare("VACUUM").run();
 
+export const [version] = db.prepare("SELECT sqlite_version()").raw().get();
+
 // Stmt = SQL Query Statement
 
 // Add guilds to GuildInfo table
@@ -66,6 +68,11 @@ export const initGuilds = db.transaction((guildCache, clientId) => {
   guildCache.each(guild => upsertGuildShardStmt.run({ guildId: guild.id, clientId }));
 });
 export const addGuild = (guildId, clientId) => upsertGuildShardStmt.run({ guildId, clientId });
+// --x--
+
+// Remove guild
+const deleteGuildStmt = db.prepare("DELETE FROM GuildInfo WHERE Guild = @guildId");
+export const removeGuild = guildId => deleteMessageStmt.run({ guildId });
 // --x--
 
 // Get or set prefix for each guild
@@ -92,6 +99,11 @@ export const addCountdown = data => {
   const { guildId, channelId } = data;
   trimCountdownsInChannelStmt.run({ guildId, channelId, channelMax });
 };
+// --x--
+
+// Removing countdowns
+const deleteMessageStmt = db.prepare("DELETE FROM CountdownInfo WHERE ReplyMessage = ?");
+export const removeMessageWithReplyId = messageId => deleteMessageStmt.run(messageId);
 // --x--
 
 const selectCountdownsInChannelStmt = db.prepare(
@@ -125,9 +137,6 @@ const deleteOldestRowStmt = db.prepare(`
   LIMIT 1
 `);
 export const removeOldestCountdowninGuild = server => deleteOldestRowStmt.run(server);
-
-const deleteMessageStmt = db.prepare("DELETE FROM CountdownInfo WHERE ReplyMessage = ?");
-export const removeMessageWithReplyId = messageId => deleteMessageStmt.run(messageId);
 
 const selectNextInQueueStmt = db.prepare(`
   SELECT Channel, ReplyMessage, NextUpdate, CountObj

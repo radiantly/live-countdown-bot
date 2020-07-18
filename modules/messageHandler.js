@@ -1,5 +1,4 @@
 import { DMChannel, MessageEmbed } from "discord.js";
-import chrono from "chrono-node";
 import { exit } from "process";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import {
@@ -8,12 +7,7 @@ import {
   generateStatsEmbed,
   generateStatsFallback,
 } from "./embed.js";
-import {
-  getCountdownsInServer,
-  removeOldestCountdowninGuild,
-  addCountdown,
-  removeMessageWithReplyId,
-} from "./sqlite3.js";
+import { addCountdown } from "./sqlite3.js";
 import { parseInline, computeCountdown, assembleInlineMessage } from "./countdownHelper.js";
 import config from "../config.js";
 import { getPrefix, setPrefix } from "./prefixHandler.js";
@@ -136,14 +130,6 @@ export const messageHandler = async (message, messageReply) => {
     if (command === "whoistherealtechguy") return await sendReply("<@553965304993153049>");
 
     if (message.author.id === botOwner) {
-      // if (command === "flush" && args.length === 1)
-      //   return await sendReply(await removeCountdowns(args[0]));
-
-      // if (command === "logs")
-      //   return await getLogs().then(results =>
-      //     sendReply(runTime.join(" | ") + "\n```" + results.join("\n") + "```")
-      //   );
-
       if (command === "eval") {
         try {
           return await sendReply(`${eval(args.join(""))}`);
