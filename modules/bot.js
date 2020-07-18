@@ -73,8 +73,8 @@ client.on("guildCreate", guild => {
   log(`Added to ${guild.name} (${guild.id})`);
 });
 
-client.on("guildDelete", async guild => {
-  log(`Removed from ${guild.name}: ${await removeCountdowns(guild.id)}`);
+client.on("guildDelete", guild => {
+  log(`Removed from ${guild.name} (${guild.id})`);
   removeGuild(guild.id);
 });
 

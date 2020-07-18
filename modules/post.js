@@ -1,8 +1,9 @@
 import { request } from "https";
-import { log } from "./db.js";
-import config from "../config.json";
+import config from "../config.js";
 
 const { topggAPIkey, discordBotsggAPIkey, discordBotscoAPIkey } = config;
+
+const log = console.log;
 
 const postJSON = (url, jsonString, headers) => {
   const req = request(

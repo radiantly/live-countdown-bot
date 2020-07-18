@@ -72,7 +72,7 @@ export const addGuild = (guildId, clientId) => upsertGuildShardStmt.run({ guildI
 
 // Remove guild
 const deleteGuildStmt = db.prepare("DELETE FROM GuildInfo WHERE Guild = @guildId");
-export const removeGuild = guildId => deleteMessageStmt.run({ guildId });
+export const removeGuild = guildId => deleteGuildStmt.run({ guildId });
 // --x--
 
 // Get or set prefix for each guild
@@ -106,22 +106,6 @@ const deleteMessageStmt = db.prepare("DELETE FROM CountdownInfo WHERE ReplyMessa
 export const removeMessageWithReplyId = messageId => deleteMessageStmt.run(messageId);
 // --x--
 
-const selectCountdownsInChannelStmt = db.prepare(
-  "SELECT COUNT(*) FROM CountdownInfo WHERE Guild = ? AND Channel = ?"
-);
-export const getCountdownsInChannel = (guildId, channelId) => {
-  selectCountdownsInChannelStmt.get(guildId, channelId);
-  trimChannelCountdowns(guildId, channelId);
-};
-
-const selectAllCountdownsStmt = db.prepare("SELECT COUNT(*) FROM CountdownInfo;");
-export const getTotalCountdowns = () => selectAllCountdownsStmt.get();
-
-const selectCountdownsInGuildStmt = db.prepare(
-  "SELECT COUNT(*) FROM CountdownInfo WHERE Guild = ?"
-);
-export const getCountdownsInServer = server => selectCountdownsInGuildStmt.get(server);
-
 const updateRecomputedCountdownStmt = db.prepare(`
   UPDATE CountdownInfo
   SET NextUpdate = @nextUpdate,
@@ -129,14 +113,6 @@ const updateRecomputedCountdownStmt = db.prepare(`
   WHERE ReplyMessage = @replyMsgId
 `);
 export const updateRecomputedCountdown = data => updateRecomputedCountdownStmt.run(data);
-
-const deleteOldestRowStmt = db.prepare(`
-  DELETE FROM CountdownInfo
-  WHERE Guild = ?
-  ORDER BY Timestamp
-  LIMIT 1
-`);
-export const removeOldestCountdowninGuild = server => deleteOldestRowStmt.run(server);
 
 const selectNextInQueueStmt = db.prepare(`
   SELECT Channel, ReplyMessage, NextUpdate, CountObj
@@ -147,3 +123,21 @@ const selectNextInQueueStmt = db.prepare(`
   LIMIT 1
 `);
 export const getNextInQueue = clientId => selectNextInQueueStmt.get(clientId);
+
+// Below statements are currently unused
+
+const selectAllCountdownsStmt = db.prepare("SELECT COUNT(*) FROM CountdownInfo;");
+export const getTotalCountdowns = () => selectAllCountdownsStmt.get();
+
+const selectCountdownsInGuildStmt = db.prepare(
+  "SELECT COUNT(*) FROM CountdownInfo WHERE Guild = ?"
+);
+export const getCountdownsInServer = server => selectCountdownsInGuildStmt.get(server);
+
+const deleteOldestRowStmt = db.prepare(`
+  DELETE FROM CountdownInfo
+  WHERE Guild = ?
+  ORDER BY Timestamp
+  LIMIT 1
+`);
+export const removeOldestCountdowninGuild = server => deleteOldestRowStmt.run(server);
