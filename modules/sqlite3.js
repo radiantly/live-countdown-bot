@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-export const db = new Database(process.env.NODE_ENV === "test" ? ":memory:" : "app.db");
+export const db = new Database(process.env.NODE_ENV === "test" ? ":memory:" : "db/app.db");
 
 import config from "../config.js";
 

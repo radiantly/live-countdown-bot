@@ -74,9 +74,13 @@ export const messageHandler = async (message, messageReply) => {
         priority,
         countObj: JSON.stringify({ parts: inline.parts, timers }),
       });
+    return;
   }
 
   const prefix = message.guild?.available ? getPrefix(message.guild) : "!";
+
+  if (message.content === `<@!${message.client.user.id}>`)
+    return await sendReply(`Need help? Try \`${prefix}help\``);
 
   if (message.content.startsWith(prefix)) {
     const args = message.content.slice(prefix.length).split(/ +/);
@@ -108,6 +112,10 @@ export const messageHandler = async (message, messageReply) => {
       if (newPrefix.length >= 4) return await sendReply("Prefix can at most be 3 characters.");
       if (!message.guild?.available)
         return await sendReply("Sorry, custom prefixes can only be set in servers.");
+      if (!message.member.permissionsIn(message.channel).has("MANAGE_MESSAGES"))
+        return await sendReply(
+          "Sorry, you must have the `MANAGE_MESSAGES` permission to set a new prefix."
+        );
       setPrefix(message.guild, newPrefix);
       return await sendReply(`Prefix has been successfully set to \`${newPrefix}\``);
     }
