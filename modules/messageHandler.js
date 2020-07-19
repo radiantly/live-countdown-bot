@@ -1,35 +1,18 @@
 import { DMChannel, MessageEmbed } from "discord.js";
-import chrono from "chrono-node";
 import { exit } from "process";
-import { timeDiffForHumans } from "./timeDiffForHumans.js";
+import { computeTimeDiff } from "./computeTimeDiff.js";
 import {
   generateHelpEmbed,
   generateHelpFallback,
   generateStatsEmbed,
   generateStatsFallback,
 } from "./embed.js";
-import {
-  getCountdownLen,
-  addCountdown,
-  log,
-  removeCountdowns,
-  removeMessageWithId,
-  getLogs,
-} from "./db.js";
-import { getTag } from "./countdownHelper.js";
-import { runTime } from "../index.js";
-import config from "../config.json";
+import { addCountdown } from "./sqlite3.js";
+import { parseInline, computeCountdown, assembleInlineMessage } from "./countdownHelper.js";
+import config from "../config.js";
+import { getPrefix, setPrefix } from "./prefixHandler.js";
 
-const { prefix, botOwner, maxCountdowns } = config;
-
-const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const inlineCommandPattern = new RegExp(
-  `^(.*)${escapedPrefix}(${escapedPrefix}[^${escapedPrefix}]+)${escapedPrefix}(.*)$`,
-  "sm"
-);
-
-const maxTimeEnd = new Date();
-maxTimeEnd.setFullYear(maxTimeEnd.getFullYear() + 2);
+const { botOwner } = config;
 
 // messageReply is only populated during a messageUpdate event
 export const messageHandler = async (message, messageReply) => {
@@ -39,147 +22,134 @@ export const messageHandler = async (message, messageReply) => {
   // Check if we're allowed to send messages in the channel
   if (message.guild?.me?.permissionsIn(message.channel.id).has("SEND_MESSAGES") === false) return;
 
+  // Send reply. If message was edited, edit replyMessage.
   const sendReply = async reply => {
     if (messageReply) {
       if (reply instanceof MessageEmbed)
         return await messageReply.edit({ content: null, embed: reply });
-      return await messageReply.edit({ content: reply, embed: null });
+      if (typeof reply === "string")
+        return await messageReply.edit({ content: reply, embed: null });
+      return await messageReply.edit(reply);
     }
     const sentMessage = await message.channel.send(reply);
     message[Symbol.for("messageReply")] = sentMessage;
     return sentMessage;
   };
 
-  // If active countdown exists for the current message, only process message once it is removed
-  if (message[Symbol.for("active")])
-    if (messageReply && (await removeMessageWithId(message.guild.id, messageReply.id)))
-      message[Symbol.for("active")] = false;
-    else return sendReply("Error. Message in superposition.");
+  // Check if inline countdown
+  const inline = parseInline(message.content);
 
-  const inlineContent = message.content.match(inlineCommandPattern);
-  const inline = inlineContent?.length === 4;
+  if (inline) {
+    if (!message.guild?.available)
+      return await sendReply("Sorry, countdowns can only be initiated in servers.");
+    let error = false;
+    const timers = inline.commands.map(inlineCommand => {
+      const timer = computeCountdown(inlineCommand, message);
+      if (timer.error) error = true;
+      return timer;
+    });
+    console.log(timers);
+    if (error)
+      return await sendReply(
+        timers
+          .map((timer, index) =>
+            timer.error
+              ? `:negative_squared_cross_mark: Countdown ${index + 1}: ${timer.error}`
+              : `:white_check_mark: Countdown ${index + 1}: No problems`
+          )
+          .join("\n")
+      );
 
-  // Check if inline command or starts with prefix
-  if (!inline && !message.content.startsWith(prefix)) {
-    // If DM, guide them to !help
-    if (message.channel instanceof DMChannel)
-      return await sendReply("Try `!help`\nInvite from https://top.gg/bot/710486805836988507");
+    const { assembledMessage, priority, nextUpdate } = assembleInlineMessage(timers, inline.parts);
+
+    const replyMessage = await sendReply(assembledMessage);
+
+    if (replyMessage)
+      addCountdown({
+        guildId: message.guild.id,
+        channelId: message.channel.id,
+        origMsgId: message.id,
+        replyMsgId: replyMessage.id,
+        nextUpdate,
+        priority,
+        countObj: JSON.stringify({ parts: inline.parts, timers }),
+      });
     return;
   }
 
-  const content = inline ? inlineContent[2] : message.content;
-  const args = content.slice(prefix.length).split(/ +/);
-  const command = args.shift().toLowerCase();
+  const prefix = message.guild?.available ? getPrefix(message.guild) : "!";
 
-  // Display help message
-  if (["help", "commands", "usage"].includes(command))
-    return message.guild?.me?.permissionsIn(message.channel.id).has("EMBED_LINKS") === false
-      ? await sendReply(generateHelpFallback())
-      : await sendReply(generateHelpEmbed(command));
+  if (message.content === `<@!${message.client.user.id}>`)
+    return await sendReply(`Need help? Try \`${prefix}help\``);
 
-  // Show process stats
-  if (command === "botstats")
-    return message.guild?.me?.permissionsIn(message.channel.id).has("EMBED_LINKS") === false
-      ? await sendReply(generateStatsFallback(message.client))
-      : await sendReply(await generateStatsEmbed(message.client));
+  if (message.content.startsWith(prefix)) {
+    const args = message.content.slice(prefix.length).split(/ +/);
+    const command = args.shift().toLowerCase();
 
-  // Start a countdown
-  if (command === "countdown") {
-    if (!args.length)
-      return await sendReply(
-        "Syntax: `!countdown <Date/time to countdown to>`\n" +
-          "*Edit your message to see this error go away*"
-      );
+    if (command === "countdown") {
+      if (!message.guild?.available)
+        return await sendReply("Sorry, countdowns can only be initiated in servers.");
+      const timer = computeCountdown(args.join(" "), message);
+      if (timer.error) return await sendReply(timer.error);
+      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timer.timeEnd - Date.now());
+      const replyMessage = await sendReply(`Time left: ${humanDiff}.`);
+      if (replyMessage)
+        addCountdown({
+          guildId: message.guild.id,
+          channelId: message.channel.id,
+          origMsgId: message.id,
+          replyMsgId: replyMessage.id,
+          nextUpdate: timer.timeEnd - timeLeftForNextUpdate,
+          priority: timeLeftForNextUpdate ? 0 : 10,
+          countObj: JSON.stringify({ timers: [timer] }),
+        });
+    }
 
-    let MessageObj = {};
-
-    const tagObj = getTag(args.join(" "), message);
-
-    if (tagObj.error) return await sendReply(tagObj.error);
-
-    const { command: argstring, tag } = tagObj;
-    if (tag) MessageObj.tag = tag;
-
-    if (["infinity", "\u221E", "\u267E\uFE0F"].includes(argstring.toLowerCase()))
-      return await sendReply("Seriously? -_-");
-
-    const timeEnd = chrono.parseDate(argstring);
-    if (!timeEnd)
-      return await sendReply("Invalid date/time!\n*Edit your message to see this error go away*");
-
-    if (!message.guild?.available)
-      return await sendReply("The date/time is valid, but this bot can only be used in servers.");
-
-    let priority = true;
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-      const countdowns = await getCountdownLen(message.guild.id);
-      if (countdowns >= maxCountdowns)
+    // Set a new prefix
+    if (command === "setprefix") {
+      if (args.length !== 1) return await sendReply(`Syntax: \`${prefix}setprefix <newprefix>\``);
+      const newPrefix = args[0];
+      if (newPrefix.length >= 4) return await sendReply("Prefix can at most be 3 characters.");
+      if (!message.guild?.available)
+        return await sendReply("Sorry, custom prefixes can only be set in servers.");
+      if (!message.member.permissionsIn(message.channel).has("MANAGE_MESSAGES"))
         return await sendReply(
-          "Max countdowns exceeded. You must have the `MANAGE_MESSAGES` permission to set any more."
+          "Sorry, you must have the `MANAGE_MESSAGES` permission to set a new prefix."
         );
-      priority = false;
+      setPrefix(message.guild, newPrefix);
+      return await sendReply(`Prefix has been successfully set to \`${newPrefix}\``);
     }
 
-    const timeStart = message.editedAt || message.createdAt;
-    const timeLeft = timeEnd - timeStart;
+    const fallbackRequired =
+      message.guild?.me?.permissionsIn(message.channel.id).has("EMBED_LINKS") === false;
 
-    if (timeLeft < 0)
-      return await sendReply(
-        "You are trying to set a countdown to a date/time in the past. " +
-          "A common reason for this is the lack of year.\n" +
-          "*Edit your message to see this error go away*"
-      );
+    // Display help message
+    if (["help", "usage"].includes(command) && !args.length)
+      return fallbackRequired
+        ? await sendReply(generateHelpFallback(prefix))
+        : await sendReply(generateHelpEmbed(prefix));
 
-    if (timeLeft < 59000)
-      return await sendReply("Too short! Countdowns must be higher than a minute!");
+    // Show process stats
+    if (command === "botstats")
+      return fallbackRequired
+        ? await sendReply(generateStatsFallback(message.client))
+        : await sendReply(generateStatsEmbed(message.client));
 
-    if (timeEnd > maxTimeEnd)
-      return await sendReply(
-        ":eyes: That's too far away in the future. Currently, countdowns are limited to 2 years."
-      );
+    if (command === "whoistherealtechguy") return await sendReply("<@553965304993153049>");
 
-    let reply = `Time left: ${timeDiffForHumans(timeLeft)} left.`;
-    if (inline) {
-      MessageObj.content = [inlineContent[1], inlineContent[3]];
-      reply = `${inlineContent[1]}${timeDiffForHumans(timeLeft)}${inlineContent[3]}`;
-    }
-
-    message[Symbol.for("active")] = true;
-    return await sendReply(reply).then(replyMessage => {
-      if (!replyMessage?.id || !replyMessage.guild?.id || !replyMessage.channel?.id) return;
-
-      // Delete message initiating countdowm if possible
-      if (message.deletable) message.delete({ reason: "Countdown initiate" });
-
-      MessageObj = {
-        messageId: replyMessage.id,
-        channelId: replyMessage.channel.id,
-        timeEnd: timeEnd,
-        ...MessageObj,
-      };
-      addCountdown(replyMessage.guild.id, MessageObj, priority);
-    });
-  }
-
-  if (command === "whoistherealtechguy") return await sendReply("<@553965304993153049>");
-
-  if (message.author?.id === botOwner) {
-    if (command === "flush" && args.length === 1)
-      return await sendReply(await removeCountdowns(args[0]));
-
-    if (command === "logs")
-      return await getLogs().then(results =>
-        sendReply(runTime.join(" | ") + "\n```" + results.join("\n") + "```")
-      );
-
-    if (command === "eval") {
-      try {
-        return await sendReply(`${eval(args.join(""))}`);
-      } catch (ex) {
-        return await sendReply(`Error: ${ex}`);
+    if (message.author.id === botOwner) {
+      if (command === "eval") {
+        try {
+          return await sendReply(`${eval(args.join(""))}`);
+        } catch (ex) {
+          return await sendReply(`Error: ${ex}`);
+        }
       }
-    }
 
-    if (command === "kill") exit();
+      if (command === "kill") exit();
+    }
   }
+  // If DM channel and not command, guide them to help.
+  if (message.channel instanceof DMChannel)
+    return await sendReply("Try `!help`\nInvite from https://top.gg/bot/710486805836988507");
 };

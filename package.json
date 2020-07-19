@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node --experimental-json-modules index.js",
+    "start": "node index.js",
     "check-formatting": "prettier --check \"**/*.js\"",
-    "test": "jest"
+    "test": "NODE_ENV=test jest"
   },
   "repository": {
     "type": "git",
@@ -21,9 +21,9 @@
   },
   "homepage": "https://github.com/radiantly/live-countdown-bot#readme",
   "dependencies": {
+    "better-sqlite3": "^7.1.0",
     "chrono-node": "^1.4.6",
-    "discord.js": "^12.2.0",
-    "ioredis": "^4.17.1"
+    "discord.js": "^12.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
@@ -38,5 +38,8 @@
     "hooks": {
       "pre-commit": "npm test && pretty-quick --staged"
     }
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }

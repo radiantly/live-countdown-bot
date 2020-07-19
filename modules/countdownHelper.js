@@ -1,3 +1,22 @@
+// import { computeTimeDiff } from "./timeDiffForHumans.js";
+import chrono from "chrono-node";
+import { computeTimeDiff } from "./computeTimeDiff.js";
+
+export const parseInline = command => {
+  let commands = [];
+  let parts = [];
+  for (let i = 1; i <= 5; i++) {
+    const match = command.match(/^(.*?)!!countdown ([^!]+)!(.*)$/ims);
+    if (match?.length !== 4) break;
+    parts.push(match[1]);
+    commands.push(match[2].trim().toLowerCase());
+    command = match[3];
+  }
+  if (parts.length) parts.push(command);
+  else return null;
+  return { commands, parts };
+};
+
 const findRoleId = (commandArray, guild) => {
   let tag = commandArray.shift();
 
@@ -44,4 +63,80 @@ export const getTag = (command, message) => {
   return tag
     ? { command: commandArray.join(" "), tag }
     : { error: "Accepted tags: tagme/taghere/tageveryone" };
+};
+
+const maxTimeEnd = new Date();
+maxTimeEnd.setFullYear(maxTimeEnd.getFullYear() + 2);
+
+export const computeCountdown = (command, message) => {
+  const countObj = {};
+
+  // Get tag if present
+  const tagObj = getTag(command, message);
+  if (tagObj.error) return tagObj;
+  command = tagObj.command;
+  if (tagObj.tag) countObj.tag = tagObj.tag;
+
+  if (["infinity", "\u221E", "\u267E\uFE0F"].includes(command)) return { error: "Seriously? -_-" };
+
+  // Parse time and check if valid
+  const timeEnd = chrono.parseDate(command);
+  if (!timeEnd) return { error: "Invalid date/time." };
+  const timeLeft = timeEnd - Date.now();
+
+  // Check if date/time in the past
+  if (timeLeft < 0)
+    return {
+      error:
+        "You are trying to set a countdown to a date/time in the past. " +
+        "A common reason for this is the lack of year.",
+    };
+
+  if (timeLeft < 55000) return { error: "Too short! Countdowns must be higher than a minute!" };
+
+  if (timeEnd > maxTimeEnd)
+    return {
+      error:
+        ":eyes: That's too far away in the future. Currently, countdowns are limited to 2 years.",
+    };
+
+  countObj.timeEnd = timeEnd;
+  return countObj;
+};
+
+export const assembleInlineMessage = (timers, parts) => {
+  let nextUpdate = null;
+  let priority = 0;
+
+  const assembled = timers.map((timer, index) => {
+    const timeEnd = new Date(timer.timeEnd);
+    const timeLeft = timeEnd - Date.now();
+
+    let diff;
+
+    // if countdown is done
+    if (timeLeft < 10000) {
+      diff = "no minutes";
+    } else {
+      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft);
+
+      diff = humanDiff;
+
+      // If next update is the last one, prioritize it
+      if (!timeLeftForNextUpdate) priority = 10;
+      console.log(timer, timeLeftForNextUpdate);
+
+      if (!nextUpdate) nextUpdate = timeEnd;
+
+      // Get nextUpdate time
+      const timerNextUpdate = timeEnd - timeLeftForNextUpdate;
+      nextUpdate = Math.min(nextUpdate, timerNextUpdate);
+    }
+
+    return parts[index] + diff;
+  });
+  // console.log(assembled);
+  assembled.push(parts[parts.length - 1]);
+
+  return { assembledMessage: assembled.join(""), nextUpdate, priority };
 };
