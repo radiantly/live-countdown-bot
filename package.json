@@ -22,15 +22,15 @@
   "homepage": "https://github.com/radiantly/live-countdown-bot#readme",
   "dependencies": {
     "better-sqlite3": "^7.1.0",
-    "chrono-node": "^1.4.6",
+    "chrono-node": "^1.4.8",
     "discord.js": "^12.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.2",
-    "@babel/preset-env": "^7.10.2",
-    "babel-jest": "^26.0.1",
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "babel-jest": "^26.1.0",
     "husky": "^4.2.5",
-    "jest": "^26.0.1",
+    "jest": "^26.1.0",
     "prettier": "2.0.5",
     "pretty-quick": "^2.0.1"
   },

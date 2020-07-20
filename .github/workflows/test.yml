@@ -1,11 +1,11 @@
 name: Tests
 on:
   push:
-    branches: [master]
+    branches: [master, develop]
     paths:
       - "**.js"
   pull_request:
-    branches: [master]
+    branches: [master, develop]
     paths:
       - "**.js"
 

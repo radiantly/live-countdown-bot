@@ -16,7 +16,7 @@ const activities = [
 const activity = activities[Math.floor(Math.random() * activities.length)];
 const presence =
   env.NODE_ENV === "debug"
-    ? { activity: { name: "maintenance", type: "WATCHING" }, status: "online" }
+    ? { activity: { name: "maintenance", type: "WATCHING" }, status: "dnd" }
     : { activity, status: "online" };
 
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
@@ -25,7 +25,7 @@ const client = new Client({
   messageCacheMaxSize: 10,
   messageCacheLifetime: 30 * 60 * 60,
   messageSweepInterval: 6 * 60 * 60,
-  presence: { activity: { name: "v2 upgrade. Report bugs!", type: "WATCHING" }, status: "dnd" },
+  presence: { activity: { name: "v2 upgrade. Report bugs!", type: "WATCHING" }, status: "online" },
   ws: { intents: requiredIntents },
 });
 
