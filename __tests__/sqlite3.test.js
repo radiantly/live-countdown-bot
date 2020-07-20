@@ -1,5 +1,6 @@
-import { db, initGuilds, getTotalCountdowns } from "../modules/sqlite3.js";
+import { db, initGuilds, addGuild } from "../modules/sqlite3.js";
 import { Client, Guild, Collection } from "discord.js";
+import { getPrefix, setPrefix } from "../modules/prefixHandler.js";
 
 describe("test db functions", () => {
   const client = new Client();
@@ -35,6 +36,25 @@ describe("test db functions", () => {
     expect(db.prepare("SELECT Guild FROM GuildInfo WHERE Client = 2").raw().all().sort()).toEqual(
       [["719541990580289557"], ["703884760531075183"]].sort()
     );
+  });
+
+  // Test prefixHandler.js
+  // TODO: Move to own test file once
+  // https://github.com/JoshuaWise/better-sqlite3/issues/414 is resolved
+
+  db.prepare("DELETE FROM GuildInfo").run();
+
+  test("null conditions", () => {
+    expect(getPrefix(testGuild)).toBe("!");
+    expect(setPrefix(testGuild, "4")).toBeUndefined();
+  });
+
+  addGuild(testGuild.id, "0");
+
+  test("normal working", () => {
+    expect(getPrefix(testGuild)).toBe("4");
+    expect(setPrefix(testGuild, "gad")).toBeUndefined();
+    expect(getPrefix(testGuild)).toBe("gad");
   });
 
   afterAll(() => {

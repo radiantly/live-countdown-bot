@@ -16,7 +16,7 @@ const activities = [
 const activity = activities[Math.floor(Math.random() * activities.length)];
 const presence =
   env.NODE_ENV === "debug"
-    ? { activity: { name: "maintenance", type: "WATCHING" }, status: "dnd" }
+    ? { activity: { name: "maintenance", type: "WATCHING" }, status: "online" }
     : { activity, status: "online" };
 
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
@@ -49,18 +49,17 @@ client.on("message", async message => {
     message.channel.messages.cache.delete(message.id);
 });
 
-// client.on("messageUpdate", (_, message) => {
-//   if (message.partial || message.author.bot) return;
+client.on("messageUpdate", (_, message) => {
+  if (message.partial || message.author.bot) return;
 
-//   const messageReply = message[Symbol.for("messageReply")];
-//   if (messageReply && !messageReply.deleted) messageHandler(message, messageReply);
-// });
+  const messageReply = message[Symbol.for("messageReply")];
+  if (messageReply && !messageReply.deleted) messageHandler(message, messageReply);
+});
 
 client.on("messageDelete", message => {
-  const { id: messageId, guild, client, author } = message;
-  if (author?.id !== client.user?.id || !guild?.available) return;
+  const { guild, client, author } = message;
+  if (message.partial || author.id !== client.user.id || !guild.available) return;
 
-  // removeMessageWithId(guild.id, messageId);
   removeMessageWithReplyId(message.id);
 });
 
@@ -87,9 +86,9 @@ client.login(token);
 if (env.NODE_ENV === "debug") client.on("debug", console.info);
 
 process.on("unhandledRejection", log);
-process.on("SIGTERM", () => process.exit(143));
-process.on("SIGINT", () => process.exit(130));
-process.on("SIGHUP", () => process.exit(129));
+process.on("SIGHUP", () => process.exit(128 + 1));
+process.on("SIGINT", () => process.exit(128 + 2));
+process.on("SIGTERM", () => process.exit(128 + 15));
 process.on("exit", code => {
   console.log(`Destroying client ${clientId} (${client.shard.ids.join()}). Code ${code}.`);
   client.destroy();

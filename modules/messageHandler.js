@@ -7,7 +7,7 @@ import {
   generateStatsEmbed,
   generateStatsFallback,
 } from "./embed.js";
-import { addCountdown } from "./sqlite3.js";
+import { addCountdown, removeMessageWithReplyId } from "./sqlite3.js";
 import { parseInline, computeCountdown, assembleInlineMessage } from "./countdownHelper.js";
 import config from "../config.js";
 import { getPrefix, setPrefix } from "./prefixHandler.js";
@@ -35,6 +35,8 @@ export const messageHandler = async (message, messageReply) => {
     message[Symbol.for("messageReply")] = sentMessage;
     return sentMessage;
   };
+
+  if (messageReply) removeMessageWithReplyId(messageReply.id);
 
   // Check if inline countdown
   const inline = parseInline(message.content);

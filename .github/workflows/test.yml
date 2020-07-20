@@ -22,4 +22,6 @@ jobs:
       - name: Check formatting
         run: npm run check-formatting
       - name: Run Tests
-        run: npm test
+        run: |
+          mv config.sample.js config.js
+          npm test
