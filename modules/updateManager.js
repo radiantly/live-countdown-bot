@@ -4,7 +4,7 @@ import { computeTimeDiff } from "./computeTimeDiff.js";
 import { assembleInlineMessage } from "./countdownHelper.js";
 
 // Automatically reject promise after 1000ms
-const timedPromise = (callback, ...args) => {
+export const timedPromise = (callback, ...args) => {
   return Promise.race([
     callback(...args),
     new Promise((_, reject) =>

@@ -1,9 +1,11 @@
 import { loadavg, cpus } from "os";
-import { env, memoryUsage, version as nodeVersion } from "process";
+import { memoryUsage, version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
 import { version as sqliteVersion } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import config from "../config.js";
+import { timedPromise } from "./updateManager.js";
+import { getGitInfo } from "./gitinfo.js";
 
 const { channelMax } = config;
 
@@ -74,10 +76,8 @@ export const generateHelpEmbed = prefix =>
 
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
 
-const statsFooterText =
-  env.REF && env.COMMIT_SHA
-    ? `Build: ${env.REF.replace(/^.*\//, "")}@${env.COMMIT_SHA.substring(0, 7)}`
-    : "Live Countdown Bot";
+let statsFooterText = "Live Countdown Bot";
+timedPromise(getGitInfo).then(gitinfo => (statsFooterText = gitinfo));
 
 export const generateStatsEmbed = async client => {
   const { rss } = memoryUsage();
