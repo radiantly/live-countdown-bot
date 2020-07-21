@@ -36,6 +36,9 @@ export const messageHandler = async (message, messageReply) => {
     return sentMessage;
   };
 
+  const deleteMessage = message =>
+    message.deletable && message.delete({ reason: "Automatic countdown deletion!" });
+
   if (messageReply) removeMessageWithReplyId(messageReply.id);
 
   // Check if inline countdown
@@ -65,7 +68,7 @@ export const messageHandler = async (message, messageReply) => {
     const { assembledMessage, priority, nextUpdate } = assembleInlineMessage(timers, inline.parts);
 
     const replyMessage = await sendReply(assembledMessage);
-
+    deleteMessage(message);
     if (replyMessage)
       addCountdown({
         guildId: message.guild.id,
@@ -95,6 +98,7 @@ export const messageHandler = async (message, messageReply) => {
       if (timer.error) return await sendReply(timer.error);
       const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timer.timeEnd - Date.now());
       const replyMessage = await sendReply(`Time left: ${humanDiff}.`);
+      deleteMessage(message);
       if (replyMessage)
         addCountdown({
           guildId: message.guild.id,
