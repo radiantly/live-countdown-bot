@@ -1,6 +1,6 @@
 {
   "name": "live-countdown-bot",
-  "version": "1.0.0",
+  "version": "2.0.5",
   "description": "A discord bot that counts down to an event.",
   "main": "index.js",
   "type": "module",
