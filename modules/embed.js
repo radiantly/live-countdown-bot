@@ -86,7 +86,7 @@ export const generateStatsEmbed = async client => {
   const upTime = computeTimeDiff(client.uptime, true).humanDiff;
   const totalServers = await client.shard
     .fetchClientValues("guilds.cache.size")
-    .then(sizes => sizes.reduce((size, guildCount) => size + guildCount, 0))
+    .then(sizes => sizes.reduce((total, size) => total + size, 0))
     .catch(console.error);
 
   return new MessageEmbed()

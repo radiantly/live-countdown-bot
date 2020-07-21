@@ -33,7 +33,7 @@ export const postServerCount = guildSizes => {
   const botId = "710486805836988507";
 
   const shardCount = guildSizes.length;
-  const guildCount = guildSizes.reduce((size, count) => size + count, 0);
+  const guildCount = guildSizes.reduce((total, size) => total + size, 0);
 
   const topggData = JSON.stringify({ server_count: guildSizes });
   postJSON(`https://top.gg/api/bots/${botId}/stats`, topggData, {

@@ -1,5 +1,6 @@
 import { DMChannel, MessageEmbed } from "discord.js";
 import { exit } from "process";
+import { inspect, types } from "util";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import {
   generateHelpEmbed,
@@ -10,7 +11,7 @@ import {
 import { addCountdown, removeMessageWithReplyId } from "./sqlite3.js";
 import { parseInline, computeCountdown, assembleInlineMessage } from "./countdownHelper.js";
 import config from "../config.js";
-import { getPrefix, setPrefix } from "./prefixHandler.js";
+import { getPrefix, setPrefix, escapeBacktick } from "./prefixHandler.js";
 
 const { botOwner } = config;
 
@@ -85,7 +86,7 @@ export const messageHandler = async (message, messageReply) => {
   const prefix = message.guild?.available ? getPrefix(message.guild) : "!";
 
   if (message.content === `<@!${message.client.user.id}>`)
-    return await sendReply(`Need help? Try \`${prefix}help\``);
+    return await sendReply(`Need help? Try ${escapeBacktick(prefix + "help")}`);
 
   if (message.content.startsWith(prefix)) {
     const args = message.content.slice(prefix.length).split(/ +/);
@@ -123,7 +124,7 @@ export const messageHandler = async (message, messageReply) => {
           "Sorry, you must have the `MANAGE_MESSAGES` permission to set a new prefix."
         );
       setPrefix(message.guild, newPrefix);
-      return await sendReply(`Prefix has been successfully set to \`${newPrefix}\``);
+      return await sendReply(`Prefix has been successfully set to ${escapeBacktick(newPrefix)}`);
     }
 
     const fallbackRequired =
@@ -144,12 +145,18 @@ export const messageHandler = async (message, messageReply) => {
     if (command === "whoistherealtechguy") return await sendReply("<@553965304993153049>");
 
     if (message.author.id === botOwner) {
-      if (command === "eval") {
+      if (command.startsWith("eval")) {
+        let result;
         try {
-          return await sendReply(`${eval(args.join(""))}`);
+          result = eval(args.join(" "));
+          if (types.isPromise) result = await result;
         } catch (ex) {
-          return await sendReply(`Error: ${ex}`);
+          result = ex;
         }
+        if (typeof result !== "string") result = inspect(result);
+        return command === "eval"
+          ? await sendReply("```\n" + result.substr(0, 1950) + "\n```")
+          : null;
       }
 
       if (command === "kill") exit();
