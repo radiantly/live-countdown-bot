@@ -79,12 +79,16 @@ const statsFooterText =
     ? `Build: ${env.REF.replace(/^.*\//, "")}@${env.COMMIT_SHA.substring(0, 7)}`
     : "Live Countdown Bot";
 
-export const generateStatsEmbed = client => {
+export const generateStatsEmbed = async client => {
   const { rss } = memoryUsage();
   const memUsage = Math.round((rss / 1024 / 1024) * 100) / 100;
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
   const upTime = computeTimeDiff(client.uptime, true).humanDiff;
-  const totalServers = client.guilds.cache.size;
+  const totalServers = await client.shard
+    .fetchClientValues("guilds.cache.size")
+    .then(sizes => sizes.reduce((size, guildCount) => size + guildCount, 0))
+    .catch(console.error);
+
   return new MessageEmbed()
     .setColor("#f26522")
     .setTitle("Stats")
