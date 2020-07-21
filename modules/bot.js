@@ -38,9 +38,6 @@ client.once("ready", () => {
 
   initGuilds(client.guilds.cache, clientId);
   updateCountdowns(client, clientId);
-
-  // Post server counts to bot lists hourly.
-  if (env.NODE_ENV === "production") client.setInterval(postServerCount, 60 * 60 * 1000, client);
 });
 
 client.on("message", async message => {

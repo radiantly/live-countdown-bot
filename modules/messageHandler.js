@@ -139,7 +139,7 @@ export const messageHandler = async (message, messageReply) => {
     if (command === "botstats")
       return fallbackRequired
         ? await sendReply(generateStatsFallback(message.client))
-        : await sendReply(generateStatsEmbed(message.client));
+        : await sendReply(await generateStatsEmbed(message.client));
 
     if (command === "whoistherealtechguy") return await sendReply("<@553965304993153049>");
 

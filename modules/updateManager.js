@@ -14,7 +14,7 @@ const timedPromise = (callback, ...args) => {
 };
 
 export const updateCountdowns = async (client, clientId) => {
-  client.setTimeout(updateCountdowns, 200, client, clientId);
+  client.setTimeout(updateCountdowns, 400, client, clientId);
   const countdownObj = getNextInQueue(clientId);
 
   // Abort if no elements exist
@@ -51,7 +51,10 @@ export const updateCountdowns = async (client, clientId) => {
         nextUpdate,
         priority,
       });
-    await timedPromise(editMessage, assembledMessage);
+    await timedPromise(editMessage, assembledMessage).catch(error => {
+      console.log(replyMsgId, error);
+      if (error instanceof DiscordAPIError) removeMessageWithReplyId(replyMsgId);
+    });
   } else {
     // If not inline, it must be a normal message
 
@@ -80,11 +83,10 @@ export const updateCountdowns = async (client, clientId) => {
         priority: timeLeftForNextUpdate ? 0 : 10,
       });
     }
-    try {
-      await timedPromise(editMessage, editText);
-    } catch (error) {
+
+    await timedPromise(editMessage, editText).catch(error => {
       console.log(replyMsgId, error);
       if (error instanceof DiscordAPIError) removeMessageWithReplyId(replyMsgId);
-    }
+    });
   }
 };

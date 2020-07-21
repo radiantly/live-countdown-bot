@@ -29,11 +29,13 @@ const postJSON = (url, jsonString, headers) => {
   req.end();
 };
 
-export const postServerCount = client => {
-  const botId = client.user.id;
-  const serverCount = client.guilds.cache.size;
+export const postServerCount = guildSizes => {
+  const botId = "710486805836988507";
 
-  const topggData = JSON.stringify({ server_count: serverCount });
+  const shardCount = guildSizes.length;
+  const guildCount = guildSizes.reduce((size, count) => size + count, 0);
+
+  const topggData = JSON.stringify({ server_count: guildSizes });
   postJSON(`https://top.gg/api/bots/${botId}/stats`, topggData, {
     Authorization: topggAPIkey,
   });
@@ -44,12 +46,12 @@ export const postServerCount = client => {
   //   Authorization: botsOnDiscordAPIkey,
   // });
 
-  const discordBotsggData = JSON.stringify({ guildCount: serverCount });
+  const discordBotsggData = JSON.stringify({ guildCount, shardCount });
   postJSON(`https://discord.bots.gg/api/v1/bots/${botId}/stats`, discordBotsggData, {
     Authorization: discordBotsggAPIkey,
   });
 
-  const discordBotscoData = JSON.stringify({ serverCount });
+  const discordBotscoData = JSON.stringify({ serverCount: guildCount, shardCount });
   postJSON(`https://api.discordbots.co/v1/public/bot/${botId}/stats`, discordBotscoData, {
     Authorization: discordBotscoAPIkey,
   });

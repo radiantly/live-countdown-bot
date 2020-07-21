@@ -123,7 +123,6 @@ export const assembleInlineMessage = (timers, parts) => {
 
       // If next update is the last one, prioritize it
       if (!timeLeftForNextUpdate) priority = 10;
-      console.log(timer, timeLeftForNextUpdate);
 
       if (!nextUpdate) nextUpdate = timeEnd;
 
