@@ -25,7 +25,7 @@ const client = new Client({
   messageCacheMaxSize: 10,
   messageCacheLifetime: 30 * 60 * 60,
   messageSweepInterval: 6 * 60 * 60,
-  presence: { activity: { name: "v2 upgrade. Report bugs!", type: "WATCHING" }, status: "online" },
+  presence,
   ws: { intents: requiredIntents },
 });
 

@@ -2,6 +2,7 @@ import chrono from "chrono-node";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 
 export const parseInline = command => {
+  if (!command) return null;
   let commands = [];
   let parts = [];
   for (let i = 1; i <= 5; i++) {
