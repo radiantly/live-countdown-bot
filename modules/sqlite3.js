@@ -8,6 +8,8 @@ const { channelMax } = config;
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
 
+export const [version] = db.prepare("SELECT sqlite_version()").raw().get();
+
 db.prepare(
   `
   CREATE TABLE IF NOT EXISTS GuildInfo (
@@ -52,11 +54,12 @@ db.prepare(
 `
 ).run();
 
-db.prepare("VACUUM").run();
-
-export const [version] = db.prepare("SELECT sqlite_version()").raw().get();
-
 // Stmt = SQL Query Statement
+
+const vacuumStmt = db.prepare("VACUUM");
+
+export const vacuumDb = () => vacuumStmt.run();
+export const closeDb = () => db.close();
 
 // Add guilds to GuildInfo table
 const upsertGuildShardStmt = db.prepare(`
@@ -124,10 +127,12 @@ const selectNextInQueueStmt = db.prepare(`
 `);
 export const getNextInQueue = clientId => selectNextInQueueStmt.get(clientId);
 
-// Below statements are currently unused
-
+// Get total number of countdowns
 const selectAllCountdownsStmt = db.prepare("SELECT COUNT(*) FROM CountdownInfo;");
-export const getTotalCountdowns = () => selectAllCountdownsStmt.get();
+export const getTotalCountdowns = () => selectAllCountdownsStmt.raw().get()[0];
+// --x--
+
+// Below statements are currently unused
 
 const selectCountdownsInGuildStmt = db.prepare(
   "SELECT COUNT(*) FROM CountdownInfo WHERE Guild = ?"

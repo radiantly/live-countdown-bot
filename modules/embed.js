@@ -1,7 +1,7 @@
 import { loadavg, cpus } from "os";
 import { memoryUsage, version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
-import { version as sqliteVersion } from "./sqlite3.js";
+import { getTotalCountdowns, version as sqliteVersion } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import config from "../config.js";
 import { timedPromise } from "./updateManager.js";
@@ -84,6 +84,7 @@ export const generateStatsEmbed = async client => {
   const memUsage = Math.round((rss / 1024 / 1024) * 100) / 100;
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
   const upTime = computeTimeDiff(client.uptime, true).humanDiff;
+  const totalCountdowns = getTotalCountdowns();
   const totalServers = await client.shard
     .fetchClientValues("guilds.cache.size")
     .then(sizes => sizes.reduce((total, size) => total + size, 0))
@@ -124,8 +125,8 @@ export const generateStatsEmbed = async client => {
         inline: true,
       },
       {
-        name: ":timer: Servers",
-        value: `**${totalServers}**`,
+        name: ":timer: Countdowns",
+        value: `**${totalCountdowns}** in **${totalServers}**`,
         inline: true,
       },
       {

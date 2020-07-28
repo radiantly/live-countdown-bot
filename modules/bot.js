@@ -1,9 +1,8 @@
 import { Client, Intents } from "discord.js";
 import process, { env } from "process";
 import config from "../config.js";
-import { db, initGuilds, addGuild, removeMessageWithReplyId, removeGuild } from "./sqlite3.js";
+import { initGuilds, addGuild, removeMessageWithReplyId, removeGuild, closeDb } from "./sqlite3.js";
 import { messageHandler } from "./messageHandler.js";
-import { postServerCount } from "./post.js";
 import { updateCountdowns } from "./updateManager.js";
 
 const activities = [
@@ -89,5 +88,5 @@ process.on("SIGTERM", () => process.exit(128 + 15));
 process.on("exit", code => {
   console.log(`Destroying client ${clientId} (${client.shard.ids.join()}). Code ${code}.`);
   client.destroy();
-  db.close();
+  closeDb();
 });

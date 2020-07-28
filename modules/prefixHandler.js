@@ -16,7 +16,7 @@ export const setPrefix = (guild, prefix = "!") => {
   updatePrefixInDb({ guildId: guild.id, prefix });
 };
 
-// If text contains `, replace all occurences with \`
+// If text contains `, escape all special symbols
 // If not, return `text`
 export const escapeBacktick = text =>
-  text.includes("`") ? text.replace(/`/g, "\\`") : `\`${text}\``;
+  text.includes("`") ? text.replace(/([`*_~])/g, "\\$1") : `\`${text}\``;

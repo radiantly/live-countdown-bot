@@ -1,8 +1,14 @@
 import { ShardingManager } from "discord.js";
 import config from "./config.js";
 import { postServerCount } from "./modules/post.js";
+import { vacuumDb, closeDb } from "./modules/sqlite3.js";
 
 const { token } = config;
+
+// Vacuum database
+vacuumDb();
+closeDb();
+// --x--
 
 const manager = new ShardingManager("./modules/bot.js", { token });
 

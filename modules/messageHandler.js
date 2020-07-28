@@ -85,7 +85,7 @@ export const messageHandler = async (message, messageReply) => {
 
   const prefix = message.guild?.available ? getPrefix(message.guild) : "!";
 
-  if (message.content === `<@!${message.client.user.id}>`)
+  if (message.content.replace(/^<@!?(\d+)>$/, "$1") === message.client.user.id)
     return await sendReply(`Need help? Try ${escapeBacktick(prefix + "help")}`);
 
   if (message.content.startsWith(prefix)) {
