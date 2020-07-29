@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/radiantly/live-countdown-bot#readme",
   "dependencies": {
+    "@amanda/neko": "git+https://github.com/AmandaDiscord/NEKO.git",
     "better-sqlite3": "^7.1.0",
     "chrono-node": "^1.4.8",
     "discord.js": "^12.2.0"

@@ -1,4 +1,10 @@
-import { Client, Intents } from "discord.js";
+import { Intents, Structures } from "discord.js";
+import NEKO from "@amanda/neko";
+
+Structures.extend("Guild", () => NEKO.OptimizedGuild);
+Structures.extend("Presence", () => NEKO.OptimizedPresence);
+Structures.extend("User", () => NEKO.OptimizedUser);
+
 import process, { env } from "process";
 import config from "../config.js";
 import { initGuilds, addGuild, removeMessageWithReplyId, removeGuild, closeDb } from "./sqlite3.js";
@@ -20,12 +26,18 @@ const presence =
 
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
-const client = new Client({
+const client = new NEKO.Neko({
   messageCacheMaxSize: 10,
   messageCacheLifetime: 30 * 60 * 60,
   messageSweepInterval: 6 * 60 * 60,
-  presence,
+  presence: {
+    activity: { name: "with prod. Report bugs!", type: "PLAYING" },
+    status: "online",
+  },
   ws: { intents: requiredIntents },
+  optimizations: {
+    disablePresences: true,
+  },
 });
 
 export const clientId = Math.round(Math.random() * 1e9);
