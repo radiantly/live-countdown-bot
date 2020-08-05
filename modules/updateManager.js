@@ -1,4 +1,4 @@
-import { Message, DiscordAPIError } from "discord.js";
+import { Message, DiscordAPIError } from "./bot.js";
 import { getNextInQueue, removeMessageWithReplyId, updateRecomputedCountdown } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import { assembleInlineMessage } from "./countdownHelper.js";

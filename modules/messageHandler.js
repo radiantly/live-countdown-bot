@@ -1,4 +1,4 @@
-import { DMChannel, MessageEmbed } from "discord.js";
+import { DMChannel, MessageEmbed } from "./bot.js";
 import { exit } from "process";
 import { inspect, types } from "util";
 import { computeTimeDiff } from "./computeTimeDiff.js";

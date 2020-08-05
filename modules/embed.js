@@ -1,6 +1,6 @@
 import { loadavg, cpus } from "os";
 import { memoryUsage, version as nodeVersion } from "process";
-import { MessageEmbed, version as djsVersion } from "discord.js";
+import { MessageEmbed, version as djsVersion } from "./bot.js";
 import { getTotalCountdowns, version as sqliteVersion } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import config from "../config.js";

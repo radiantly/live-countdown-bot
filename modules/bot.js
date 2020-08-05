@@ -1,9 +1,16 @@
-import { Intents, Structures } from "discord.js";
-import NEKO from "@amanda/neko";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 
-Structures.extend("Guild", () => NEKO.OptimizedGuild);
-Structures.extend("Presence", () => NEKO.OptimizedPresence);
-Structures.extend("User", () => NEKO.OptimizedUser);
+const Discord = require("discord.js");
+const { Intents, Structures } = Discord;
+
+export const { DMChannel, Message, DiscordAPIError, MessageEmbed, version } = Discord;
+
+import { Neko, OptimizedGuild, OptimizedPresence, OptimizedUser } from "@amanda/neko";
+
+Structures.extend("Guild", () => OptimizedGuild);
+Structures.extend("Presence", () => OptimizedPresence);
+Structures.extend("User", () => OptimizedUser);
 
 import process, { env } from "process";
 import config from "../config.js";
@@ -26,14 +33,11 @@ const presence =
 
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
-const client = new NEKO.Neko({
+const client = new Neko({
   messageCacheMaxSize: 10,
   messageCacheLifetime: 30 * 60 * 60,
   messageSweepInterval: 6 * 60 * 60,
-  presence: {
-    activity: { name: "with prod. Report bugs!", type: "PLAYING" },
-    status: "online",
-  },
+  presence,
   ws: { intents: requiredIntents },
   optimizations: {
     disablePresences: true,
