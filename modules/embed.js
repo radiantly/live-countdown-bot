@@ -1,5 +1,5 @@
 import { loadavg, cpus } from "os";
-import { memoryUsage, version as nodeVersion } from "process";
+import { version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "./bot.js";
 import { getTotalCountdowns, version as sqliteVersion } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
@@ -71,7 +71,7 @@ export const generateHelpEmbed = prefix =>
           "Invite me from [here](https://top.gg/bot/710486805836988507).",
       }
     )
-    .setFooter("Made with ❤️ by LordBusiness#4990")
+    .setFooter("Made by LordBusiness")
     .setTimestamp();
 
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
@@ -80,8 +80,13 @@ let statsFooterText = "Live Countdown Bot";
 timedPromise(getGitInfo).then(gitinfo => (statsFooterText = gitinfo));
 
 export const generateStatsEmbed = async client => {
-  const { rss } = memoryUsage();
-  const memUsage = Math.round((rss / 1024 / 1024) * 100) / 100;
+  // const memUsages =
+  const memUsage = await client.shard
+    .broadcastEval("process.memoryUsage().rss")
+    .then(memUsages =>
+      memUsages.reduce((total, rss) => total + Math.round((rss / 1024 / 1024) * 100) / 100, 0)
+    )
+    .catch(console.error);
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
   const upTime = computeTimeDiff(client.uptime, true).humanDiff;
   const totalCountdowns = getTotalCountdowns();
