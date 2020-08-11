@@ -79,14 +79,16 @@ export const generateStatsFallback = client => `All good! API Latency is ${clien
 let statsFooterText = "Live Countdown Bot";
 timedPromise(getGitInfo).then(gitinfo => (statsFooterText = gitinfo));
 
+const toMB = num => num / 1024 / 1024;
+const to2Decimals = num => Math.round(num * 100) / 100;
 export const generateStatsEmbed = async client => {
   // const memUsages =
   const memUsage = await client.shard
     .broadcastEval("process.memoryUsage().rss")
-    .then(memUsages =>
-      memUsages.reduce((total, rss) => total + Math.round((rss / 1024 / 1024) * 100) / 100, 0)
-    )
+    .then(memUsages => memUsages.reduce((total, rss) => total + rss, 0))
     .catch(console.error);
+  const memUsageRounded = Math.round(toMB(memUsage));
+  const shardMemUsage = to2Decimals(toMB(process.memoryUsage().rss));
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
   const upTime = computeTimeDiff(client.uptime, true).humanDiff;
   const totalCountdowns = getTotalCountdowns();
@@ -106,7 +108,7 @@ export const generateStatsEmbed = async client => {
       },
       {
         name: ":level_slider: Memory",
-        value: `**${memUsage}M**`,
+        value: `**${shardMemUsage}/${memUsageRounded}M**`,
         inline: true,
       },
       {
