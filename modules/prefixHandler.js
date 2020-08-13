@@ -1,4 +1,5 @@
-import { getPrefixFromDb, updatePrefixInDb } from "./sqlite3.js";
+import { updatePrefixInDb } from "./writeSqlite3Helper.js";
+import { getPrefixFromDb } from "./readSqlite3.js";
 
 const prefixes = new WeakMap();
 

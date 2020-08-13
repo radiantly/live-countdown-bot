@@ -17,16 +17,24 @@ import heapdump from "heapdump";
 
 import process, { env } from "process";
 import config from "../config.js";
-import { initGuilds, addGuild, removeMessageWithReplyId, removeGuild, closeDb } from "./sqlite3.js";
+import { closeDb } from "./readSqlite3.js";
+import {
+  initGuilds,
+  addGuild,
+  removeMessageWithReplyId,
+  removeGuild,
+} from "./writeSqlite3Helper.js";
 import { messageHandler } from "./messageHandler.js";
 import { updateCountdowns } from "./updateManager.js";
 
 const activities = [
-  { name: "https://bit.ly/live-bot", type: "WATCHING" },
-  { name: "for !help", type: "WATCHING" },
-  { name: "the time fly by", type: "WATCHING" },
-  { name: "the clock tick", type: "LISTENING" },
-  { name: "with time", type: "PLAYING" },
+  { type: "PLAYING", name: "with time" },
+  { type: "PLAYING", name: "with 100 seconds" },
+  { type: "WATCHING", name: "for !help" },
+  { type: "WATCHING", name: "times change" },
+  { type: "WATCHING", name: "the time fly by" },
+  { type: "WATCHING", name: "https://bit.ly/live-bot" },
+  { type: "LISTENING", name: "the clock tick" },
 ];
 const activity = activities[Math.floor(Math.random() * activities.length)];
 const presence =
@@ -36,7 +44,7 @@ const presence =
 
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
-const client = new Neko({
+export const client = new Neko({
   messageCacheMaxSize: 10,
   messageCacheLifetime: 30 * 60 * 60,
   messageSweepInterval: 6 * 60 * 60,
@@ -54,7 +62,10 @@ const log = console.log;
 client.once("ready", () => {
   log(`Initialized client ${clientId} (${client.shard.ids.join()}).`);
 
-  initGuilds(client.guilds.cache, clientId);
+  initGuilds(
+    client.guilds.cache.map(guild => guild.id),
+    clientId
+  );
   updateCountdowns(client, clientId);
 });
 

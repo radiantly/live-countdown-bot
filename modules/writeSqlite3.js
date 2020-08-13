@@ -1,15 +1,11 @@
 import Database from "better-sqlite3";
-export const db = new Database(process.env.NODE_ENV === "test" ? ":memory:" : "db/app.db");
+export const db = new Database("db/app.db");
 
 import config from "../config.js";
 
 const { channelMax } = config;
 
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
-
-export const [version] = db.prepare("SELECT sqlite_version()").raw().get();
-
+// Initialize database
 db.prepare(
   `
   CREATE TABLE IF NOT EXISTS GuildInfo (
@@ -53,13 +49,14 @@ db.prepare(
   )
 `
 ).run();
+// --x--
 
 // Stmt = SQL Query Statement
 
+// Vacuum database
 const vacuumStmt = db.prepare("VACUUM");
-
 export const vacuumDb = () => vacuumStmt.run();
-export const closeDb = () => db.close();
+// --x--
 
 // Add guilds to GuildInfo table
 const upsertGuildShardStmt = db.prepare(`
@@ -67,8 +64,8 @@ const upsertGuildShardStmt = db.prepare(`
     ON CONFLICT(Guild) DO UPDATE SET Client = excluded.Client;
 `);
 
-export const initGuilds = db.transaction((guildCache, clientId) => {
-  guildCache.each(guild => upsertGuildShardStmt.run({ guildId: guild.id, clientId }));
+export const initGuilds = db.transaction((guildIdArray, clientId) => {
+  guildIdArray.forEach(guildId => upsertGuildShardStmt.run({ guildId, clientId }));
 });
 export const addGuild = (guildId, clientId) => upsertGuildShardStmt.run({ guildId, clientId });
 // --x--
@@ -76,14 +73,6 @@ export const addGuild = (guildId, clientId) => upsertGuildShardStmt.run({ guildI
 // Remove guild
 const deleteGuildStmt = db.prepare("DELETE FROM GuildInfo WHERE Guild = @guildId");
 export const removeGuild = guildId => deleteGuildStmt.run({ guildId });
-// --x--
-
-// Get or set prefix for each guild
-const selectPrefixStmt = db.prepare("SELECT Prefix from GuildInfo WHERE Guild = @guildId");
-export const getPrefixFromDb = guildId => selectPrefixStmt.get({ guildId });
-
-const updatePrefixStmt = db.prepare("UPDATE GuildInfo SET Prefix = @prefix WHERE Guild = @guildId");
-export const updatePrefixInDb = data => updatePrefixStmt.run(data);
 // --x--
 
 // Adding countdown section
@@ -104,11 +93,17 @@ export const addCountdown = data => {
 };
 // --x--
 
+// Set prefix for a guild
+const updatePrefixStmt = db.prepare("UPDATE GuildInfo SET Prefix = @prefix WHERE Guild = @guildId");
+export const updatePrefixInDb = data => updatePrefixStmt.run(data);
+// --x--
+
 // Removing countdowns
 const deleteMessageStmt = db.prepare("DELETE FROM CountdownInfo WHERE ReplyMessage = ?");
 export const removeMessageWithReplyId = messageId => deleteMessageStmt.run(messageId);
 // --x--
 
+// Save the recomputed cowntdown once it is processes
 const updateRecomputedCountdownStmt = db.prepare(`
   UPDATE CountdownInfo
   SET NextUpdate = @nextUpdate,
@@ -116,33 +111,8 @@ const updateRecomputedCountdownStmt = db.prepare(`
   WHERE ReplyMessage = @replyMsgId
 `);
 export const updateRecomputedCountdown = data => updateRecomputedCountdownStmt.run(data);
-
-const selectNextInQueueStmt = db.prepare(`
-  SELECT Channel, ReplyMessage, NextUpdate, CountObj
-  FROM CountdownInfo
-  INNER JOIN GuildInfo USING (Guild)
-  WHERE Client = ?
-  ORDER BY NextUpdate, Priority
-  LIMIT 1
-`);
-export const getNextInQueue = clientId => selectNextInQueueStmt.get(clientId);
-
-// Get total number of countdowns
-const selectAllCountdownsStmt = db.prepare("SELECT COUNT(*) FROM CountdownInfo;");
-export const getTotalCountdowns = () => selectAllCountdownsStmt.raw().get()[0];
 // --x--
 
-// Below statements are currently unused
-
-const selectCountdownsInGuildStmt = db.prepare(
-  "SELECT COUNT(*) FROM CountdownInfo WHERE Guild = ?"
-);
-export const getCountdownsInServer = server => selectCountdownsInGuildStmt.get(server);
-
-const deleteOldestRowStmt = db.prepare(`
-  DELETE FROM CountdownInfo
-  WHERE Guild = ?
-  ORDER BY Timestamp
-  LIMIT 1
-`);
-export const removeOldestCountdowninGuild = server => deleteOldestRowStmt.run(server);
+// Close DB connection
+export const closeDb = () => db.close();
+// --x--

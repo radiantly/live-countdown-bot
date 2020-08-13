@@ -1,18 +1,25 @@
 import { ShardingManager } from "discord.js";
 import config from "./config.js";
 import { postServerCount } from "./modules/post.js";
-import { vacuumDb, closeDb } from "./modules/sqlite3.js";
+import * as writeSqlite3 from "./modules/writeSqlite3.js";
 
 const { token } = config;
 
 // Vacuum database
-vacuumDb();
-closeDb();
+writeSqlite3.vacuumDb();
 // --x--
 
 const manager = new ShardingManager("./modules/bot.js", { token });
 
-manager.spawn();
+const handleShardMessage = message => {
+  console.log(message);
+  if (message.module === "writeSqlite3") {
+    const { func, args } = message;
+    writeSqlite3[func].apply(null, args);
+  }
+};
+
+manager.spawn().then(shards => shards.each(shard => shard.on("message", handleShardMessage)));
 
 manager.on("shardCreate", shard => console.log(`Launched client (${shard.id}).`));
 

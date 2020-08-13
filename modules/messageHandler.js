@@ -8,7 +8,7 @@ import {
   generateStatsEmbed,
   generateStatsFallback,
 } from "./embed.js";
-import { addCountdown, removeMessageWithReplyId } from "./sqlite3.js";
+import { addCountdown, removeMessageWithReplyId } from "./writeSqlite3Helper.js";
 import { parseInline, computeCountdown, assembleInlineMessage } from "./countdownHelper.js";
 import config from "../config.js";
 import { getPrefix, setPrefix, escapeBacktick } from "./prefixHandler.js";

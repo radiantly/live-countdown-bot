@@ -1,8 +1,8 @@
-import { db, initGuilds, addGuild } from "../modules/sqlite3.js";
-import { Client, Guild, Collection } from "discord.js";
-import { getPrefix, setPrefix } from "../modules/prefixHandler.js";
+// import { db, initGuilds, addGuild } from "../modules/writeSqlite3.js";
+// import { Client, Guild, Collection } from "discord.js";
+// import { getPrefix, setPrefix } from "../modules/prefixHandler.js";
 
-describe("test db functions", () => {
+describe.skip("test db functions", () => {
   const client = new Client();
   const guildCache = new Collection();
 

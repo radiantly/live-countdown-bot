@@ -1,5 +1,6 @@
 import { Message, DiscordAPIError } from "./bot.js";
-import { getNextInQueue, removeMessageWithReplyId, updateRecomputedCountdown } from "./sqlite3.js";
+import { getNextInQueue } from "./readSqlite3.js";
+import { removeMessageWithReplyId, updateRecomputedCountdown } from "./writeSqlite3Helper.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import { assembleInlineMessage } from "./countdownHelper.js";
 
@@ -8,7 +9,7 @@ export const timedPromise = (callback, ...args) => {
   return Promise.race([
     callback(...args),
     new Promise((_, reject) =>
-      setTimeout(reject, 1000, new Error(`Promise timed out: ${callback.name}(${args.join(" ,")})`))
+      setTimeout(reject, 5000, new Error(`Promise timed out: ${callback.name}(${args.join(" ,")})`))
     ),
   ]);
 };
@@ -41,6 +42,11 @@ export const updateCountdowns = async (client, clientId) => {
   const editMessage = messageToEdit.edit.bind(messageToEdit);
   const sendMessage = channel.send.bind(channel);
 
+  const messageErrorHandler = error => {
+    console.log(replyMsgId, error);
+    if (error instanceof DiscordAPIError) removeMessageWithReplyId(replyMsgId);
+  };
+
   // Check if inline message
   if (parts) {
     const { assembledMessage, nextUpdate, priority } = assembleInlineMessage(timers, parts);
@@ -51,10 +57,7 @@ export const updateCountdowns = async (client, clientId) => {
         nextUpdate,
         priority,
       });
-    await timedPromise(editMessage, assembledMessage).catch(error => {
-      console.log(replyMsgId, error);
-      if (error instanceof DiscordAPIError) removeMessageWithReplyId(replyMsgId);
-    });
+    await timedPromise(editMessage, assembledMessage).catch(messageErrorHandler);
   } else {
     // If not inline, it must be a normal message
 
@@ -84,9 +87,6 @@ export const updateCountdowns = async (client, clientId) => {
       });
     }
 
-    await timedPromise(editMessage, editText).catch(error => {
-      console.log(replyMsgId, error);
-      if (error instanceof DiscordAPIError) removeMessageWithReplyId(replyMsgId);
-    });
+    await timedPromise(editMessage, editText).catch(messageErrorHandler);
   }
 };
