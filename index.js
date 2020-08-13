@@ -12,7 +12,6 @@ writeSqlite3.vacuumDb();
 const manager = new ShardingManager("./modules/bot.js", { token });
 
 const handleShardMessage = message => {
-  console.log(message);
   if (message.module === "writeSqlite3") {
     const { func, args } = message;
     writeSqlite3[func].apply(null, args);
