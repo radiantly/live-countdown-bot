@@ -8,7 +8,7 @@ export const timedPromise = (callback, ...args) => {
   return Promise.race([
     callback(...args),
     new Promise((_, reject) =>
-      setTimeout(reject, 1000, new Error(`Promise timed out: ${callback.name}(${args.join(" ,")})`))
+      setTimeout(reject, 5000, new Error(`Promise timed out: ${callback.name}(${args.join(" ,")})`))
     ),
   ]);
 };

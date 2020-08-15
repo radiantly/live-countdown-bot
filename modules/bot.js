@@ -2,18 +2,18 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
 const Discord = require("discord.js");
-const { Intents, Structures } = Discord;
+const { Intents, Client } = Discord;
 
 export const { DMChannel, Message, DiscordAPIError, MessageEmbed, version } = Discord;
 
-import { Neko, OptimizedGuild, OptimizedPresence, OptimizedUser } from "@amanda/neko";
+// import { Neko, OptimizedGuild, OptimizedPresence, OptimizedUser } from "@amanda/neko";
 
-Structures.extend("Guild", () => OptimizedGuild);
-Structures.extend("Presence", () => OptimizedPresence);
-Structures.extend("User", () => OptimizedUser);
+// Structures.extend("Guild", () => OptimizedGuild);
+// Structures.extend("Presence", () => OptimizedPresence);
+// Structures.extend("User", () => OptimizedUser);
 
 // Trigger heap snaphot on USR2 signal
-import heapdump from "heapdump";
+// import heapdump from "heapdump";
 
 import process, { env } from "process";
 import config from "../config.js";
@@ -36,15 +36,16 @@ const presence =
 
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
-const client = new Neko({
+const client = new Client({
   messageCacheMaxSize: 10,
   messageCacheLifetime: 30 * 60 * 60,
   messageSweepInterval: 6 * 60 * 60,
+  // partials: ["MESSAGE"],
   presence,
   ws: { intents: requiredIntents },
-  optimizations: {
-    disablePresences: true,
-  },
+  // optimizations: {
+  //   disablePresences: true,
+  // },
 });
 
 export const clientId = Math.round(Math.random() * 1e9);

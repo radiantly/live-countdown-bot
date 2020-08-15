@@ -54,7 +54,6 @@ export const messageHandler = async (message, messageReply) => {
       if (timer.error) error = true;
       return timer;
     });
-    console.log(timers);
     if (error)
       return await sendReply(
         timers

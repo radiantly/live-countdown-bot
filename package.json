@@ -22,10 +22,10 @@
   },
   "homepage": "https://github.com/radiantly/live-countdown-bot#readme",
   "dependencies": {
-    "@amanda/neko": "git+https://github.com/AmandaDiscord/NEKO.git",
+    "@amanda/neko": "github:AmandaDiscord/NEKO#98eb97cb75c445ede186f4478f9e2ab624a681eb",
     "better-sqlite3": "^7.1.0",
     "chrono-node": "^1.4.8",
-    "discord.js": "^12.2.0",
+    "discord.js": "^12.3.1",
     "heapdump": "^0.3.15"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "@babel/preset-env": "^7.11.0",
     "babel-jest": "^26.3.0",
     "husky": "^4.2.5",
-    "jest": "^26.3.0",
+    "jest": "^26.4.0",
     "prettier": "2.0.5",
     "pretty-quick": "^2.0.1"
   },
