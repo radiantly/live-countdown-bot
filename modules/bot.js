@@ -6,14 +6,8 @@ const { Intents, Client } = Discord;
 
 export const { DMChannel, Message, DiscordAPIError, MessageEmbed, version } = Discord;
 
-// import { Neko, OptimizedGuild, OptimizedPresence, OptimizedUser } from "@amanda/neko";
-
-// Structures.extend("Guild", () => OptimizedGuild);
-// Structures.extend("Presence", () => OptimizedPresence);
-// Structures.extend("User", () => OptimizedUser);
-
 // Trigger heap snaphot on USR2 signal
-// import heapdump from "heapdump";
+import heapdump from "heapdump";
 
 import process, { env } from "process";
 import config from "../config.js";
@@ -37,15 +31,10 @@ const presence =
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
 const client = new Client({
-  messageCacheMaxSize: 10,
-  messageCacheLifetime: 30 * 60 * 60,
-  messageSweepInterval: 6 * 60 * 60,
+  messageCacheMaxSize: 0,
   // partials: ["MESSAGE"],
   presence,
   ws: { intents: requiredIntents },
-  // optimizations: {
-  //   disablePresences: true,
-  // },
 });
 
 export const clientId = Math.round(Math.random() * 1e9);
@@ -61,23 +50,23 @@ client.once("ready", () => {
 
 client.on("message", async message => {
   await messageHandler(message);
-  if (message.author?.id !== client.user?.id && !message[Symbol.for("messageReply")])
-    message.channel.messages.cache.delete(message.id);
+  // if (message.author?.id !== client.user?.id && !message[Symbol.for("messageReply")])
+  //   message.channel.messages.cache.delete(message.id);
 });
 
-client.on("messageUpdate", (_, message) => {
-  if (message.partial || message.author.bot) return;
+// client.on("messageUpdate", (_, message) => {
+//   if (message.partial || message.author.bot) return;
 
-  const messageReply = message[Symbol.for("messageReply")];
-  if (messageReply && !messageReply.deleted) messageHandler(message, messageReply);
-});
+//   const messageReply = message[Symbol.for("messageReply")];
+//   if (messageReply && !messageReply.deleted) messageHandler(message, messageReply);
+// });
 
-client.on("messageDelete", message => {
-  const { guild, client, author } = message;
-  if (message.partial || author.id !== client.user.id || !guild.available) return;
+// client.on("messageDelete", message => {
+//   const { guild, client, author } = message;
+//   if (message.partial || author.id !== client.user.id || !guild.available) return;
 
-  removeMessageWithReplyId(message.id);
-});
+//   removeMessageWithReplyId(message.id);
+// });
 
 client.on("guildCreate", guild => {
   addGuild(guild.id, clientId);

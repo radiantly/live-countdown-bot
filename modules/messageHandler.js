@@ -33,7 +33,7 @@ export const messageHandler = async (message, messageReply) => {
       return await messageReply.edit(reply);
     }
     const sentMessage = await message.channel.send(reply);
-    message[Symbol.for("messageReply")] = sentMessage;
+    // message[Symbol.for("messageReply")] = sentMessage;
     return sentMessage;
   };
 
