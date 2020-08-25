@@ -107,6 +107,7 @@ export const computeCountdown = (command, message) => {
 export const assembleInlineMessage = (timers, parts) => {
   let nextUpdate = null;
   let priority = 0;
+  let finishedTimers = [];
 
   const assembled = timers.map((timer, index) => {
     const timeEnd = new Date(timer.timeEnd);
@@ -117,6 +118,7 @@ export const assembleInlineMessage = (timers, parts) => {
     // if countdown is done
     if (timeLeft < 10000) {
       diff = "no minutes";
+      finishedTimers.push(index);
     } else {
       const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft);
 
@@ -137,5 +139,10 @@ export const assembleInlineMessage = (timers, parts) => {
   // console.log(assembled);
   assembled.push(parts[parts.length - 1]);
 
-  return { assembledMessage: assembled.join(""), nextUpdate, priority };
+  return {
+    assembledMessage: assembled.join(""),
+    nextUpdate,
+    priority,
+    finishedTimers,
+  };
 };

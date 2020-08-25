@@ -109,6 +109,13 @@ const deleteMessageStmt = db.prepare("DELETE FROM CountdownInfo WHERE ReplyMessa
 export const removeMessageWithReplyId = messageId => deleteMessageStmt.run(messageId);
 // --x--
 
+const updateCountObjStmt = db.prepare(`
+  UPDATE CountdownInfo
+  SET CountObj = @countObj
+  WHERE ReplyMessage = @replyMsgId
+`);
+export const updateCountObj = data => updateCountObjStmt.run(data);
+
 const updateRecomputedCountdownStmt = db.prepare(`
   UPDATE CountdownInfo
   SET NextUpdate = @nextUpdate,
