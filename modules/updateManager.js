@@ -53,38 +53,36 @@ export const updateCountdowns = async (client, clientId) => {
       parts
     );
     if (!nextUpdate) removeMessageWithReplyId(replyMsgId);
-    else {
+    else
       updateRecomputedCountdown({
         replyMsgId,
         nextUpdate,
         priority,
       });
 
-      // Check if a countdown in the inline countdown is finished
-      if (finishedTimers.length) {
-        // If it has a tag, tag users.
-        const tags = finishedTimers
-          .map(timerIndex => timers[timerIndex].tag)
-          .filter(Boolean)
-          .join(" ");
-        if (tags && channel.permissionsFor(client.user).has("SEND_MESSAGES"))
-          await timedPromise(sendMessage, `Countdown done! ${tags}`).catch(err =>
-            console.error(err)
-          );
+    // Check if a countdown in the inline countdown is finished
+    if (finishedTimers.length) {
+      // If it has a tag, tag users.
+      const tags = finishedTimers
+        .map(timerIndex => timers[timerIndex].tag)
+        .filter(Boolean)
+        .join(" ");
+      if (tags && channel.permissionsFor(client.user).has("SEND_MESSAGES"))
+        await timedPromise(sendMessage, `Countdown done! ${tags}`).catch(err => console.error(err));
 
-        // Remove finished timers backwards
-        for (let i = finishedTimers.length - 1; i >= 0; i--) {
-          parts.splice(
-            finishedTimers[i],
-            2,
-            parts[finishedTimers[i]] + "no minutes" + parts[finishedTimers[i] + 1]
-          );
-          timers.splice(finishedTimers[i], 1);
-        }
-        // Update countObj
-        updateCountObj({ replyMsgId, countObj: JSON.stringify({ parts, timers }) });
+      // Remove finished timers backwards
+      for (let i = finishedTimers.length - 1; i >= 0; i--) {
+        parts.splice(
+          finishedTimers[i],
+          2,
+          parts[finishedTimers[i]] + "no minutes" + parts[finishedTimers[i] + 1]
+        );
+        timers.splice(finishedTimers[i], 1);
       }
+      // Update countObj
+      updateCountObj({ replyMsgId, countObj: JSON.stringify({ parts, timers }) });
     }
+
     await timedPromise(editMessage, assembledMessage).catch(error => {
       console.log(replyMsgId, error);
       if (error instanceof DiscordAPIError) removeMessageWithReplyId(replyMsgId);
