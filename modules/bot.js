@@ -16,12 +16,15 @@ import { messageHandler } from "./messageHandler.js";
 import { updateCountdowns } from "./updateManager.js";
 
 const activities = [
-  { name: "https://bit.ly/live-bot", type: "WATCHING" },
-  { name: "for !help", type: "WATCHING" },
-  { name: "the time fly by", type: "WATCHING" },
-  { name: "the clock tick", type: "LISTENING" },
-  { name: "with time", type: "PLAYING" },
+  { type: "PLAYING", name: "with time" },
+  { type: "PLAYING", name: "with 100 seconds" },
+  { type: "WATCHING", name: "for !help" },
+  { type: "WATCHING", name: "times change" },
+  { type: "WATCHING", name: "the time fly by" },
+  { type: "WATCHING", name: "https://bit.ly/live-bot" },
+  { type: "LISTENING", name: "the clock tick" },
 ];
+
 const activity = activities[Math.floor(Math.random() * activities.length)];
 const presence =
   env.NODE_ENV === "debug"
