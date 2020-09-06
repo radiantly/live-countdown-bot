@@ -94,15 +94,33 @@ export const messageHandler = async (message, messageReply) => {
     if (command === "countdown") {
       if (!message.guild?.available)
         return await sendReply("Sorry, countdowns can only be initiated in servers.");
-      const timer = computeCountdown(args.join(" "), message);
+      let countdownCommand = args.join(" ");
+
+      let sendChannel = message.channel;
+      const sendChannelId = /<#(\d+)>/.exec(countdownCommand);
+      if (sendChannelId?.length >= 2) {
+        countdownCommand = countdownCommand.replace(/<#(\d+)>/g, "");
+        sendChannel = message.guild.channels.cache.get(sendChannelId[1]);
+        if (!sendChannel || !sendChannel.viewable)
+          return await sendReply("I can't seem to find that channel :thinking:");
+        if (!sendChannel.permissionsFor(message.guild.me).has("SEND_MESSAGES"))
+          return await sendReply(
+            "Hmmm. It looks like I don't have the send messages permission in that channel."
+          );
+        if (!sendChannel.permissionsFor(message.author).has("SEND_MESSAGES"))
+          return await sendReply(
+            "Hmmm. You need to have the send messages permission to initialise a countdown in that channel."
+          );
+      }
+      const timer = computeCountdown(countdownCommand, message);
       if (timer.error) return await sendReply(timer.error);
       const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timer.timeEnd - Date.now());
-      const replyMessage = await sendReply(`Time left: ${humanDiff}.`);
+      const replyMessage = await sendChannel.send(`Time left: ${humanDiff}.`);
       deleteMessage(message);
       if (replyMessage)
         addCountdown({
-          guildId: message.guild.id,
-          channelId: message.channel.id,
+          guildId: replyMessage.guild.id,
+          channelId: replyMessage.channel.id,
           origMsgId: message.id,
           replyMsgId: replyMessage.id,
           nextUpdate: timer.timeEnd - timeLeftForNextUpdate,
