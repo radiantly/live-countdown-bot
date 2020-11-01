@@ -18,7 +18,5 @@ manager.on("shardCreate", shard => console.log(`Launched client (${shard.id}).`)
 
 // Post server counts to bot lists hourly.
 setInterval(async () => {
-  const guildCount = await manager.fetchClientValues("guilds.cache.size");
-  // We know that the bot is running prod if it's l33t ;)
-  if (guildCount >= 1337) postServerCount(guildCount);
+  manager.fetchClientValues("guilds.cache.size").then(postServerCount);
 }, 60 * 60 * 1000);

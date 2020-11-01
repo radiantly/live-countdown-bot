@@ -12,6 +12,7 @@ import { addCountdown, removeMessageWithReplyId } from "./sqlite3.js";
 import { parseInline, computeCountdown, assembleInlineMessage } from "./countdownHelper.js";
 import config from "../config.js";
 import { getPrefix, setPrefix, escapeBacktick } from "./prefixHandler.js";
+import { postServerCount } from "./post.js";
 
 const { botOwner } = config;
 
@@ -174,6 +175,13 @@ export const messageHandler = async (message, messageReply) => {
         return command === "eval"
           ? await sendReply("```\n" + result.substr(0, 1950) + "\n```")
           : null;
+      }
+
+      if (command === "updatecount") {
+        const updateCountStatus = await message.client.shard
+          .fetchClientValues("guilds.cache.size")
+          .then(postServerCount);
+        return sendReply("```\n" + updateCountStatus.join("\n") + "\n```");
       }
 
       if (command === "kill") exit();
