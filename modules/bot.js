@@ -6,9 +6,6 @@ const { Intents, Client } = Discord;
 
 export const { DMChannel, Message, DiscordAPIError, MessageEmbed, version } = Discord;
 
-// Trigger heap snaphot on USR2 signal
-import heapdump from "heapdump";
-
 import process, { env } from "process";
 import config from "../config.js";
 import { initGuilds, addGuild, removeMessageWithReplyId, removeGuild, closeDb } from "./sqlite3.js";

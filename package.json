@@ -22,28 +22,29 @@
   },
   "homepage": "https://github.com/radiantly/live-countdown-bot#readme",
   "dependencies": {
-    "@amanda/neko": "github:AmandaDiscord/NEKO#98eb97cb75c445ede186f4478f9e2ab624a681eb",
-    "better-sqlite3": "^7.1.0",
+    "better-sqlite3": "^7.1.1",
     "chrono-node": "^1.4.8",
-    "discord.js": "^12.3.1",
-    "got": "^11.8.0",
-    "heapdump": "^0.3.15"
+    "discord.js": "^12.4.1",
+    "got": "^11.8.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.1",
-    "@babel/preset-env": "^7.11.0",
-    "babel-jest": "^26.3.0",
-    "husky": "^4.2.5",
-    "jest": "^26.4.0",
-    "prettier": "2.0.5",
-    "pretty-quick": "^2.0.1"
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "babel-jest": "^26.6.1",
+    "husky": "^4.3.0",
+    "jest": "^26.6.1",
+    "lint-staged": "^10.5.1",
+    "prettier": "2.1.2"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test && pretty-quick --staged"
+      "pre-commit": "npm test && lint-staged"
     }
   },
   "jest": {
     "testEnvironment": "node"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
