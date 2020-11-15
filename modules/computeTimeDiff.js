@@ -1,19 +1,4 @@
-const longStrings = {
-  lessThanAMinute: "less than a minute",
-  minute: "minute",
-  hour: "hour",
-  day: "day",
-  week: "week",
-  and: "and",
-};
-const shortStrings = {
-  lessThanAMinute: "< 1min",
-  minute: "min",
-  hour: "hr",
-  day: "day",
-  week: "wk",
-  and: "&",
-};
+import { t } from "./lang.js";
 
 const oneSec = 1000;
 const oneMin = 60 * oneSec;
@@ -27,8 +12,8 @@ const trackUpdate = {
   9: oneDay,
 };
 
-export const computeTimeDiff = (timeLeftms, short = false) => {
-  let strings = short ? shortStrings : longStrings;
+export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
+  let strings = short ? t("shortStrings", lang) : t("longStrings", lang);
 
   if (timeLeftms < oneMin)
     return {

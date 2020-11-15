@@ -7,6 +7,7 @@ import {
 } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import { assembleInlineMessage } from "./countdownHelper.js";
+import { t } from "./lang.js";
 
 // Automatically reject promise after 1000ms
 export const timedPromise = (callback, ...args) => {
@@ -68,14 +69,16 @@ export const updateCountdowns = async (client, clientId) => {
         .filter(Boolean)
         .join(" ");
       if (tags && channel.permissionsFor(client.user).has("SEND_MESSAGES"))
-        await timedPromise(sendMessage, `Countdown done! ${tags}`).catch(err => console.error(err));
+        await timedPromise(sendMessage, `${t("countdownDone")}! ${tags}`).catch(console.error);
 
       // Remove finished timers backwards
       for (let i = finishedTimers.length - 1; i >= 0; i--) {
         parts.splice(
           finishedTimers[i],
           2,
-          parts[finishedTimers[i]] + "no minutes" + parts[finishedTimers[i] + 1]
+          parts[finishedTimers[i]] +
+            t("inlineNoMinutes", timers[finishedTimers[i]].lang) +
+            parts[finishedTimers[i] + 1]
         );
         timers.splice(finishedTimers[i], 1);
       }
@@ -92,23 +95,25 @@ export const updateCountdowns = async (client, clientId) => {
 
     const timeEnd = new Date(timers[0].timeEnd);
     const timeLeft = timeEnd - Date.now();
+    const { lang } = timers[0];
 
     let editText;
 
     // If countdown is done
     if (timeLeft < 10000) {
       removeMessageWithReplyId(replyMsgId);
-      editText = "Countdown done.";
+      editText = t("countdownDone", lang);
 
       // If tag exists, send a new message with the tag.
       if (timers[0].tag)
         if (channel.permissionsFor(client.user).has("SEND_MESSAGES"))
-          await timedPromise(sendMessage, `Countdown done! ${timers[0].tag}`).catch(err =>
-            console.error(err)
-          );
+          await timedPromise(
+            sendMessage,
+            `${t("countdownDone", lang)}! ${timers[0].tag}`
+          ).catch(err => console.error(err));
     } else {
-      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft);
-      editText = `Time left: ${humanDiff} left.`;
+      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft, lang);
+      editText = `${t("timeLeft", lang)}: ${humanDiff}`;
       updateRecomputedCountdown({
         replyMsgId,
         nextUpdate: timeEnd - timeLeftForNextUpdate,

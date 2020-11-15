@@ -1,5 +1,6 @@
 import chrono from "chrono-node";
 import { computeTimeDiff } from "./computeTimeDiff.js";
+import { t, availableLanguages } from "./lang.js";
 
 export const parseInline = command => {
   if (!command) return null;
@@ -71,6 +72,17 @@ maxTimeEnd.setFullYear(maxTimeEnd.getFullYear() + 2);
 export const computeCountdown = (command, message) => {
   const countObj = {};
 
+  // Support different languages
+  const commandPieces = command.toLowerCase().split(/ +/);
+  const langIndex = commandPieces.findIndex(word =>
+    availableLanguages.includes(word.toLowerCase())
+  );
+  if (langIndex != -1) {
+    countObj.lang = commandPieces[langIndex].toLowerCase();
+    commandPieces.splice(langIndex, 1);
+    command = commandPieces.join(" ");
+  }
+
   // Get tag if present
   const tagObj = getTag(command, message);
   if (tagObj.error) return tagObj;
@@ -117,10 +129,10 @@ export const assembleInlineMessage = (timers, parts) => {
 
     // if countdown is done
     if (timeLeft < 10000) {
-      diff = "no minutes";
+      diff = t("inlineNoMinutes", timer.lang);
       finishedTimers.push(index);
     } else {
-      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft);
+      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft, timer.lang);
 
       diff = humanDiff;
 

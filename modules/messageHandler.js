@@ -13,6 +13,7 @@ import { parseInline, computeCountdown, assembleInlineMessage } from "./countdow
 import config from "../config.js";
 import { getPrefix, setPrefix, escapeBacktick } from "./prefixHandler.js";
 import { postServerCount } from "./post.js";
+import { t } from "./lang.js";
 
 const { botOwner } = config;
 
@@ -115,8 +116,11 @@ export const messageHandler = async (message, messageReply) => {
       }
       const timer = computeCountdown(countdownCommand, message);
       if (timer.error) return await sendReply(timer.error);
-      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timer.timeEnd - Date.now());
-      const replyMessage = await sendChannel.send(`Time left: ${humanDiff}.`);
+      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(
+        timer.timeEnd - Date.now(),
+        timer.lang
+      );
+      const replyMessage = await sendChannel.send(`${t("timeLeft", timer.lang)}: ${humanDiff}.`);
       deleteMessage(message);
       if (replyMessage)
         addCountdown({

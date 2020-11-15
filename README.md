@@ -2,7 +2,7 @@
 
 [![Invite me](https://img.shields.io/static/v1?style=flat&logo=discord&logoColor=FFF&label=&message=invite%20me&color=7289DA)](https://discord.com/api/oauth2/authorize?client_id=710486805836988507&permissions=2048&scope=bot)
 [![Bot status](https://top.gg/api/widget/status/710486805836988507.svg?noavatar=true)](https://top.gg/bot/710486805836988507)
-[![Docker build](https://github.com/radiantly/live-countdown-bot/workflows/Docker%20build/badge.svg)](https://github.com/radiantly/live-countdown-bot/actions?query=workflow%3A%22Docker+build%22)
+[![Tests](https://github.com/radiantly/live-countdown-bot/workflows/Tests/badge.svg)](https://github.com/radiantly/live-countdown-bot/actions?query=workflow%3A%22Tests%22)
 [![Code quality](https://img.shields.io/badge/Quality-Ninja-critical)](https://javascript.info/ninja-code)
 [![Code style](https://img.shields.io/badge/Style-Prettier-ff69b4)](https://github.com/prettier/prettier)
 [![Server count](https://top.gg/api/widget/servers/710486805836988507.svg?noavatar=true)](https://top.gg/bot/710486805836988507)
@@ -44,46 +44,6 @@ Examples:
 Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT! left.
 There is !!countdown taghere 11:59 PM EST! left to capture flags!
 ```
-
-## Running locally
-
-### 1. Using Docker
-
-If you have `docker-compose` installed:
-
-```sh
-# Clone the repo
-git clone https://github.com/radiantly/live-countdown-bot && cd live-countdown-bot
-
-# Copy config.sample.json and add your bot token
-cp config.sample.json config.json
-
-docker-compose up --build
-```
-
-If running in production, you can use Docker Swarm mode.
-
-```sh
-# Create a config.json with your bot token
-docker secret create botconfig config.json
-
-# Download docker-stack.yml
-curl https://raw.githubusercontent.com/radiantly/live-countdown-bot/master/docker-stack.yml -O
-
-# docker swarm init
-docker stack deploy -c docker-stack.yml --prune app
-```
-
-### 2. Without using docker
-
-- Step 1: Install Node v14 and Redis
-- Step 2: ???
-- Step 3: Clone this repo
-- Step 4: Add `config.json` with your bot token
-- Step 5: `npm i`
-- Step 6: `npm start`
-
-Disclaimer: Author has not gone down this treacherous path.
 
 ## Contributing
 

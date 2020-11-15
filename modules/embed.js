@@ -82,7 +82,6 @@ timedPromise(getGitInfo).then(gitinfo => (statsFooterText = gitinfo));
 const toMB = num => num / 1024 / 1024;
 const to2Decimals = num => Math.round(num * 100) / 100;
 export const generateStatsEmbed = async client => {
-  // const memUsages =
   const memUsage = await client.shard
     .broadcastEval("process.memoryUsage().rss")
     .then(memUsages => memUsages.reduce((total, rss) => total + rss, 0))
@@ -90,7 +89,7 @@ export const generateStatsEmbed = async client => {
   const memUsageRounded = Math.round(toMB(memUsage));
   const shardMemUsage = to2Decimals(toMB(process.memoryUsage().rss));
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
-  const upTime = computeTimeDiff(client.uptime, true).humanDiff;
+  const upTime = computeTimeDiff(client.uptime, "en", true).humanDiff;
   const totalCountdowns = getTotalCountdowns();
   const totalServers = await client.shard
     .fetchClientValues("guilds.cache.size")
