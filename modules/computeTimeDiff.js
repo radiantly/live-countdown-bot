@@ -33,11 +33,13 @@ export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
   const hours = Math.floor((timeLeftms % oneDay) / oneHrs);
   const minutes = Math.floor((timeLeftms % oneHrs) / oneMin);
 
+  const stringGen = (num, str) =>
+    `${num} ${num == 1 ? strings[str] : strings[str + "s"] || strings[str] + "s"}`;
   let finalString = "";
-  if (weeks) finalString = `${weeks} ${strings.week}${weeks > 1 ? "s" : ""} `;
-  if (days) finalString += `${days} ${strings.day}${days > 1 ? "s" : ""} `;
-  if (hours && track < 9) finalString += `${hours} ${strings.hour}${hours > 1 ? "s" : ""} `;
-  if (minutes && track < 5) finalString += `${minutes} ${strings.minute}${minutes > 1 ? "s" : ""}`;
+  if (weeks) finalString = stringGen(weeks, "week") + " ";
+  if (days) finalString += stringGen(days, "day") + " ";
+  if (hours && track < 9) finalString += stringGen(hours, "hour") + " ";
+  if (minutes && track < 5) finalString += stringGen(minutes, "minute");
 
   let finalWords = finalString.trim().split(" ");
   if (finalWords.length > 5) finalWords[1] += ",";

@@ -33,6 +33,23 @@ const languages = {
     countdownDone: "Tiempo restante terminado",
     inlineNoMinutes: "0 minutos",
   },
+  nl: {
+    longStrings: {
+      lessThanAMinute: "minder dan een minuut",
+      minute: "minuut",
+      minutes: "minuten",
+      hour: "uur",
+      hours: "uren",
+      day: "dag",
+      days: "dagen",
+      week: "week",
+      weeks: "weken",
+      and: "en",
+    },
+    timeLeft: "Tijd over",
+    countdownDone: "Aftellen over",
+    inlineNoMinutes: "0 minuten",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
