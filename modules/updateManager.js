@@ -69,7 +69,10 @@ export const updateCountdowns = async (client, clientId) => {
         .filter(Boolean)
         .join(" ");
       if (tags && channel.permissionsFor(client.user).has("SEND_MESSAGES"))
-        await timedPromise(sendMessage, `${t("countdownDone")}! ${tags}`).catch(console.error);
+        await timedPromise(
+          sendMessage,
+          `${t("countdownDone", timers[finishedTimers[0]].lang)}! ${tags}`
+        ).catch(console.error);
 
       // Remove finished timers backwards
       for (let i = finishedTimers.length - 1; i >= 0; i--) {
