@@ -24,16 +24,16 @@
   "dependencies": {
     "better-sqlite3": "^7.1.1",
     "chrono-node": "^1.4.8",
-    "discord.js": "^12.4.1",
+    "discord.js": "^12.5.1",
     "got": "^11.8.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/preset-env": "^7.12.1",
-    "babel-jest": "^26.6.1",
+    "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.12.7",
+    "babel-jest": "^26.6.3",
     "husky": "^4.3.0",
-    "jest": "^26.6.1",
-    "lint-staged": "^10.5.1",
+    "jest": "^26.6.3",
+    "lint-staged": "^10.5.2",
     "prettier": "2.1.2"
   },
   "husky": {
