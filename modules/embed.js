@@ -34,32 +34,48 @@ There is !!countdown taghere 11:59 PM EST$! left to capture flags!
 Links:
 Bot page - https://top.gg/bot/710486805836988507`;
 
-export const generateHelpEmbed = prefix =>
-  new MessageEmbed()
+export const generateHelpEmbed = prefix => {
+  const g = (strings, ...keys) =>
+    "`" +
+    (strings[0].startsWith("cd") ? prefix : "") +
+    strings[0].replace(/cd/g, "countdown") +
+    keys.map((key, i) => key + strings[i + 1]).join("") +
+    "`";
+  const nextMonth = () =>
+    new Date("2000", (new Date().getMonth() + 1) % 12).toLocaleString("default", {
+      month: "short",
+    });
+  return new MessageEmbed()
     .setTitle(`${prefix}help`)
     .setColor("#f26522")
     .setDescription("Usage for the Live Countdown Bot")
     .addFields(
       {
         name: "Set a countdown",
-        value: `\`${prefix}countdown <Date/Time to countdown to>\``,
+        value: g`cd <Date/Time to cd to>` + "\nExample: " + g`cd 10mins`,
       },
       {
         name: "To tag:",
-        value: `\`${prefix}countdown [tagme|taghere|tageveryone] <Date/Time to countdown to>\``,
+        value:
+          g`cd [tagme|taghere|tageveryone] <Date/Time to cd to>` +
+          "\nExample: " +
+          g`cd tagme Jan 21 9AM CEST`,
       },
       {
         name: `Inline mode: (put command between two ! characters)`,
-        value: `\` .. !!countdown <Date/Time to countdown to>! .. \``,
+        value:
+          g` .. !!cd <Date/Time to cd to>! .. ` +
+          "\nExample: " +
+          g`Time till I'm 13 yrs old: !!cd ${nextMonth()} 27, 10PM EDT! left.`,
       },
       {
-        name: "Examples:",
+        name: "More Examples:",
         value:
-          `\`${prefix}countdown 10mins\`\n` +
-          `\`${prefix}countdown tagme 1 hour 43mins\`\n` +
-          `\`${prefix}countdown Sep 24 3:47 PM PDT\`\n` +
-          `\`Time till I'm 13 yrs old: !!countdown Aug 31, 10PM GMT! left.\`\n` +
-          `\`There is !!countdown taghere 11:59 PM EST! left to capture flags!\`\n`,
+          g`cd 10:30 PM PDT` +
+          "\n" +
+          g`cd tageveryone 1 hour 43mins` +
+          "\n" +
+          g`There is !!cd taghere 11:59 PM EST! left to capture flags!`,
       },
       {
         name: "Notes",
@@ -67,13 +83,13 @@ export const generateHelpEmbed = prefix =>
           `There can be ${channelMax} active countdowns per channel.\n` +
           "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
           `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
-          "Find my support server [here](https://discord.com/invite/tytftA3 'Join the support server!'). " +
+          "Find my support server [here](https://discord.com/invite/b2fY4z4xBY 'Join the support server!'). " +
           "Invite me from [here](https://top.gg/bot/710486805836988507).",
       }
     )
     .setFooter("Made by LordBusiness")
     .setTimestamp();
-
+};
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
 
 let statsFooterText = "Live Countdown Bot";
