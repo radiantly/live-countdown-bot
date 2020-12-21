@@ -41,6 +41,7 @@ describe("test db functions", () => {
   // Test prefixHandler.js
   // TODO: Move to own test file once
   // https://github.com/JoshuaWise/better-sqlite3/issues/414 is resolved
+  // Update: has been resolved.
 
   db.prepare("DELETE FROM GuildInfo").run();
 
