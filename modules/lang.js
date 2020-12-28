@@ -19,6 +19,7 @@ const languages = {
     timeLeft: "Time left",
     countdownDone: "Countdown done",
     inlineNoMinutes: "no minutes",
+    countingDown: "Counting down",
   },
   es: {
     longStrings: {

@@ -115,6 +115,17 @@ export const messageHandler = async (message, messageReply) => {
           );
       }
       const timer = computeCountdown(countdownCommand, message);
+
+      // If a timer is less than 1min, we send an "ephemeral" timer
+      // This is not stored in the database - instead, we simply use setTimeout
+      if (timer.ephemeral) {
+        const { timeEnd, lang, tag } = timer.ephemeral;
+        const timeLeft = Math.abs(Date.now() - timeEnd);
+        deleteMessage(message);
+        if (timeLeft > 2000) sendReply(`${t("countingDown", lang)} ..`);
+        return setTimeout(sendReply, timeLeft, `${t("countdownDone", lang)}! ${tag || ""}`);
+      }
+
       if (timer.error) return await sendReply(timer.error);
       const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(
         timer.timeEnd - Date.now(),

@@ -96,6 +96,8 @@ export const computeCountdown = (command, message) => {
   if (!timeEnd) return { error: "Invalid date/time." };
   const timeLeft = timeEnd - Date.now();
 
+  countObj.timeEnd = timeEnd;
+
   // Check if date/time in the past
   if (timeLeft < 0)
     return {
@@ -104,15 +106,15 @@ export const computeCountdown = (command, message) => {
         "A common reason for this is the lack of year.",
     };
 
-  if (timeLeft < 55000) return { error: "Too short! Countdowns must be higher than a minute!" };
-
   if (timeEnd > maxTimeEnd)
     return {
       error:
         ":eyes: That's too far away in the future. Currently, countdowns are limited to 2 years.",
     };
 
-  countObj.timeEnd = timeEnd;
+  if (timeLeft < 55000)
+    return { error: "Too short! Countdowns must be higher than a minute!", ephemeral: countObj };
+
   return countObj;
 };
 
