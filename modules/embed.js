@@ -34,6 +34,8 @@ There is !!countdown taghere 11:59 PM EST$! left to capture flags!
 Links:
 Bot page - https://top.gg/bot/710486805836988507`;
 
+const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+
 export const generateHelpEmbed = prefix => {
   const g = (strings, ...keys) =>
     "`" +
@@ -87,8 +89,13 @@ export const generateHelpEmbed = prefix => {
           "Invite me from [here](https://top.gg/bot/710486805836988507).",
       }
     )
-    .setFooter("Made by LordBusiness")
-    .setTimestamp();
+    .setFooter(
+      `Special thanks to ${rand(["Pr€d∆†๏r™", "Loco Musician"])} for ${rand([
+        "moderating the support server",
+        "helping with moderation",
+        "being cool",
+      ])}.`
+    );
 };
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
 
