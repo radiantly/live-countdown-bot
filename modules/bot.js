@@ -12,28 +12,10 @@ import { initGuilds, addGuild, removeMessageWithReplyId, removeGuild, closeDb } 
 import { messageHandler } from "./messageHandler.js";
 import { updateCountdowns } from "./updateManager.js";
 
-const activities = [
-  { type: "PLAYING", name: "with time" },
-  { type: "PLAYING", name: "with 100 seconds" },
-  { type: "WATCHING", name: "for !help" },
-  { type: "WATCHING", name: "times change" },
-  { type: "WATCHING", name: "the time fly by" },
-  { type: "WATCHING", name: "https://bit.ly/live-bot" },
-  { type: "LISTENING", name: "the clock tick" },
-];
-
-const activity = activities[Math.floor(Math.random() * activities.length)];
-const presence =
-  env.NODE_ENV === "debug"
-    ? { activity: { name: "maintenance", type: "WATCHING" }, status: "dnd" }
-    : { activity, status: "online" };
-
 const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
 
 const client = new Client({
   messageCacheMaxSize: 0,
-  // partials: ["MESSAGE"],
-  presence,
   ws: { intents: requiredIntents },
 });
 
