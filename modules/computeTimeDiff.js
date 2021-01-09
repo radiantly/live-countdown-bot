@@ -54,7 +54,14 @@ export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
 };
 
 export const computeChanTimeDiff = (timeLeftms, lang = "en") => {
-  let strings = t("longStrings", lang);
+  let strings = {
+    lessThanAMinute: "less than a minute",
+    minute: "minute",
+    hour: "Hour",
+    day: "Day",
+    week: "week",
+    and: "and",
+  };
 
   if (timeLeftms < oneHrs)
     return {
