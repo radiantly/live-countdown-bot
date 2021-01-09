@@ -1,19 +1,19 @@
 import { DMChannel, MessageEmbed } from "./bot.js";
 import { exit } from "process";
 import { inspect, types } from "util";
-import { computeTimeDiff } from "./computeTimeDiff.js";
+import { computeChanTimeDiff, computeTimeDiff } from "./computeTimeDiff.js";
 import {
   generateHelpEmbed,
   generateHelpFallback,
   generateStatsEmbed,
   generateStatsFallback,
 } from "./embed.js";
-import { addCountdown, removeMessageWithReplyId } from "./sqlite3.js";
+import { addCountdown, removeChannelCountdowns, removeMessageWithReplyId } from "./sqlite3.js";
 import { parseInline, computeCountdown, assembleInlineMessage } from "./countdownHelper.js";
 import config from "../config.js";
 import { getPrefix, setPrefix, escapeBacktick } from "./prefixHandler.js";
-import { postServerCount } from "./post.js";
 import { t } from "./lang.js";
+import { getChan, setChan } from "./chan.js";
 
 const { botOwner } = config;
 
@@ -93,6 +93,12 @@ export const messageHandler = async (message, messageReply) => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
+    if (
+      message.guild?.available &&
+      !message.channel.permissionsFor(message.author).has("MANAGE_MESSAGES")
+    )
+      return;
+
     if (command === "countdown") {
       if (!message.guild?.available)
         return await sendReply("Sorry, countdowns can only be initiated in servers.");
@@ -145,6 +151,65 @@ export const messageHandler = async (message, messageReply) => {
         });
     }
 
+    if (command === "setchannel") {
+      if (!message.guild?.available) return await sendReply("Try again in a server.");
+      if (!args.length) return await sendReply(`Syntax: \`${prefix}setchannel CHANNEL_NAME\``);
+      const chanName = args.join().replace(" ", "").toLowerCase();
+      const chan = message.guild.channels.cache.find(
+        c => c.name.replace(" ", "").toLowerCase() === chanName
+      );
+      if (!chan) return await sendReply(`Channel ${args.join()} not found.`);
+      setChan(message.guild, chan.id);
+      if (chan.permissionsFor(message.guild.me).has("MANAGE_CHANNELS"))
+        return await sendReply(`Channel set to ${chan} successfully.`);
+      return await sendReply(
+        `Channel ${chan} successfully set, but I do not have the \`MANAGE_CHANNELS\` permission for changing the channel name.`
+      );
+    }
+
+    if (command === "channelcountdown") {
+      if (!message.guild?.available)
+        return await sendReply("Sorry, channel countdowns can only be initiated in servers.");
+
+      const channelId = getChan(message.guild);
+      if (!channelId)
+        return await sendReply(
+          `No countdown channel set. Use \`${prefix}setchannel CHANNEL_NAME\` to set one.`
+        );
+
+      const chan = message.guild.channels.cache.get(channelId);
+      if (!chan) return await sendReply("Cannot find the set channel.");
+
+      let countdownCommand = args.join(" ");
+
+      let sendChannel = message.channel;
+      const timer = computeCountdown(countdownCommand, message);
+
+      if (timer.error) return await sendReply(timer.error);
+      const { humanDiff, timeLeftForNextUpdate } = computeChanTimeDiff(
+        timer.timeEnd - Date.now(),
+        timer.lang
+      );
+      removeChannelCountdowns(message.guild);
+      try {
+        await chan.setName(humanDiff);
+        const replyMessage = await sendChannel.send(`Successfully started channel countdown.`);
+        deleteMessage(message);
+        if (replyMessage)
+          addCountdown({
+            guildId: replyMessage.guild.id,
+            channelId: replyMessage.channel.id,
+            origMsgId: message.id,
+            replyMsgId: replyMessage.id,
+            nextUpdate: timer.timeEnd - timeLeftForNextUpdate,
+            priority: timeLeftForNextUpdate ? 0 : 10,
+            countObj: JSON.stringify({ timers: [timer], chan: channelId }),
+          });
+      } catch (ex) {
+        await sendChannel.send(`An error occured - ${ex}`);
+      }
+    }
+
     // Set a new prefix
     if (command === "setprefix") {
       if (args.length !== 1) return await sendReply(`Syntax: \`${prefix}setprefix <newprefix>\``);
@@ -190,13 +255,6 @@ export const messageHandler = async (message, messageReply) => {
         return command === "eval"
           ? await sendReply("```\n" + result.substr(0, 1950) + "\n```")
           : null;
-      }
-
-      if (command === "updatecount") {
-        const updateCountStatus = await message.client.shard
-          .fetchClientValues("guilds.cache.size")
-          .then(postServerCount);
-        return sendReply("```\n" + updateCountStatus.join("\n") + "\n```");
       }
 
       if (command === "kill") exit();

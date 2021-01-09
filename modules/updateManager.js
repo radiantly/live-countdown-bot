@@ -5,7 +5,7 @@ import {
   updateCountObj,
   updateRecomputedCountdown,
 } from "./sqlite3.js";
-import { computeTimeDiff } from "./computeTimeDiff.js";
+import { computeChanTimeDiff, computeTimeDiff } from "./computeTimeDiff.js";
 import { assembleInlineMessage } from "./countdownHelper.js";
 import { t } from "./lang.js";
 
@@ -36,7 +36,7 @@ export const updateCountdowns = async (client, clientId) => {
   // Abort if thisUpdate is supposed to be too far away
   if (Math.round(thisUpdate) > Date.now()) return;
 
-  const { parts, timers } = JSON.parse(countObj);
+  const { parts, timers, chan } = JSON.parse(countObj);
 
   // Get channel. Remove countdown if not viewable.
   const channel = client.channels.cache.get(channelId);
@@ -47,8 +47,30 @@ export const updateCountdowns = async (client, clientId) => {
   const editMessage = messageToEdit.edit.bind(messageToEdit);
   const sendMessage = channel.send.bind(channel);
 
-  // Check if inline message
-  if (parts) {
+  if (chan) {
+    const timeEnd = new Date(timers[0].timeEnd);
+    const timeLeft = timeEnd - Date.now();
+    const { lang } = timers[0];
+
+    let editText;
+
+    // If countdown is done
+    if (timeLeft < 10000) {
+      removeMessageWithReplyId(replyMsgId);
+      editText = t("countdownDone", lang);
+    } else {
+      const { humanDiff, timeLeftForNextUpdate } = computeChanTimeDiff(timeLeft, lang);
+      editText = humanDiff;
+      updateRecomputedCountdown({
+        replyMsgId,
+        nextUpdate: timeEnd - timeLeftForNextUpdate,
+        priority: timeLeftForNextUpdate ? 0 : 10,
+      });
+    }
+
+    const changeChannel = client.channels.cache.get(chan);
+    await changeChannel.setName(editText);
+  } else if (parts) {
     const { assembledMessage, nextUpdate, priority, finishedTimers } = assembleInlineMessage(
       timers,
       parts

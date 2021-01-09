@@ -54,19 +54,17 @@ export const generateHelpEmbed = prefix => {
     .addFields(
       {
         name: "Set a countdown",
-        value: g`cd <Date/Time to cd to>` + "\nExample: " + g`cd 10mins`,
+        value: g`cd DATE/TIME` + "\nExample: " + g`cd 10mins`,
       },
       {
         name: "To tag:",
         value:
-          g`cd [tagme|taghere|tageveryone] <Date/Time to cd to>` +
-          "\nExample: " +
-          g`cd tagme Jan 21 9AM CEST`,
+          g`cd [tagme|taghere|tageveryone] DATE/TIME` + "\nExample: " + g`cd tagme Jan 21 9AM CEST`,
       },
       {
         name: `Inline mode: (put command between two ! characters)`,
         value:
-          g` .. !!cd <Date/Time to cd to>! .. ` +
+          g` .. !!cd DATE/TIME! .. ` +
           "\nExample: " +
           g`Time till I'm 13 yrs old: !!cd ${nextMonth()} 27, 10PM EDT! left.`,
       },
@@ -80,22 +78,21 @@ export const generateHelpEmbed = prefix => {
           g`There is !!cd taghere 11:59 PM EST! left to capture flags!`,
       },
       {
+        name: "Custom commands:",
+        value:
+          `\`${prefix}setchannel CHANNEL_NAME\` - This sets the countdown channel.\n` +
+          `\`${prefix}channelcountdown DATE/TIME\` - This starts a channel countdown.`,
+      },
+      {
         name: "Notes",
         value:
           `There can be ${channelMax} active countdowns per channel.\n` +
           "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
-          `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
-          "Find my support server [here](https://discord.com/invite/b2fY4z4xBY 'Join the support server!'). " +
-          "Invite me from [here](https://top.gg/bot/710486805836988507).",
+          `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.`,
       }
     )
-    .setFooter(
-      `Special thanks to ${rand(["Pr€d∆†๏r™", "Loco Musician"])} for ${rand([
-        "moderating the support server",
-        "helping with moderation",
-        "being cool",
-      ])}.`
-    );
+    .setFooter("Built by LordBusiness")
+    .setTimestamp();
 };
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
 

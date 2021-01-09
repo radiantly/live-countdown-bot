@@ -53,4 +53,38 @@ export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
   };
 };
 
-computeTimeDiff(3540000, true);
+export const computeChanTimeDiff = (timeLeftms, lang = "en") => {
+  let strings = t("longStrings", lang);
+
+  if (timeLeftms < oneHrs)
+    return {
+      timeLeftForNextUpdate: 0,
+      humanDiff: "Less than an hour",
+    };
+
+  /* Compute track:
+   * 1 -> Show days, hours & minutes
+   * 5 -> Show weeks, days & hours
+   * 9 -> Show weeks & days
+   */
+  const track = 5;
+
+  const days = Math.floor(timeLeftms / oneDay);
+  const hours = Math.floor((timeLeftms % oneDay) / oneHrs);
+
+  const stringGen = (num, str) =>
+    `${num} ${num == 1 ? strings[str] : strings[str + "s"] || strings[str] + "s"}`;
+  let finalString = "";
+  if (days) finalString += stringGen(days, "day") + " ";
+  if (hours && track < 9) finalString += stringGen(hours, "hour");
+
+  let finalWords = finalString.trim().split(" ");
+  if (finalWords.length > 2) finalWords.splice(-2, 0, ",");
+
+  let timeLeftForNextUpdate = timeLeftms - (timeLeftms % trackUpdate[track]);
+  if (timeLeftms <= timeLeftForNextUpdate + 10000) timeLeftForNextUpdate -= trackUpdate[track];
+  return {
+    timeLeftForNextUpdate,
+    humanDiff: finalWords.join(" "),
+  };
+};

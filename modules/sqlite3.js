@@ -15,7 +15,8 @@ db.prepare(
   CREATE TABLE IF NOT EXISTS GuildInfo (
     Guild TEXT PRIMARY KEY NOT NULL,
     Client INTEGER NOT NULL,
-    Prefix TEXT DEFAULT "!" NOT NULL
+    Prefix TEXT DEFAULT "!" NOT NULL,
+    Chan TEXT
   )
 `
 ).run();
@@ -86,6 +87,14 @@ const updatePrefixStmt = db.prepare("UPDATE GuildInfo SET Prefix = @prefix WHERE
 export const updatePrefixInDb = data => updatePrefixStmt.run(data);
 // --x--
 
+// Get or set countdown channel for each guild
+const selectChanStmt = db.prepare("SELECT Chan from GuildInfo WHERE Guild = @guildId");
+export const getChanFromDb = guildId => selectChanStmt.get({ guildId });
+
+const updateChanStmt = db.prepare("UPDATE GuildInfo SET Chan = @chan WHERE Guild = @guildId");
+export const updateChanInDb = data => updateChanStmt.run(data);
+// --x--
+
 // Adding countdown section
 const trimCountdownsInChannelStmt = db.prepare(`
   DELETE FROM CountdownInfo
@@ -137,6 +146,14 @@ export const getNextInQueue = clientId => selectNextInQueueStmt.get(clientId);
 // Get total number of countdowns
 const selectAllCountdownsStmt = db.prepare("SELECT COUNT(*) FROM CountdownInfo;");
 export const getTotalCountdowns = () => selectAllCountdownsStmt.raw().get()[0];
+// --x--
+
+// Delete all channel countdowns
+const removeChannelCountdownsStmt = db.prepare(
+  "DELETE FROM CountdownInfo WHERE Guild = @guildId AND CountObj LIKE '%chan%'"
+);
+export const removeChannelCountdowns = guild =>
+  removeChannelCountdownsStmt.run({ guildId: guild.id });
 // --x--
 
 // Below statements are currently unused
