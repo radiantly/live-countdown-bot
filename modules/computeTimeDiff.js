@@ -79,7 +79,7 @@ export const computeChanTimeDiff = (timeLeftms, lang = "en") => {
   if (hours && track < 9) finalString += stringGen(hours, "hour");
 
   let finalWords = finalString.trim().split(" ");
-  if (finalWords.length > 2) finalWords.splice(-2, 0, ",");
+  if (finalWords.length > 2) finalWords[1] += ",";
 
   let timeLeftForNextUpdate = timeLeftms - (timeLeftms % trackUpdate[track]);
   if (timeLeftms <= timeLeftForNextUpdate + 10000) timeLeftForNextUpdate -= trackUpdate[track];

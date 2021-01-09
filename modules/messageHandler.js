@@ -154,11 +154,11 @@ export const messageHandler = async (message, messageReply) => {
     if (command === "setchannel") {
       if (!message.guild?.available) return await sendReply("Try again in a server.");
       if (!args.length) return await sendReply(`Syntax: \`${prefix}setchannel CHANNEL_NAME\``);
-      const chanName = args.join().replace(" ", "").toLowerCase();
+      const chanName = args.join("").toLowerCase();
       const chan = message.guild.channels.cache.find(
-        c => c.name.replace(" ", "").toLowerCase() === chanName
+        c => c.name.replace(/ /g, "").toLowerCase() === chanName
       );
-      if (!chan) return await sendReply(`Channel ${args.join()} not found.`);
+      if (!chan) return await sendReply(`Channel ${args.join(" ")} not found.`);
       setChan(message.guild, chan.id);
       if (chan.permissionsFor(message.guild.me).has("MANAGE_CHANNELS"))
         return await sendReply(`Channel set to ${chan} successfully.`);
