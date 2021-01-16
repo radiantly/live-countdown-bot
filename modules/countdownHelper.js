@@ -57,6 +57,14 @@ export const getTag = (command, message) => {
       : { error: "Specified role was not found." };
   }
 
+  if (
+    ["tageveryone", "taghere"].includes(tagdirective) &&
+    !message.channel.permissionsFor(message.author).has("MENTION_EVERYONE")
+  )
+    return {
+      error: `You cannot use \`${tagdirective}\` as you do not seem to have the required permissions.`,
+    };
+
   // prettier-ignore
   const tag = tagdirective === "tageveryone" ? "@everyone" :
               tagdirective === "taghere" ? "@here" :
