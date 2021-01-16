@@ -14,6 +14,7 @@ import config from "../config.js";
 import { getPrefix, setPrefix, escapeBacktick } from "./prefixHandler.js";
 import { postServerCount } from "./post.js";
 import { t } from "./lang.js";
+import { faq } from "./faq.js";
 
 const { botOwner } = config;
 
@@ -92,6 +93,29 @@ export const messageHandler = async (message, messageReply) => {
   if (message.content.startsWith(prefix)) {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
+
+    if (command === "cdfaq") {
+      if (!args.length)
+        return await sendReply(
+          new MessageEmbed().setTitle("Live Countdown Bot FAQ").setDescription(
+            `Syntax: \`${prefix}cdfaq TAG\`\n\nAvailable tags: ${Object.keys(faq)
+              .map(k => `\`${k}\` `)
+              .join("")}`
+          )
+        );
+
+      if (!(args[0] in faq)) return;
+
+      const qas = Array.isArray(faq[args[0]]) ? faq[args[0]] : [faq[args[0]]];
+      const embed = new MessageEmbed().addFields(...qas.map(qa => ({ name: qa.q, value: qa.a })));
+      const contributedBy = qas
+        .filter(qa => qa.by)
+        .map(qa => qa.by)
+        .join(", ");
+      if (contributedBy) embed.setFooter(`Contributed by ${contributedBy}`);
+
+      return await sendReply(embed);
+    }
 
     if (command === "countdown") {
       if (!message.guild?.available)
