@@ -51,6 +51,23 @@ const languages = {
     countdownDone: "Aftellen over",
     inlineNoMinutes: "0 minuten",
   },
+  tr: {
+    longStrings: {
+      lessThanAMinute: "bir dakikadan az",
+      minute: "dakika",
+      minutes: "dakika",
+      hour: "saat",
+      hours: "saat",
+      day: "gün",
+      days: "gün",
+      week: "hafta",
+      weeks: "hafta",
+      and: "ve",
+    },
+    timeLeft: "kaldı",
+    countdownDone: "geri sayım tamamlandı",
+    inlineNoMinutes: "0 dakika",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
