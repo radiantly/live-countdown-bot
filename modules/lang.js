@@ -65,8 +65,9 @@ const languages = {
       and: "ve",
     },
     timeLeft: "kaldı",
-    countdownDone: "geri sayım tamamlandı",
+    countdownDone: "Geri sayım tamamlandı",
     inlineNoMinutes: "0 dakika",
+    countingDown: "Geri sayım devam ediyor",
   },
 };
 
