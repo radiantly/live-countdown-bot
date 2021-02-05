@@ -21,6 +21,23 @@ const languages = {
     inlineNoMinutes: "no minutes",
     countingDown: "Counting down",
   },
+  de: {
+    longStrings: {
+      lessThanAMinute: "weniger als eine Minute",
+      minute: "Minute",
+      minutes: "Minuten",
+      hour: "Stunde",
+      hours: "Stunden",
+      day: "Tag",
+      days: "Tage",
+      week: "Woche",
+      weeks: "Wochen",
+      and: "und",
+    },
+    timeLeft: "Verbleibende Zeit",
+    countdownDone: "Countdown abgeschlossen",
+    inlineNoMinutes: "keine Minuten",
+  },
   es: {
     longStrings: {
       lessThanAMinute: "menos de un minuto",
