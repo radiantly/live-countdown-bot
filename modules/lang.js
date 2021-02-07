@@ -36,7 +36,7 @@ const languages = {
     },
     timeLeft: "Verbleibende Zeit",
     countdownDone: "Countdown abgeschlossen",
-    inlineNoMinutes: "keine Minuten",
+    inlineNoMinutes: "0 Minuten",
   },
   es: {
     longStrings: {
