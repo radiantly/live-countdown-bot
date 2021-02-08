@@ -171,7 +171,7 @@ export const messageHandler = async (message, messageReply) => {
 
     // Set a new prefix
     if (command === "setprefix") {
-      if (args.length !== 1) return await sendReply(`Syntax: \`${prefix}setprefix <newprefix>\``);
+      if (args.length !== 1) return await sendReply(`Syntax: \`${prefix}setprefix NEW_PREFIX\``);
       const newPrefix = args[0];
       if (newPrefix.length >= 4) return await sendReply("Prefix can at most be 3 characters.");
       if (!message.guild?.available)
