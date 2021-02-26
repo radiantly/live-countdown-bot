@@ -24,9 +24,12 @@ describe("Time diff for humans", () => {
   });
 
   test("weeks", () => {
-    expect(computeTimeDiff(1 * 7 * 24 * 60 * 60 * 1000).humanDiff).toEqual("1 week");
-    expect(computeTimeDiff(3 * 7 * 24 * 60 * 60 * 1000).humanDiff).toEqual("3 weeks");
-    expect(computeTimeDiff(13 * 7 * 24 * 60 * 60 * 1000, "en", true).humanDiff).toEqual("13 wks");
+    expect(computeTimeDiff(1 * 7 * 24 * 60 * 60 * 1000).humanDiff).toEqual("7 days");
+    // expect(computeTimeDiff(1 * 7 * 24 * 60 * 60 * 1000).humanDiff).toEqual("1 week");
+    // expect(computeTimeDiff(3 * 7 * 24 * 60 * 60 * 1000).humanDiff).toEqual("3 weeks");
+    expect(computeTimeDiff(3 * 7 * 24 * 60 * 60 * 1000).humanDiff).toEqual("21 days");
+    // expect(computeTimeDiff(13 * 7 * 24 * 60 * 60 * 1000, "en", true).humanDiff).toEqual("13 wks");
+    expect(computeTimeDiff(13 * 7 * 24 * 60 * 60 * 1000, "en", true).humanDiff).toEqual("91 days");
   });
 
   test("2 unit outputs", () => {
@@ -34,11 +37,13 @@ describe("Time diff for humans", () => {
     expect(computeTimeDiff(180000000).humanDiff).toEqual("2 days and 2 hours");
     expect(computeTimeDiff(86940000, "en", true).humanDiff).toEqual("1 day & 9 mins");
     expect(computeTimeDiff(209939232).humanDiff).toEqual("2 days and 10 hours");
-    expect(computeTimeDiff(3289329032, "en", true).humanDiff).toEqual("5 wks & 3 days");
+    // expect(computeTimeDiff(3289329032, "en", true).humanDiff).toEqual("5 wks & 3 days");
+    expect(computeTimeDiff(3289329032, "en", true).humanDiff).toEqual("38 days");
   });
 
   test("3 unit outputs", () => {
-    expect(computeTimeDiff(904839232).humanDiff).toEqual("1 week, 3 days and 11 hours");
+    expect(computeTimeDiff(160000000).humanDiff).toEqual("1 day, 20 hours and 26 minutes");
+    // expect(computeTimeDiff(904839232).humanDiff).toEqual("1 week, 3 days and 11 hours");
   });
 });
 
