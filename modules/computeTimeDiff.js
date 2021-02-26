@@ -23,21 +23,21 @@ export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
 
   /* Compute track:
    * 1 -> Show days, hours & minutes
-   * 5 -> Show weeks, days & hours
-   * 9 -> Show weeks & days
+   * 5 -> Show days & hours
+   * 9 -> Show days
    */
   const track = timeLeftms < 2 * oneWks ? (timeLeftms < 2 * oneDay ? 1 : 5) : 9;
 
-  const weeks = Math.floor(timeLeftms / oneWks);
-  const days = Math.floor((timeLeftms % oneWks) / oneDay);
+  // const weeks = Math.floor(timeLeftms / oneWks);
+  const days = Math.floor(timeLeftms / oneDay);
   const hours = Math.floor((timeLeftms % oneDay) / oneHrs);
   const minutes = Math.floor((timeLeftms % oneHrs) / oneMin);
 
   const stringGen = (num, str) =>
     `${num} ${num == 1 ? strings[str] : strings[str + "s"] || strings[str] + "s"}`;
   let finalString = "";
-  if (weeks) finalString = stringGen(weeks, "week") + " ";
-  if (days) finalString += stringGen(days, "day") + " ";
+  // if (weeks) finalString = stringGen(weeks, "week") + " ";
+  if (days) finalString = stringGen(days, "day") + " ";
   if (hours && track < 9) finalString += stringGen(hours, "hour") + " ";
   if (minutes && track < 5) finalString += stringGen(minutes, "minute");
 
@@ -52,5 +52,3 @@ export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
     humanDiff: finalWords.join(" "),
   };
 };
-
-computeTimeDiff(3540000, true);
