@@ -26,7 +26,7 @@ export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
    * 5 -> Show days & hours
    * 9 -> Show days
    */
-  const track = timeLeftms < 2 * oneWks ? (timeLeftms < 2 * oneDay ? 1 : 5) : 9;
+  const track = timeLeftms < 2 * oneWks ? (timeLeftms < 6 * oneHrs ? 1 : 5) : 9;
 
   // const weeks = Math.floor(timeLeftms / oneWks);
   const days = Math.floor(timeLeftms / oneDay);

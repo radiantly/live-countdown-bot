@@ -47,4 +47,4 @@ There is !!countdown taghere 11:59 PM EST! left to capture flags!
 
 ## Contributing
 
-Feel free to open an issue/pull request.
+Feel free to open an issue/pull request. You may find the [Architecture.md](./Architecture.md) document helpful to find what you're looking for.
