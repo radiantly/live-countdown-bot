@@ -20,7 +20,7 @@ export const timedPromise = (callback, ...args) => {
 };
 
 export const updateCountdowns = async (client, clientId) => {
-  client.setTimeout(updateCountdowns, 400, client, clientId);
+  client.setTimeout(updateCountdowns, 1000, client, clientId);
   const countdownObj = getNextInQueue(clientId);
 
   // Abort if no elements exist
