@@ -100,7 +100,7 @@ export const computeCountdown = (command, message) => {
   if (["infinity", "\u221E", "\u267E\uFE0F"].includes(command)) return { error: "Seriously? -_-" };
 
   // Parse time and check if valid
-  const timeEnd = chrono.parseDate(command);
+  const timeEnd = chrono.parseDate(command, undefined, { forwardDate: true });
   if (!timeEnd) return { error: "Invalid date/time." };
   const timeLeft = timeEnd - Date.now();
 
