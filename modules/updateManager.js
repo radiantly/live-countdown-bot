@@ -96,9 +96,10 @@ export const updateCountdowns = async (client, clientId) => {
   } else {
     // If not inline, it must be a normal message
 
+    const { lang } = timers[0];
     const timeEnd = new Date(timers[0].timeEnd);
     const timeLeft = timeEnd - Date.now();
-    const { lang } = timers[0];
+    const timeElapsed = timers[0].timeStart ? Date.now() - new Date(timers[0].timeStart) : Infinity;
 
     let editText;
 
@@ -115,7 +116,7 @@ export const updateCountdowns = async (client, clientId) => {
             `${t("countdownDone", lang)}! ${timers[0].tag}`
           ).catch(err => console.error(err));
     } else {
-      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft, lang);
+      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft, timeElapsed, lang);
       editText = `${t("timeLeft", lang)}: ${humanDiff}`;
       updateRecomputedCountdown({
         replyMsgId,

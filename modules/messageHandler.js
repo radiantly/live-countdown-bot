@@ -153,6 +153,7 @@ export const messageHandler = async (message, messageReply) => {
       if (timer.error) return await sendReply(timer.error);
       const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(
         timer.timeEnd - Date.now(),
+        Date.now() - timer.timeStart,
         timer.lang
       );
       const replyMessage = await sendChannel.send(`${t("timeLeft", timer.lang)}: ${humanDiff}.`);

@@ -8,12 +8,14 @@ const oneWks = 7 * oneDay;
 
 const trackUpdate = {
   1: oneMin,
+  2: oneMin * 2,
   5: oneHrs,
   9: oneDay,
 };
 
-export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
+export const computeTimeDiff = (timeLeftms, timeElapsed, lang = "en", short = false) => {
   let strings = short ? t("shortStrings", lang) : t("longStrings", lang);
+  if (!timeElapsed) timeElapsed = Infinity;
 
   if (timeLeftms < oneMin)
     return {
@@ -26,7 +28,10 @@ export const computeTimeDiff = (timeLeftms, lang = "en", short = false) => {
    * 5 -> Show days & hours
    * 9 -> Show days
    */
-  const track = timeLeftms < 2 * oneWks ? (timeLeftms < 2 * oneHrs ? 1 : 5) : 9;
+  const startTrack =
+    timeElapsed < 30 * oneMin ? 1 : timeElapsed < oneHrs ? 2 : timeElapsed < oneDay ? 5 : 9;
+  const endTrack = timeLeftms < 2 * oneWks ? (timeLeftms < 2 * oneHrs ? 1 : 5) : 9;
+  const track = Math.min(startTrack, endTrack);
 
   // const weeks = Math.floor(timeLeftms / oneWks);
   const days = Math.floor(timeLeftms / oneDay);

@@ -112,7 +112,7 @@ export const generateStatsEmbed = async client => {
   const memUsageRounded = Math.round(toMB(memUsage));
   const shardMemUsage = to2Decimals(toMB(process.memoryUsage().rss));
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
-  const upTime = computeTimeDiff(client.uptime, "en", true).humanDiff;
+  const upTime = computeTimeDiff(client.uptime, Infinity, "en", true).humanDiff;
   const totalCountdowns = getTotalCountdowns();
   const totalServers = await client.shard
     .fetchClientValues("guilds.cache.size")

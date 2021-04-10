@@ -104,6 +104,7 @@ export const computeCountdown = (command, message) => {
   if (!timeEnd) return { error: "Invalid date/time." };
   const timeLeft = timeEnd - Date.now();
 
+  countObj.timeStart = new Date();
   countObj.timeEnd = timeEnd;
 
   // Check if date/time in the past
@@ -133,6 +134,7 @@ export const assembleInlineMessage = (timers, parts) => {
 
   const assembled = timers.map((timer, index) => {
     const timeEnd = new Date(timer.timeEnd);
+    const timeElapsed = timer.timeStart ? Date.now() - new Date(timer.timeStart) : Infinity;
     const timeLeft = timeEnd - Date.now();
 
     let diff;
@@ -142,7 +144,11 @@ export const assembleInlineMessage = (timers, parts) => {
       diff = t("inlineNoMinutes", timer.lang);
       finishedTimers.push(index);
     } else {
-      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft, timer.lang);
+      const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(
+        timeLeft,
+        timeElapsed,
+        timer.lang
+      );
 
       diff = humanDiff;
 
