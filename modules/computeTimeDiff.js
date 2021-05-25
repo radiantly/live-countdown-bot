@@ -15,7 +15,7 @@ const trackUpdate = {
 
 export const computeTimeDiff = (timeLeftms, timeElapsed, lang = "en", short = false) => {
   let strings = short ? t("shortStrings", lang) : t("longStrings", lang);
-  if (!timeElapsed) timeElapsed = Infinity;
+  if (isNaN(timeElapsed)) timeElapsed = Infinity;
 
   if (timeLeftms < oneMin)
     return {
@@ -29,7 +29,7 @@ export const computeTimeDiff = (timeLeftms, timeElapsed, lang = "en", short = fa
    * 9 -> Show days
    */
   const startTrack =
-    timeElapsed < 30 * oneMin ? 1 : timeElapsed < oneHrs ? 2 : timeElapsed < oneDay ? 5 : 9;
+    timeElapsed < 10 * oneMin ? 1 : timeElapsed < oneHrs ? 2 : timeElapsed < oneDay ? 5 : 9;
   const endTrack = timeLeftms < 2 * oneWks ? (timeLeftms < 2 * oneHrs ? 1 : 5) : 9;
   const track = Math.min(startTrack, endTrack);
 

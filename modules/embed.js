@@ -90,7 +90,7 @@ export const generateHelpEmbed = prefix => {
       }
     )
     .setFooter(
-      `Special thanks to ${rand(["Pr€d∆†๏r™", "Loco Musician"])} for ${rand([
+      `Special thanks to ${rand(["Pr€d∆†๏r™", "Loco Musician", "Zetas2", "Pocket"])} for ${rand([
         "moderating the support server",
         "helping with moderation",
         "being cool",
