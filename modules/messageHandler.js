@@ -182,7 +182,10 @@ export const messageHandler = async (message, messageReply) => {
           "Sorry, you must have the `MANAGE_MESSAGES` permission to set a new prefix."
         );
       setPrefix(message.guild, newPrefix);
-      return await sendReply(`Prefix has been successfully set to ${escapeBacktick(newPrefix)}`);
+      return await sendReply(
+        `Prefix has been successfully set to ${escapeBacktick(newPrefix)}\n` +
+          "*Note: Inline countdowns still use `!`*"
+      );
     }
 
     const fallbackRequired =

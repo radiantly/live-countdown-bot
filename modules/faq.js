@@ -74,4 +74,51 @@ Example for a countdown in:
 2 weeks -> show hours
 else show weeks/days`,
   },
+  simple: {
+    q: "I hear you're looking for a simple request structure.",
+    a:
+      "Simple request structures can look as follows:\n" +
+      "```!countdown <#> <minutes/hours/days/months>```\n" +
+      "```!countdown <tag> <month> <day>, <time> <zone>```\n\n" +
+      "Realistic examples look as follows:\n" +
+      "```!countdown 5days```\n" +
+      "```!countdown tagme June 25, 3:00 PM CDT```",
+  },
+  complex: {
+    q: "I hear you're looking for a complex request structure.",
+    a:
+      "Complex request structures can look as follows:\n" +
+      "```<txt>!!countdown <#> <minutes/hours/days/months>!<txt>```\n" +
+      "```<txt>!!countdown <tag> <month> <day>, <time> <zone>!<txt>```\n\n" +
+      "Realistic examples look as follows:\n" +
+      "```My countdown: !!countdown 5days! Yay!```\n" +
+      "```My countdown: !!countdown June 25, 3:00 PM CDT! Yay!```\n\n",
+  },
+  qna1: {
+    q:
+      "Need more info? You've come to the right place! Here's some answers to commonly asked questions. Check page 2 if you don't find your answer here.",
+    a:
+      "~ You can stop or delete the countdown by deleting the message the bot reply to your request.\n" +
+      "~ Sometimes the bot is looking for 24 hours instead of a day.\n" +
+      "~ Give the bot `MANAGE_MESSAGES` to allow it to delete your requests. \n" +
+      "~ The bots default time zone is UTC but can be modified in the countdown request.\n" +
+      "~ The bot can only be made role specific by setting up a channel that only people with a certain role can type in.\n" +
+      "~ Daylight savings applies to timezones (CST/CDT).",
+  },
+  qna2: {
+    q: "Didn't find your answer? Its sure to be here somewhere..",
+    a:
+      "~ Change prefix using `!setprefix` followed by your desired prefix.\n" +
+      "~ The message the bot replies with is the countdown, pin it or make the bot its own channel so it doesnt get lost.\n" +
+      "~ You can have 5 inline countdowns per post. Up to 2 posts per channel. For a total of 10 per channel.\n" +
+      "~ To tag people use `tag Username`. Sometimes @mentions dont work.\n" +
+      "~ Due to rate limits the bot cannot show seconds.\n" +
+      "~ The bot reduces update intervals towards the middle of countdowns. It's still spot on, it just doesn't update as often when people are likely not looking at it.",
+  },
+  qna3: {
+    q: "Still didn't find your answer?",
+    a:
+      "Head over to our discord and someone will be able to assist you.\n" +
+      "https://discord.com/invite/b2fY4z4xBY",
+  },
 };
