@@ -7,7 +7,7 @@ export const parseInline = command => {
   let commands = [];
   let parts = [];
   for (let i = 1; i <= 5; i++) {
-    const match = command.match(/^(.*?)!!countdown ([^!]+)!(.*)$/ims);
+    const match = command.match(/^(.*?)!!?(?:countdown|cd) ([^!]+)!(.*)$/ims);
     if (match?.length !== 4) break;
     parts.push(match[1]);
     commands.push(match[2].trim().toLowerCase());
