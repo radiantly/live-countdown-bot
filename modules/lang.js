@@ -104,6 +104,24 @@ const languages = {
     inlineNoMinutes: "0 perc",
     countingDown: "visszaszámláló",
   },
+  ja: {
+    longStrings: {
+      lessThanAMinute: "1分内",
+      minute: "分",
+      minutes: "分",
+      hour: "時間",
+      hours: "時間",
+      day: "日",
+      days: "日",
+      week: "週間",
+      weeks: "週間",
+      and: " ",
+    },
+    timeLeft: "残り時間 ",
+    countdownDone: "終わり！",
+    inlineNoMinutes: "0 分",
+    countingDown: "カウントダウン",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
