@@ -1,8 +1,8 @@
-import { Client, Intents, Options } from "discord.js";
+import { Client, Intents, Options, Permissions } from "discord.js";
 
 import process, { env } from "process";
 import config from "../config.js";
-import { initGuilds, addGuild, removeMessageWithReplyId, removeGuild, closeDb } from "./sqlite3.js";
+import { initGuilds, addGuild, removeGuild, closeDb } from "./sqlite3.js";
 import { messageHandler } from "./messageHandler.js";
 import { updateCountdowns } from "./updateManager.js";
 
@@ -17,7 +17,7 @@ const client = new Client({
       { type: "WATCHING", name: "the time fly by" },
       { type: "WATCHING", name: "https://bit.ly/live-bot" },
       { type: "LISTENING", name: "the clock tick" },
-      { type: "COMPETING", name: "for time" },
+      { type: "COMPETING", name: "the race for time" },
     ],
   },
   makeCache: Options.cacheWithLimits({
@@ -25,6 +25,7 @@ const client = new Client({
     PresenceManager: 0,
     ThreadManager: 0,
   }),
+  partials: ["CHANNEL"],
   intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
 
@@ -42,23 +43,9 @@ client.once("ready", () => {
 
 client.on("messageCreate", messageHandler);
 
-// client.on("messageUpdate", (_, message) => {
-//   if (message.partial || message.author.bot) return;
-
-//   const messageReply = message[Symbol.for("messageReply")];
-//   if (messageReply && !messageReply.deleted) messageHandler(message, messageReply);
-// });
-
-// client.on("messageDelete", message => {
-//   const { guild, client, author } = message;
-//   if (message.partial || author.id !== client.user.id || !guild.available) return;
-
-//   removeMessageWithReplyId(message.id);
-// });
-
 client.on("guildCreate", guild => {
   addGuild(guild.id, clientId);
-  if (guild.systemChannel && guild.me?.permissionsIn(guild.systemChannel.id).has("SEND_MESSAGES"))
+  if (guild.systemChannel?.permissionsFor(guild.me).has(Permissions.FLAGS.SEND_MESSAGES))
     guild.systemChannel.send(
       "**Glad to be a part of your server** :heart:\nYou're probably looking for `!help`"
     );
