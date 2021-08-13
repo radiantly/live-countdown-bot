@@ -1,4 +1,4 @@
-import { DMChannel, MessageEmbed, Permissions } from "discord.js";
+import { MessageEmbed, Permissions } from "discord.js";
 import { exit } from "process";
 import { inspect, types } from "util";
 import { computeTimeDiff } from "./computeTimeDiff.js";
@@ -23,6 +23,9 @@ const {
 export const messageHandler = async message => {
   // Check if author is a bot
   if (message.author.bot) return;
+
+  // DMChannels are uncached
+  if (message.channel.partial) await message.channel.fetch();
 
   // Send a message
   // mainContent can either be a string or embed.
@@ -224,6 +227,6 @@ export const messageHandler = async message => {
     }
   }
   // If DM channel and not command, guide them to help.
-  if (message.channel instanceof DMChannel)
+  if (message.channel.type === "DM")
     return await send("Try `!help`\nInvite from https://top.gg/bot/710486805836988507");
 };
