@@ -1,6 +1,6 @@
 import { loadavg, cpus } from "os";
 import { version as nodeVersion } from "process";
-import { MessageEmbed, version as djsVersion } from "./bot.js";
+import { MessageEmbed, version as djsVersion } from "discord.js";
 import { getTotalCountdowns, version as sqliteVersion } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import config from "../config.js";
@@ -106,7 +106,7 @@ const toMB = num => num / 1024 / 1024;
 const to2Decimals = num => Math.round(num * 100) / 100;
 export const generateStatsEmbed = async client => {
   const memUsage = await client.shard
-    .broadcastEval("process.memoryUsage().rss")
+    .broadcastEval(client => process.memoryUsage().rss)
     .then(memUsages => memUsages.reduce((total, rss) => total + rss, 0))
     .catch(console.error);
   const memUsageRounded = Math.round(toMB(memUsage));

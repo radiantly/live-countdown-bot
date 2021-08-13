@@ -1,9 +1,9 @@
 import { db, initGuilds, addGuild } from "../modules/sqlite3.js";
-import { Client, Guild, Collection } from "discord.js";
+import { Client, Guild, Collection, Intents } from "discord.js";
 import { getPrefix, setPrefix } from "../modules/prefixHandler.js";
 
 describe("test db functions", () => {
-  const client = new Client();
+  const client = new Client({ intents: [] });
   const guildCache = new Collection();
 
   for (let i = 1; i <= 1000; i++) {

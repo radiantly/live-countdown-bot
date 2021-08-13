@@ -1,4 +1,4 @@
-import { Message, DiscordAPIError } from "./bot.js";
+import { Message, DiscordAPIError } from "discord.js";
 import {
   getNextInQueue,
   removeMessageWithReplyId,
@@ -20,14 +20,14 @@ export const timedPromise = (callback, ...args) => {
 };
 
 export const updateCountdowns = async (client, clientId) => {
-  client.setTimeout(updateCountdowns, 1000, client, clientId);
+  setTimeout(updateCountdowns, 1000, client, clientId);
   const countdownObj = getNextInQueue(clientId);
 
   // Abort if no elements exist
   if (!countdownObj) return;
 
   const {
-    Channel: channelId,
+    Channel: channel_id,
     ReplyMessage: replyMsgId,
     NextUpdate: thisUpdate,
     CountObj: countObj,
@@ -39,11 +39,10 @@ export const updateCountdowns = async (client, clientId) => {
   const { parts, timers } = JSON.parse(countObj);
 
   // Get channel. Remove countdown if not viewable.
-  const channel = client.channels.cache.get(channelId);
+  const channel = client.channels.cache.get(channel_id);
   if (!channel?.viewable) return removeMessageWithReplyId(replyMsgId);
 
-  let messageToEdit = channel.messages.cache.get(replyMsgId);
-  if (!messageToEdit) messageToEdit = new Message(client, { id: replyMsgId }, channel);
+  const messageToEdit = new Message(client, { id: replyMsgId, channel_id });
   const editMessage = messageToEdit.edit.bind(messageToEdit);
   const sendMessage = channel.send.bind(channel);
 

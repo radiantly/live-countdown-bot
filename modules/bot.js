@@ -1,10 +1,4 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-
-const Discord = require("discord.js");
-const { Intents, Client } = Discord;
-
-export const { DMChannel, Message, DiscordAPIError, MessageEmbed, version } = Discord;
+import { Client, Intents, Options } from "discord.js";
 
 import process, { env } from "process";
 import config from "../config.js";
@@ -12,35 +6,33 @@ import { initGuilds, addGuild, removeMessageWithReplyId, removeGuild, closeDb } 
 import { messageHandler } from "./messageHandler.js";
 import { updateCountdowns } from "./updateManager.js";
 
-const activities = [
-  { type: "PLAYING", name: "with time" },
-  { type: "PLAYING", name: "with 100 seconds" },
-  { type: "WATCHING", name: "for !help" },
-  { type: "WATCHING", name: "times change" },
-  { type: "WATCHING", name: "the time fly by" },
-  { type: "WATCHING", name: "https://bit.ly/live-bot" },
-  { type: "LISTENING", name: "the clock tick" },
-];
-
-const activity = activities[Math.floor(Math.random() * activities.length)];
-const presence =
-  env.NODE_ENV === "debug"
-    ? { activity: { name: "maintenance", type: "WATCHING" }, status: "dnd" }
-    : { activity, status: "online" };
-
-const requiredIntents = new Intents(["DIRECT_MESSAGES", "GUILDS", "GUILD_MESSAGES"]);
-
 const client = new Client({
-  messageCacheMaxSize: 0,
-  // partials: ["MESSAGE"],
-  presence,
-  ws: { intents: requiredIntents },
+  presence: {
+    status: "online",
+    activities: [
+      { type: "PLAYING", name: "with time" },
+      { type: "PLAYING", name: "with 100 seconds" },
+      { type: "WATCHING", name: "for !help" },
+      { type: "WATCHING", name: "times change" },
+      { type: "WATCHING", name: "the time fly by" },
+      { type: "WATCHING", name: "https://bit.ly/live-bot" },
+      { type: "LISTENING", name: "the clock tick" },
+      { type: "COMPETING", name: "for time" },
+    ],
+  },
+  makeCache: Options.cacheWithLimits({
+    MessageManager: 0,
+    PresenceManager: 0,
+    ThreadManager: 0,
+  }),
+  intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
 
 export const clientId = Math.round(Math.random() * 1e9);
 
 const { token } = config;
 const log = console.log;
+
 client.once("ready", () => {
   log(`Initialized client ${clientId} (${client.shard.ids.join()}).`);
 
@@ -48,11 +40,7 @@ client.once("ready", () => {
   updateCountdowns(client, clientId);
 });
 
-client.on("message", async message => {
-  await messageHandler(message);
-  // if (message.author?.id !== client.user?.id && !message[Symbol.for("messageReply")])
-  //   message.channel.messages.cache.delete(message.id);
-});
+client.on("messageCreate", messageHandler);
 
 // client.on("messageUpdate", (_, message) => {
 //   if (message.partial || message.author.bot) return;
