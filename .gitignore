@@ -1,6 +1,7 @@
 # Config file
 config.js
 config.json
+config.prod.js
 
 # VSCode settings
 .vscode

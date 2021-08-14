@@ -7,6 +7,8 @@
   "scripts": {
     "start": "node index.js",
     "check-formatting": "prettier --check \"**/*.js\"",
+    "register-guild": "node registerInteractions.js",
+    "register-global": "node registerInteractions.js --global",
     "test": "NODE_ENV=test jest"
   },
   "repository": {
