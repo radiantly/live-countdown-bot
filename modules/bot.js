@@ -5,6 +5,7 @@ import config from "../config.js";
 import { initGuilds, addGuild, removeGuild, closeDb } from "./sqlite3.js";
 import { messageHandler } from "./messageHandler.js";
 import { updateCountdowns } from "./updateManager.js";
+import { interactionHandler } from "./interactionHandler.js";
 
 const client = new Client({
   presence: {
@@ -42,6 +43,7 @@ client.once("ready", () => {
 });
 
 client.on("messageCreate", messageHandler);
+client.on("interactionCreate", interactionHandler);
 
 client.on("guildCreate", guild => {
   addGuild(guild.id, clientId);

@@ -21,8 +21,11 @@
   },
   "homepage": "https://github.com/radiantly/live-countdown-bot#readme",
   "dependencies": {
+    "@discordjs/builders": "^0.5.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
     "better-sqlite3": "^7.1.2",
     "chrono-node": "^2.2.7",
+    "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
     "got": "^11.8.1"
   },
