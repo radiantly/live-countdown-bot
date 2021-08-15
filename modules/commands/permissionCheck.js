@@ -16,11 +16,11 @@ const permissionsRequired = [
   ],
 ];
 
-export const permissionCheckCommand = new SlashCommandBuilder()
+export const command = new SlashCommandBuilder()
   .setName("permissioncheck")
   .setDescription("Check if bot permissions are correct in this channel");
 
-export const permissionCheckExecute = async interaction => {
+export const handler = async interaction => {
   if (!interaction.channel || !interaction.guild?.me)
     return interaction.reply({
       content: "Unknown error. Try reinviting the bot from https://top.gg/bot/710486805836988507",

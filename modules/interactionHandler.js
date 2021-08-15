@@ -1,9 +1,10 @@
-import { timerCommand, timerExecute } from "./timer.js";
-import { permissionCheckCommand, permissionCheckExecute } from "./permissionCheck.js";
-export const interactionHandler = interaction => {
-  if (!interaction.isCommand()) return;
+import * as timer from "./commands/timer.js";
+import * as permissionCheck from "./commands/permissionCheck.js";
+import * as remindMeIn from "./commands/remindMeIn.js";
+import * as sendToDM from "./commands/sendToDM.js";
 
+export const interactionHandler = interaction => {
   const { commandName } = interaction;
-  if (commandName === timerCommand.name) return timerExecute(interaction);
-  if (commandName === permissionCheckCommand.name) return permissionCheckExecute(interaction);
+  for (const item of [timer, permissionCheck, remindMeIn, sendToDM])
+    if (commandName === item.command.name) return item.handler(interaction);
 };

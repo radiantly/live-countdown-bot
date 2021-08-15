@@ -1,11 +1,14 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { timerCommand } from "./modules/timer.js";
-import { permissionCheckCommand } from "./modules/permissionCheck.js";
+import { command as timerCommand } from "./modules/commands/timer.js";
+import { command as permissionCheckCommand } from "./modules/commands/permissionCheck.js";
+import { command as remindMeInCommand } from "./modules/commands/remindMeIn.js";
+import { command as sendToDM } from "./modules/commands/sendToDM.js";
+
 import config from "./config.js";
 
 const { token, clientId, supportGuildId: guildId } = config;
-const guildCommands = [timerCommand, permissionCheckCommand];
+const guildCommands = [timerCommand, permissionCheckCommand, remindMeInCommand, sendToDM];
 const globalCommands = [];
 
 const rest = new REST({ version: "9" }).setToken(token);
