@@ -104,6 +104,24 @@ const languages = {
     inlineNoMinutes: "0 perc",
     countingDown: "visszaszámláló",
   },
+  id: {
+    longStrings: {
+      lessThanAMinute: "Kurang dari 1 menit",
+      minute: "menit",
+      minutes: "menit",
+      hour: "jam",
+      hours: "jam",
+      day: "hari",
+      days: "hari",
+      week: "minggu",
+      weeks: "minggu",
+      and: "dan",
+    },
+    timeLeft: "Waktu yang tersisa",
+    countdownDone: "Selesai!",
+    inlineNoMinutes: "0 menit",
+    countingDown: "Menghitung",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
