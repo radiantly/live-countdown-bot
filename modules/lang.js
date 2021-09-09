@@ -140,6 +140,24 @@ const languages = {
     inlineNoMinutes: "0 menit",
     countingDown: "Menghitung",
   },
+  sv: {
+    longStrings: {
+      lessThanAMinute: "Mindre än en minut",
+      minute: "minut",
+      minutes: "minuter",
+      hour: "timma",
+      hours: "timmar",
+      day: "dag",
+      days: "dagar",
+      week: "vecka",
+      weeks: "veckor",
+      and: "och",
+    },
+    timeLeft: "Tid kvar",
+    countdownDone: "Nedräkning klar!",
+    inlineNoMinutes: "inga minuter",
+    countingDown: "Räknar ned",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
