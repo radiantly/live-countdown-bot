@@ -72,7 +72,12 @@ export const messageHandler = async message => {
 
     const { assembledMessage, priority, nextUpdate } = assembleInlineMessage(timers, inline.parts);
 
-    const replyMessage = await send(assembledMessage);
+    const replyMessage = await send({
+      content: assembledMessage,
+      allowedMentions: {
+        parse: [],
+      },
+    });
     deleteMessage(message);
     if (replyMessage)
       addCountdown({
