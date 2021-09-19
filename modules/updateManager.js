@@ -1,4 +1,4 @@
-import { Message, DiscordAPIError } from "discord.js";
+import { Message, DiscordAPIError, MessageManager } from "discord.js";
 import {
   getNextInQueue,
   removeMessageWithReplyId,
@@ -9,15 +9,9 @@ import { computeTimeDiff } from "./computeTimeDiff.js";
 import { assembleInlineMessage } from "./countdownHelper.js";
 import { t } from "./lang.js";
 
-// Automatically reject promise after 1000ms
-export const timedPromise = (callback, ...args) => {
-  return Promise.race([
-    callback(...args),
-    new Promise((_, reject) =>
-      setTimeout(reject, 5000, new Error(`Promise timed out: ${callback.name}(${args.join(" ,")})`))
-    ),
-  ]);
-};
+// Automatically reject promise after 5000ms
+export const timedPromise = (ms = 5000) =>
+  new Promise((_, reject) => setTimeout(reject, ms, new Error("Promise timed out")));
 
 export const updateCountdowns = async (client, clientId) => {
   setTimeout(updateCountdowns, 1000, client, clientId);
@@ -39,11 +33,7 @@ export const updateCountdowns = async (client, clientId) => {
   const { parts, timers } = JSON.parse(countObj);
 
   // Get channel. Remove countdown if not viewable.
-  const channel = client.channels.cache.get(channel_id);
-  if (!channel?.viewable) return removeMessageWithReplyId(replyMsgId);
-
-  const messageToEdit = new Message(client, { id: replyMsgId, channel_id });
-  const editMessage = messageToEdit.edit.bind(messageToEdit);
+  const channel = await client.channels.fetch(channel_id);
   const sendMessage = channel.send.bind(channel);
 
   // Check if inline message
@@ -68,10 +58,7 @@ export const updateCountdowns = async (client, clientId) => {
         .filter(Boolean)
         .join(" ");
       if (tags && channel.permissionsFor(client.user).has("SEND_MESSAGES"))
-        await timedPromise(
-          sendMessage,
-          `${t("countdownDone", timers[finishedTimers[0]].lang)}! ${tags}`
-        ).catch(console.error);
+        channel.send(`${t("countdownDone", timers[finishedTimers[0]].lang)}! ${tags}`);
 
       // Remove finished timers backwards
       for (let i = finishedTimers.length - 1; i >= 0; i--) {
@@ -88,10 +75,12 @@ export const updateCountdowns = async (client, clientId) => {
       updateCountObj({ replyMsgId, countObj: JSON.stringify({ parts, timers }) });
     }
 
-    await timedPromise(editMessage, assembledMessage).catch(error => {
-      console.log(replyMsgId, error);
-      if (error instanceof DiscordAPIError) removeMessageWithReplyId(replyMsgId);
-    });
+    await Promise.race([
+      timedPromise(),
+      channel.messages.edit(replyMsgId, {
+        content: assembledMessage,
+      }),
+    ]);
   } else {
     // If not inline, it must be a normal message
 
@@ -110,10 +99,7 @@ export const updateCountdowns = async (client, clientId) => {
       // If tag exists, send a new message with the tag.
       if (timers[0].tag)
         if (channel.permissionsFor(client.user).has("SEND_MESSAGES"))
-          await timedPromise(
-            sendMessage,
-            `${t("countdownDone", lang)}! ${timers[0].tag}`
-          ).catch(err => console.error(err));
+          channel.send(`${t("countdownDone", lang)}! ${timers[0].tag}`);
     } else {
       const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft, timeElapsed, lang);
       editText = `${t("timeLeft", lang)}: ${humanDiff}`;
@@ -124,9 +110,11 @@ export const updateCountdowns = async (client, clientId) => {
       });
     }
 
-    await timedPromise(editMessage, editText).catch(error => {
-      console.log(replyMsgId, error);
-      if (error instanceof DiscordAPIError) removeMessageWithReplyId(replyMsgId);
-    });
+    await Promise.race([
+      timedPromise(),
+      channel.messages.edit(replyMsgId, {
+        content: editText,
+      }),
+    ]);
   }
 };

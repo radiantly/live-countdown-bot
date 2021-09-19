@@ -100,7 +100,7 @@ export const generateHelpEmbed = prefix => {
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
 
 let statsFooterText = "Live Countdown Bot";
-timedPromise(getGitInfo).then(gitinfo => (statsFooterText = gitinfo));
+Promise.race([timedPromise(), getGitInfo()]).then(gitinfo => (statsFooterText = gitinfo));
 
 const toMB = num => num / 1024 / 1024;
 const to2Decimals = num => Math.round(num * 100) / 100;
