@@ -32,10 +32,6 @@ export const updateCountdowns = async (client, clientId) => {
 
   const { parts, timers } = JSON.parse(countObj);
 
-  // Get channel. Remove countdown if not viewable.
-  const channel = await client.channels.fetch(channel_id);
-  const sendMessage = channel.send.bind(channel);
-
   // Check if inline message
   if (parts) {
     const { assembledMessage, nextUpdate, priority, finishedTimers } = assembleInlineMessage(
@@ -57,8 +53,10 @@ export const updateCountdowns = async (client, clientId) => {
         .map(timerIndex => timers[timerIndex].tag)
         .filter(Boolean)
         .join(" ");
-      if (tags && channel.permissionsFor(client.user).has("SEND_MESSAGES"))
+      if (tags) {
+        const channel = await client.channels.fetch(channel_id);
         channel.send(`${t("countdownDone", timers[finishedTimers[0]].lang)}! ${tags}`);
+      }
 
       // Remove finished timers backwards
       for (let i = finishedTimers.length - 1; i >= 0; i--) {
@@ -77,7 +75,10 @@ export const updateCountdowns = async (client, clientId) => {
 
     await Promise.race([
       timedPromise(),
-      channel.messages.edit(replyMsgId, {
+      new Message(client, {
+        id: replyMsgId,
+        channel_id,
+      }).edit({
         content: assembledMessage,
       }),
     ]);
@@ -97,9 +98,10 @@ export const updateCountdowns = async (client, clientId) => {
       editText = t("countdownDone", lang);
 
       // If tag exists, send a new message with the tag.
-      if (timers[0].tag)
-        if (channel.permissionsFor(client.user).has("SEND_MESSAGES"))
-          channel.send(`${t("countdownDone", lang)}! ${timers[0].tag}`);
+      if (timers[0].tag) {
+        const channel = await client.channels.fetch(channel_id);
+        channel.send(`${t("countdownDone", lang)}! ${timers[0].tag}`);
+      }
     } else {
       const { humanDiff, timeLeftForNextUpdate } = computeTimeDiff(timeLeft, timeElapsed, lang);
       editText = `${t("timeLeft", lang)}: ${humanDiff}`;
@@ -112,7 +114,10 @@ export const updateCountdowns = async (client, clientId) => {
 
     await Promise.race([
       timedPromise(),
-      channel.messages.edit(replyMsgId, {
+      new Message(client, {
+        id: replyMsgId,
+        channel_id,
+      }).edit({
         content: editText,
       }),
     ]);
