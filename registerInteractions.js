@@ -8,8 +8,8 @@ import { command as sendToDM } from "./modules/commands/sendToDM.js";
 import config from "./config.js";
 
 const { token, clientId, supportGuildId: guildId } = config;
-const guildCommands = [timerCommand, permissionCheckCommand, remindMeInCommand];
-const globalCommands = [sendToDM];
+const guildCommands = [permissionCheckCommand, remindMeInCommand];
+const globalCommands = [sendToDM, timerCommand];
 
 const isGlobal = process.argv[2] === "--global";
 
