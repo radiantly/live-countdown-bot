@@ -158,6 +158,28 @@ const languages = {
     inlineNoMinutes: "inga minuter",
     countingDown: "Räknar ned",
   },
+  ru: {
+    longStrings: {
+      lessThanAMinute: "меньше минуты",
+      minute: "минута",
+      hour: "час",
+      day: "день",
+      week: "неделя",
+      and: "и",
+    },
+    shortStrings: {
+      lessThanAMinute: "< 1мин",
+      minute: "мин",
+      hour: "ч",
+      day: "д",
+      week: "н",
+      and: "и",
+    },
+    timeLeft: "Оставшееся время",
+    countdownDone: "Обратный отсчет завершен",
+    inlineNoMinutes: "0 минут",
+    countingDown: "Отсчет",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
