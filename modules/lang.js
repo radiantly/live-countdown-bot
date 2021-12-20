@@ -180,6 +180,28 @@ const languages = {
     inlineNoMinutes: "0 минут",
     countingDown: "Отсчет",
   },
+  cy: {
+    longStrings: {
+      lessThanAMinute: "llai na munud",
+      minute: "munud",
+      hour: "awr",
+      day: "dydd",
+      week: "wythnos",
+      and: "a",
+    },
+    shortStrings: {
+      lessThanAMinute: "< 1mun",
+      minute: "mun",
+      hour: "awr",
+      day: "dydd",
+      week: "wthns",
+      and: "a",
+    },
+    timeLeft: "Amser i fynd",
+    countdownDone: "Amserydd wedi'i gorffen",
+    inlineNoMinutes: "dim munudau",
+    countingDown: "Cyfri i lawr",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
