@@ -48,9 +48,9 @@ export const generateHelpEmbed = prefix => {
       month: "short",
     });
   return new MessageEmbed()
-    .setTitle(`${prefix}help`)
+    .setTitle(`${prefix}help - Usage for the Live Countdown Bot`)
     .setColor("#f26522")
-    .setDescription("Usage for the Live Countdown Bot")
+    .setDescription("Request a post from the bot that it will edit to simulate a countdown.")
     .addFields(
       {
         name: "Set a countdown",
@@ -86,7 +86,8 @@ export const generateHelpEmbed = prefix => {
           "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
           `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
           "Find my support server [here](https://discord.com/invite/b2fY4z4xBY 'Join the support server!'). " +
-          "Invite me from [here](https://top.gg/bot/710486805836988507).",
+          "Invite me from [here](https://top.gg/bot/710486805836988507). " +
+          "Help support the bot [here](https://www.patreon.com/livecountdownbot?fan_landing=true).",
       }
     )
     .setFooter(
