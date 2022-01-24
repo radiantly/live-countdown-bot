@@ -48,27 +48,30 @@ export const generateHelpEmbed = prefix => {
       month: "short",
     });
   return new MessageEmbed()
-    .setTitle(`${prefix}help - Usage for the Live Countdown Bot`)
+    .setTitle(`${prefix}help! - Usage for the Live Countdown Bot`)
     .setColor("#f26522")
-    .setDescription("Request a post from the bot that it will edit to simulate a countdown.")
+    .setDescription("Request a post from the bot that it edits to simulate a countdown.")
     .addFields(
       {
         name: "Set a countdown",
-        value: g`cd <Date/Time to cd to>` + "\nExample: " + g`cd 10mins`,
+        value:
+	  g`cd <Date/Time to cd to>` + 
+	  "\nEx: " + 
+	  g`cd 10mins`,
       },
       {
         name: "To tag:",
-        value:
-          g`cd [tagme|taghere|tageveryone] <Date/Time to cd to>` +
-          "\nExample: " +
-          g`cd tagme Jan 21 9AM CEST`,
+        value: 
+	  g`cd [tagme|taghere|tageveryone] <Date/Time>` +
+          "\nEx: " +
+       	  g`cd tagme Jan 21 9AM CEST`,
       },
       {
         name: `Inline mode: (put command between two ! characters)`,
         value:
           g` .. !!cd <Date/Time to cd to>! .. ` +
-          "\nExample: " +
-          g`Time till I'm 13 yrs old: !!cd ${nextMonth()} 27, 10PM EDT! left.`,
+          "\nEx: " +
+          g`Time till I turn 13: !!cd ${nextMonth()} 27, 10PM EDT! left.`,
       },
       {
         name: "More Examples:",
@@ -77,7 +80,7 @@ export const generateHelpEmbed = prefix => {
           "\n" +
           g`cd tageveryone 1 hour 43mins` +
           "\n" +
-          g`There is !!cd taghere 11:59 PM EST! left to capture flags!`,
+          g`There's !!cd taghere 11:59 PM EST! left in the game!`,
       },
       {
         name: "Notes",
@@ -85,9 +88,9 @@ export const generateHelpEmbed = prefix => {
           `There can be ${channelMax} active countdowns per channel.\n` +
           "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
           `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
-          "Find my support server [here](https://discord.com/invite/b2fY4z4xBY 'Join the support server!'). " +
-          "Invite me from [here](https://top.gg/bot/710486805836988507). " +
-          "Help support the bot [here](https://www.patreon.com/livecountdownbot?fan_landing=true).",
+          "[Discord Support](https://discord.com/invite/b2fY4z4xBY 'Join the support server!') | " +
+          "[Invite the Bot](https://top.gg/bot/710486805836988507) | " +
+          "[Patreon](https://www.patreon.com/livecountdownbot)",
       }
     )
     .setFooter(
