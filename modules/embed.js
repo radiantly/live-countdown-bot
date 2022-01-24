@@ -87,7 +87,7 @@ export const generateHelpEmbed = prefix => {
           `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
           "[Discord Support](https://discord.com/invite/b2fY4z4xBY 'Join the support server!') | " +
           "[Invite the Bot](https://top.gg/bot/710486805836988507) | " +
-          "[Patreon](https://www.patreon.com/livecountdownbot?fan_landing=true)",
+          "[Patreon](https://www.patreon.com/livecountdownbot)",
       }
     )
     .setFooter(
