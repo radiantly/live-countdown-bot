@@ -55,16 +55,16 @@ export const generateHelpEmbed = prefix => {
       {
         name: "Set a countdown",
         value:
-					g`cd <Date/Time to cd to>` + 
-					"\nEx: " + 
-					g`cd 10mins`,
+	  g`cd <Date/Time to cd to>` + 
+	  "\nEx: " + 
+	  g`cd 10mins`,
       },
       {
         name: "To tag:",
         value: 
-					g`cd [tagme|taghere|tageveryone] <Date/Time>` +
-        	"\nEx: " +
-       		g`cd tagme Jan 21 9AM CEST`,
+	  g`cd [tagme|taghere|tageveryone] <Date/Time>` +
+          "\nEx: " +
+       	  g`cd tagme Jan 21 9AM CEST`,
       },
       {
         name: `Inline mode: (put command between two ! characters)`,
