@@ -50,7 +50,7 @@ export const generateHelpEmbed = prefix => {
   return new MessageEmbed()
     .setTitle(`${prefix}help! - Usage for the Live Countdown Bot`)
     .setColor("#f26522")
-    .setDescription("Request a post from the bot it will edit to simulate a live countdown.")
+    .setDescription("Request a post from the bot that it will edit to simulate a countdown.")
     .addFields(
       {
         name: "Set a countdown",
