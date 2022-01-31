@@ -55,28 +55,28 @@ export const generateHelpEmbed = prefix => {
       {
         name: "__**FIRST:** Decide on Your Variables__",
         value: 
-	  			"**Mentions:** taghere, tagme, tageveryone, tag <role>\n" +
-					"**Language:** es, nl, tr, de, hu, ja, id, sv, ru, sy, ko\n" +
-					"**Months:** 3 letter abv *-or-* full\n" +
-					"**Days:** Between 1 and 725 max\n" +
-					"**Time:** Common ~ 6:45 PM *-or-* 24 hour ~ 1845\n" +
-					"**Timezone:** 3-5 letter abv + daylight savings",
+	  "**Mentions:** taghere, tagme, tageveryone, tag <role>\n" +
+	  "**Language:** es, nl, tr, de, hu, ja, id, sv, ru, sy, ko\n" +
+	  "**Months:** 3 letter abv *-or-* full\n" +
+	  "**Days:** Between 1 and 725 max\n" +
+	  "**Time:** Common ~ 6:45 PM *-or-* 24 hour ~ 1845\n" +
+	  "**Timezone:** 3-5 letter abv + daylight savings",
       },
       {
         name: "__**SECOND:** Set Up Your Command__",
         value:
           "**Simple:** *(as in a day or 2 weeks or 5 minutes)*\n" +
-					g`!countdown <# of months, days, hours or minutes>\n` +
-					"**Specific:** *(as in your birthday or a release date)*\n" +
-					g`!countdown <mention> <month> <day> <time> <timezone>\n` +
-					"**Inline:** *(placing the countdown 'in a line' of text)*\n" +
-					g`"Text" !countdown <month> <day> <time> <timezone>! "Text"\n` +
-					"**Advanced:** *(5 countdowns/post and 2 posts/channel max)*\n" +
-					"`1month warning: !!countdown tagme Aug 10, 6:30 PM CDT!!" +
-					"\n1week warning: !!countdown tagme Sep 2, 6:30 PM CDT!!" +
-					"\n1day warning: !!countdown tagme Sep 8, 6:30 PM CDT!!" +
-					"\n1hr warning: !!countdown tagme Sep 9, 5:30 PM CDT!!" +
-					"\n1min warning: !!countdown tagme Sep 9, 6:29 PM CDT!!`",
+	  g`!countdown <# of months, days, hours or minutes>\n` +
+	  "**Specific:** *(as in your birthday or a release date)*\n" +
+	  g`!countdown <mention> <month> <day> <time> <timezone>\n` +
+  	  "**Inline:** *(placing the countdown 'in a line' of text)*\n" +
+	  g`"Text" !countdown <month> <day> <time> <timezone>! "Text"\n` +
+	  "**Advanced:** *(5 countdowns/post and 2 posts/channel max)*\n" +
+	  "`1month warning: !!countdown tagme Aug 10, 6:30 PM CDT!!" +
+	  "\n1week warning: !!countdown tagme Sep 2, 6:30 PM CDT!!" +
+	  "\n1day warning: !!countdown tagme Sep 8, 6:30 PM CDT!!" +
+	  "\n1hr warning: !!countdown tagme Sep 9, 5:30 PM CDT!!" +
+	  "\n1min warning: !!countdown tagme Sep 9, 6:29 PM CDT!!`",
 			},
       {
         name: "Notes",
@@ -89,11 +89,7 @@ export const generateHelpEmbed = prefix => {
       }
     )
     .setFooter(
-      `Special thanks to ${rand(["Pr€d∆†๏r™", "Loco Musician", "Zetas2", "Pocket", "Dotydogg"])} for ${rand([
-        "moderating the support server",
-        "helping with moderation",
-        "being cool",
-      ])}.`
+      `Special thanks to: ${rand(["Pr€d∆†๏r™", "Loco Musician", "Zetas2", "Pocket", "Dotydogg"])} for ${rand(["moderating the support server", "helping with moderation", "being cool",])} and ${rand(["BluPitty", "campmods", "LemonAidan", "seebist", "UnchainedQue", "DMLiquidity"])} for ${rand(["becoming a patron", "supporting the bot", "being awesome"])}.`
     );
 };
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
