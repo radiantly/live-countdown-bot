@@ -48,45 +48,40 @@ export const generateHelpEmbed = prefix => {
       month: "short",
     });
   return new MessageEmbed()
-    .setTitle(`${prefix}help! - Usage for the Live Countdown Bot`)
+    .setTitle(`${prefix}help - Live Countdown Bot Help`)
     .setColor("#f26522")
-    .setDescription("Request a post from the bot that it edits to simulate a countdown.")
+    .setDescription("Commands to copy/paste and edit to achieve your command. *(remove all brackets)*")
     .addFields(
       {
-        name: "Set a countdown",
-        value:
-	  g`cd <Date/Time to cd to>` + 
-	  "\nEx: " + 
-	  g`cd 10mins`,
-      },
-      {
-        name: "To tag:",
+        name: "__**FIRST:** Decide on Your Variables__",
         value: 
-	  g`cd [tagme|taghere|tageveryone] <Date/Time>` +
-          "\nEx: " +
-       	  g`cd tagme Jan 21 9AM CEST`,
+	  			"**Mentions:** taghere, tagme, tageveryone, tag <role>\n" +
+					"**Language:** es, nl, tr, de, hu, ja, id, sv, ru, sy, ko\n" +
+					"**Months:** 3 letter abv *-or-* full\n" +
+					"**Days:** Between 1 and 725 max\n" +
+					"**Time:** Common ~ 6:45 PM *-or-* 24 hour ~ 1845\n" +
+					"**Timezone:** 3-5 letter abv + daylight savings",
       },
       {
-        name: `Inline mode: (put command between two ! characters)`,
+        name: "__**SECOND:** Set Up Your Command__",
         value:
-          g` .. !!cd <Date/Time to cd to>! .. ` +
-          "\nEx: " +
-          g`Time till I turn 13: !!cd ${nextMonth()} 27, 10PM EDT! left.`,
-      },
-      {
-        name: "More Examples:",
-        value:
-          g`cd 10:30 PM PDT` +
-          "\n" +
-          g`cd tageveryone 1 hour 43mins` +
-          "\n" +
-          g`There's !!cd taghere 11:59 PM EST! left in the game!`,
-      },
+          "**Simple:** *(as in a day or 2 weeks or 5 minutes)*\n" +
+					g`!countdown <# of months, days, hours or minutes>\n` +
+					"**Specific:** *(as in your birthday or a release date)*\n" +
+					g`!countdown <mention> <month> <day> <time> <timezone>\n` +
+					"**Inline:** *(placing the countdown 'in a line' of text)*\n" +
+					g`"Text" !countdown <month> <day> <time> <timezone>! "Text"\n` +
+					"**Advanced:** *(5 countdowns/post and 2 posts/channel max)*\n" +
+					"`1month warning: !!countdown tagme Aug 10, 6:30 PM CDT!!" +
+					"\n1week warning: !!countdown tagme Sep 2, 6:30 PM CDT!!" +
+					"\n1day warning: !!countdown tagme Sep 8, 6:30 PM CDT!!" +
+					"\n1hr warning: !!countdown tagme Sep 9, 5:30 PM CDT!!" +
+					"\n1min warning: !!countdown tagme Sep 9, 6:29 PM CDT!!`",
+			},
       {
         name: "Notes",
         value:
-          `There can be ${channelMax} active countdowns per channel.\n` +
-          "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
+          "Give me `MANAGE_MESSAGES` to auto clear countdown requests.\n" +
           `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
           "[Discord Support](https://discord.com/invite/b2fY4z4xBY 'Join the support server!') | " +
           "[Invite the Bot](https://top.gg/bot/710486805836988507) | " +
