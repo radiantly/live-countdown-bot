@@ -89,8 +89,7 @@ export const generateHelpEmbed = prefix => {
       }
     )
     .setFooter(
-      `Special thanks to:\n` +
-      `${rand(["Pr€d∆†๏r™", "Loco Musician", "Zetas2", "Pocket", "Dotydogg"])} for ${rand(["moderating the support server", "helping with moderation", "being cool",])}.\n`,
+      `Special thanks to: ${rand(["Pr€d∆†๏r™", "Loco Musician", "Zetas2", "Pocket", "Dotydogg"])} for ${rand(["moderating the support server", "helping with moderation", "being cool",])}.\n`,
     );
 };
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
