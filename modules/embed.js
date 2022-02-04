@@ -6,7 +6,7 @@ import { computeTimeDiff } from "./computeTimeDiff.js";
 import config from "../config.js";
 import { timedPromise } from "./updateManager.js";
 import { getGitInfo } from "./gitinfo.js";
-
+import { helpers, awesomeBackers, backers } from "./people.js";
 const { channelMax } = config;
 
 export const generateHelpFallback = prefix =>
@@ -34,53 +34,50 @@ There is !!countdown taghere 11:59 PM EST$! left to capture flags!
 Links:
 Bot page - https://top.gg/bot/710486805836988507`;
 
-const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+const choose1from = arr => arr[Math.floor(Math.random() * arr.length)];
+
+const shuffle = array => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
+const backerToStr = backer => `[${backer.discord}](${backer.link} '${backer.name}')`;
 
 export const generateHelpEmbed = prefix => {
-  const g = (strings, ...keys) =>
-    "`" +
-    (strings[0].startsWith("cd") ? prefix : "") +
-    strings[0].replace(/cd/g, "countdown") +
-    keys.map((key, i) => key + strings[i + 1]).join("") +
-    "`";
   const nextMonth = () =>
     new Date("2000", (new Date().getMonth() + 1) % 12).toLocaleString("default", {
       month: "short",
     });
   return new MessageEmbed()
-    .setTitle(`${prefix}help! - Usage for the Live Countdown Bot`)
+    .setTitle(`${prefix}help - Usage for the Live Countdown Bot`)
     .setColor("#f26522")
     .setDescription("Request a post from the bot that it edits to simulate a countdown.")
     .addFields(
       {
         name: "Set a countdown",
-        value:
-	  g`cd <Date/Time to cd to>` + 
-	  "\nEx: " + 
-	  g`cd 10mins`,
+        value: `\`${prefix}countdown <Date/Time to cd to>\`\n` + `\`${prefix}countdown 10mins\``,
       },
       {
         name: "To tag:",
-        value: 
-	  g`cd [tagme|taghere|tageveryone] <Date/Time>` +
-          "\nEx: " +
-       	  g`cd tagme Jan 21 9AM CEST`,
+        value:
+          `\`${prefix}countdown [tagme|taghere|tageveryone] <Date/Time>\`\n` +
+          `Ex: \`${prefix}countdown tagme Jan 21 9AM CEST\``,
       },
       {
         name: `Inline mode: (put command between two ! characters)`,
         value:
-          g` .. !!cd <Date/Time to cd to>! .. ` +
-          "\nEx: " +
-          g`Time till I turn 13: !!cd ${nextMonth()} 27, 10PM EDT! left.`,
+          `\` .. !!countdown <Date/Time to cd to>! .. \`\n` +
+          `Ex: \`Time till I turn 13: !!countdown ${nextMonth()} 27, 10PM EDT! left.\``,
       },
       {
         name: "More Examples:",
         value:
-          g`cd 10:30 PM PDT` +
-          "\n" +
-          g`cd tageveryone 1 hour 43mins` +
-          "\n" +
-          g`There's !!cd taghere 11:59 PM EST! left in the game!`,
+          `\`countdown 10:30 PM PDT\`\n` +
+          `\`countdown tageveryone 1 hour 43mins\`\n` +
+          `\`There's !!countdown taghere 11:59 PM EST! left in the game!\``,
       },
       {
         name: "Notes",
@@ -91,15 +88,23 @@ export const generateHelpEmbed = prefix => {
           "[Discord Support](https://discord.com/invite/b2fY4z4xBY 'Join the support server!') | " +
           "[Invite the Bot](https://top.gg/bot/710486805836988507) | " +
           "[Patreon](https://www.patreon.com/livecountdownbot)",
+      },
+      {
+        name: "Sponsors",
+        value: `A huge thank you to ${shuffle(awesomeBackers)
+          .map(backerToStr)
+          .join(", ")}, ${backerToStr(
+          choose1from(backers)
+        )} and [others](https://www.patreon.com/livecountdownbot 'Support the development of the bot on Patreon!') for supporting the bot.`,
       }
     )
-    .setFooter(
-      `Special thanks to ${rand(["Pr€d∆†๏r™", "Loco Musician", "Zetas2", "Pocket", "Dotydogg"])} for ${rand([
+    .setFooter({
+      text: `Also, special thanks to ${choose1from(helpers)} for ${choose1from([
         "moderating the support server",
         "helping with moderation",
         "being cool",
-      ])}.`
-    );
+      ])}.`,
+    });
 };
 export const generateStatsFallback = client => `All good! API Latency is ${client.ws.ping}ms.`;
 
@@ -110,7 +115,7 @@ const toMB = num => num / 1024 / 1024;
 const to2Decimals = num => Math.round(num * 100) / 100;
 export const generateStatsEmbed = async client => {
   const memUsage = await client.shard
-    .broadcastEval(client => process.memoryUsage().rss)
+    .broadcastEval(_ => process.memoryUsage().rss)
     .then(memUsages => memUsages.reduce((total, rss) => total + rss, 0))
     .catch(console.error);
   const memUsageRounded = Math.round(toMB(memUsage));
