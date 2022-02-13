@@ -12,6 +12,16 @@ export const [version] = db.prepare("SELECT sqlite_version()").raw().get();
 
 db.prepare(
   `
+  CREATE TABLE IF NOT EXISTS ClusterInfo (
+    Id INTEGER PRIMARY KEY NOT NULL,
+    GuildCount INTEGER NOT NULL,
+    RAM INTEGER NOT NULL
+  )
+`
+).run();
+
+db.prepare(
+  `
   CREATE TABLE IF NOT EXISTS GuildInfo (
     Guild TEXT PRIMARY KEY NOT NULL,
     Client INTEGER NOT NULL,
@@ -60,6 +70,21 @@ const vacuumStmt = db.prepare("VACUUM");
 
 export const vacuumDb = () => vacuumStmt.run();
 export const closeDb = () => db.close();
+
+// Add cluster info
+const upsertClusterInfoStmt = db.prepare(`
+  INSERT INTO ClusterInfo (Id, GuildCount, RAM) VALUES (@clusterId, @guildCount, @ramUsage)
+    ON CONFLICT(Id) DO UPDATE SET
+      GuildCount = excluded.GuildCount,
+      RAM = excluded.RAM
+`);
+
+export const updateClusterInfo = (clusterId, guildCount, ramUsage) =>
+  upsertClusterInfoStmt.run({ clusterId, guildCount, ramUsage });
+
+// Get total cluster statistics
+const totalClusterInfoStmt = db.prepare("SELECT TOTAL(GuildCount), TOTAL(RAM) FROM ClusterInfo");
+export const getClusterStats = () => totalClusterInfoStmt.get();
 
 // Add guilds to GuildInfo table
 const upsertGuildShardStmt = db.prepare(`

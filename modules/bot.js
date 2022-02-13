@@ -1,16 +1,19 @@
+import Cluster from "discord-hybrid-sharding";
 import { Client, Intents, Options, Permissions } from "discord.js";
-
 import process, { env } from "process";
 import config from "../config.js";
-import { initGuilds, addGuild, removeGuild, closeDb } from "./sqlite3.js";
+import { initGuilds, addGuild, removeGuild, closeDb, updateClusterInfo } from "./sqlite3.js";
 import { messageHandler } from "./messageHandler.js";
 import { updateCountdowns } from "./updateManager.js";
 import { interactionHandler } from "./interactionHandler.js";
 
 const client = new Client({
+  shards: Cluster.data.SHARD_LIST,
+  shardCount: Cluster.data.TOTAL_SHARDS,
   presence: {
     status: "online",
     activities: [
+      // { type: "WATCHING", name: "maintenance" },
       { type: "PLAYING", name: "with time" },
       { type: "PLAYING", name: "with 100 seconds" },
       { type: "WATCHING", name: "for !help" },
@@ -29,14 +32,18 @@ const client = new Client({
   partials: ["CHANNEL"],
   intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
+client.cluster = new Cluster.Client(client);
 
 export const clientId = Math.round(Math.random() * 1e9);
 
-const { token } = config;
 const log = console.log;
 
 client.once("ready", () => {
-  log(`Initialized client ${clientId} (${client.shard.ids.join()}).`);
+  log(`Initialized cluster ${client.cluster.id} (${clientId}).`);
+  setInterval(
+    () => updateClusterInfo(client.cluster.id, client.guilds.cache.size, process.memoryUsage().rss),
+    5 * 60 * 1000
+  );
 
   initGuilds(client.guilds.cache, clientId);
   updateCountdowns(client, clientId);
@@ -64,7 +71,7 @@ client.on("rateLimit", rateLimitInfo => {
 });
 
 // Start client
-client.login(token);
+client.login(config.token);
 if (env.NODE_ENV === "debug") client.on("debug", console.info);
 
 process.on("unhandledRejection", log);
@@ -72,7 +79,7 @@ process.on("SIGHUP", () => process.exit(128 + 1));
 process.on("SIGINT", () => process.exit(128 + 2));
 process.on("SIGTERM", () => process.exit(128 + 15));
 process.on("exit", code => {
-  console.log(`Destroying client ${clientId} (${client.shard.ids.join()}). Code ${code}.`);
+  console.log(`Destroying cluster ${client.cluster.id} (${clientId}). Code ${code}.`);
   client.destroy();
   closeDb();
 });

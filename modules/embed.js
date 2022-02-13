@@ -1,7 +1,7 @@
 import { loadavg, cpus } from "os";
 import { version as nodeVersion } from "process";
 import { MessageEmbed, version as djsVersion } from "discord.js";
-import { getTotalCountdowns, version as sqliteVersion } from "./sqlite3.js";
+import { getTotalCountdowns, version as sqliteVersion, getClusterStats } from "./sqlite3.js";
 import { computeTimeDiff } from "./computeTimeDiff.js";
 import config from "../config.js";
 import { timedPromise } from "./updateManager.js";
@@ -58,18 +58,18 @@ export const generateHelpEmbed = prefix => {
     .addFields(
       {
         name: "Set a countdown",
-        value: `\`${prefix}countdown <Date/Time to cd to>\`\n` + `\`${prefix}countdown 10mins\``,
+        value: `\`${prefix}countdown DATE/TIME\`\n` + `\`${prefix}countdown 10mins\``,
       },
       {
         name: "To tag:",
         value:
-          `\`${prefix}countdown [tagme|taghere|tageveryone] <Date/Time>\`\n` +
+          `\`${prefix}countdown [tagme|taghere|tageveryone] DATE/TIME\`\n` +
           `Ex: \`${prefix}countdown tagme Jan 21 9AM CEST\``,
       },
       {
         name: `Inline mode: (put command between two ! characters)`,
         value:
-          `\` .. !!countdown <Date/Time to cd to>! .. \`\n` +
+          `\` .. !!countdown DATE/TIME! .. \`\n` +
           `Ex: \`Time till I turn 13: !!countdown ${nextMonth()} 27, 10PM EDT! left.\``,
       },
       {
@@ -91,18 +91,17 @@ export const generateHelpEmbed = prefix => {
       },
       {
         name: "Sponsors",
-        value: `A huge thank you to ${shuffle(awesomeBackers)
+        value: `A huge thank you to ${shuffle([...awesomeBackers, choose1from(backers)])
           .map(backerToStr)
-          .join(", ")}, ${backerToStr(
-          choose1from(backers)
-        )} and [others](https://www.patreon.com/livecountdownbot 'Support the development of the bot on Patreon!') for supporting the bot.`,
+          .join(
+            ", "
+          )} and [others](https://www.patreon.com/livecountdownbot 'Support the development of the bot on Patreon!') for supporting the bot.`,
       }
     )
     .setFooter({
       text: `Also, special thanks to ${choose1from(helpers)} for ${choose1from([
         "moderating the support server",
         "helping with moderation",
-        "being cool",
       ])}.`,
     });
 };
@@ -114,19 +113,12 @@ Promise.race([timedPromise(), getGitInfo()]).then(gitinfo => (statsFooterText = 
 const toMB = num => num / 1024 / 1024;
 const to2Decimals = num => Math.round(num * 100) / 100;
 export const generateStatsEmbed = async client => {
-  const memUsage = await client.shard
-    .broadcastEval(_ => process.memoryUsage().rss)
-    .then(memUsages => memUsages.reduce((total, rss) => total + rss, 0))
-    .catch(console.error);
-  const memUsageRounded = Math.round(toMB(memUsage));
+  const clusterStats = getClusterStats();
+  const memUsageRounded = Math.round(toMB(clusterStats["TOTAL(RAM)"]));
   const shardMemUsage = to2Decimals(toMB(process.memoryUsage().rss));
   const osLoad = Math.round((loadavg()[0] / cpus().length) * 1e4) / 100;
   const upTime = computeTimeDiff(client.uptime, Infinity, "en", true).humanDiff;
   const totalCountdowns = getTotalCountdowns();
-  const totalServers = await client.shard
-    .fetchClientValues("guilds.cache.size")
-    .then(sizes => sizes.reduce((total, size) => total + size, 0))
-    .catch(console.error);
 
   return new MessageEmbed()
     .setColor("#f26522")
@@ -164,7 +156,7 @@ export const generateStatsEmbed = async client => {
       },
       {
         name: ":timer: Countdowns",
-        value: `**${totalCountdowns}** in **${totalServers}**`,
+        value: `**${totalCountdowns}** in **${clusterStats["TOTAL(GuildCount)"]}**`,
         inline: true,
       },
       {
@@ -173,6 +165,6 @@ export const generateStatsEmbed = async client => {
         inline: true,
       }
     )
-    .setFooter(statsFooterText)
+    .setFooter({ text: statsFooterText })
     .setTimestamp();
 };

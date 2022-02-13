@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "node cluster.js",
     "check-formatting": "prettier --check \"**/*.js\"",
     "register-guild": "node registerInteractions.js",
     "register-global": "node registerInteractions.js --global",
@@ -26,18 +26,19 @@
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
     "better-sqlite3": "^7.5.0",
-    "chrono-node": "^2.3.6",
-    "discord-api-types": "^0.26.1",
+    "chrono-node": "^2.3.7",
+    "discord-api-types": "^0.27.0",
+    "discord-hybrid-sharding": "^1.4.4",
     "discord.js": "^13.6.0",
-    "got": "^11.8.3"
+    "got": "^12.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.0",
+    "@babel/core": "^7.17.2",
     "@babel/preset-env": "^7.16.11",
-    "babel-jest": "^27.4.6",
+    "babel-jest": "^27.5.1",
     "husky": "^4.3.8",
-    "jest": "^27.4.7",
-    "lint-staged": "^11.2.6",
+    "jest": "^27.5.1",
+    "lint-staged": "^12.3.3",
     "prettier": "2.1.2"
   },
   "husky": {

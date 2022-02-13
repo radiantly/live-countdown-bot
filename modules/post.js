@@ -1,20 +1,15 @@
 import got from "got";
 import config from "../config.js";
 
-const { topggAPIkey, discordBotsggAPIkey } = config;
-
-export const postServerCount = async guildSizes => {
+export const postServerCount = async guildCount => {
   const botId = "710486805836988507";
-
-  const shardCount = guildSizes.length;
-  const guildCount = guildSizes.reduce((total, size) => total + size, 0);
 
   const { body: topggResponse } = await got.post(`https://top.gg/api/bots/${botId}/stats`, {
     headers: {
-      Authorization: topggAPIkey,
+      Authorization: config.topggAPIkey,
     },
     json: {
-      shards: guildSizes,
+      server_count: guildCount,
     },
   });
 
@@ -22,11 +17,10 @@ export const postServerCount = async guildSizes => {
     `https://discord.bots.gg/api/v1/bots/${botId}/stats`,
     {
       headers: {
-        Authorization: discordBotsggAPIkey,
+        Authorization: config.discordBotsggAPIkey,
       },
       json: {
         guildCount,
-        shardCount,
       },
     }
   );
