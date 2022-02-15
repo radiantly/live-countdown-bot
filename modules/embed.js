@@ -83,7 +83,7 @@ export const generateHelpEmbed = prefix => {
         name: "Notes",
         value:
           `There can be ${channelMax} active countdowns per channel.\n` +
-          "Give me `MANAGE_MESSAGES` permission to delete the inital message.\n" +
+          "Give me `MANAGE_MESSAGES` permission to delete countdown requests.\n" +
           `Current prefix is \`${prefix}\`. Use \`${prefix}setprefix\` to change it.\n` +
           "[Discord Support](https://discord.com/invite/b2fY4z4xBY 'Join the support server!') | " +
           "[Invite the Bot](https://top.gg/bot/710486805836988507) | " +
