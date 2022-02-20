@@ -2,7 +2,14 @@ import Cluster from "discord-hybrid-sharding";
 import { Client, Intents, Options, Permissions } from "discord.js";
 import process, { env } from "process";
 import config from "../config.js";
-import { initGuilds, addGuild, removeGuild, closeDb, updateClusterInfo } from "./sqlite3.js";
+import {
+  initGuilds,
+  addGuild,
+  removeGuild,
+  closeDb,
+  updateClusterInfo,
+  removeMessageWithReplyId,
+} from "./sqlite3.js";
 import { messageHandler } from "./messageHandler.js";
 import { updateCountdowns } from "./updateManager.js";
 import { interactionHandler } from "./interactionHandler.js";
@@ -19,7 +26,6 @@ const client = new Client({
       { type: "WATCHING", name: "for !help" },
       { type: "WATCHING", name: "times change" },
       { type: "WATCHING", name: "the time fly by" },
-      { type: "WATCHING", name: "https://bit.ly/live-bot" },
       { type: "LISTENING", name: "the clock tick" },
       { type: "COMPETING", name: "the race for time" },
     ],
@@ -29,7 +35,7 @@ const client = new Client({
     PresenceManager: 0,
     ThreadManager: 0,
   }),
-  partials: ["CHANNEL"],
+  partials: ["MESSAGE", "CHANNEL"],
   intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
 client.cluster = new Cluster.Client(client);
@@ -50,6 +56,9 @@ client.once("ready", () => {
 });
 
 client.on("messageCreate", messageHandler);
+client.on("messageDelete", message => {
+  removeMessageWithReplyId(message.id);
+});
 client.on("interactionCreate", interactionHandler);
 
 client.on("guildCreate", guild => {
