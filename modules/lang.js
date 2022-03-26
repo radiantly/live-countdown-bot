@@ -220,6 +220,20 @@ const languages = {
     inlineNoMinutes: "ingen minutter",
     countingDown: "Teller ned",
   },
+  fa: {
+    longStrings: {
+      lessThanAMinute: "کمتر از یک دقیقه",
+      minute: "دقیقه",
+      hour: "ساعت",
+      day: "روز",
+      week: "هفته",
+      and: "و",
+    },
+    timeLeft: "زمان باقی مانده",
+    countdownDone: "شمارش معکوس تمام شد",
+    inlineNoMinutes: "بدون دقیقه",
+    countingDown: "شمارش معکوس",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
