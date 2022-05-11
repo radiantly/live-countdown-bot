@@ -25,19 +25,18 @@
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
-    "better-sqlite3": "^7.5.0",
-    "chrono-node": "^2.3.7",
-    "discord-api-types": "^0.27.0",
-    "discord-hybrid-sharding": "^1.4.4",
-    "discord.js": "^13.6.0",
-    "got": "^12.0.1"
+    "better-sqlite3": "^7.5.1",
+    "chrono-node": "^2.3.8",
+    "discord-api-types": "^0.27.3",
+    "discord-hybrid-sharding": "^1.5.3",
+    "discord.js": "^13.6.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.2",
-    "@babel/preset-env": "^7.16.11",
+    "@babel/core": "^7.17.10",
+    "@babel/preset-env": "^7.17.10",
     "babel-jest": "^27.5.1",
     "husky": "^4.3.8",
-    "jest": "^27.5.1",
+    "jest": "^28.1.0",
     "prettier": "2.1.2"
   },
   "husky": {

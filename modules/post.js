@@ -1,29 +1,27 @@
-import got from "got";
 import config from "../config.js";
 
 export const postServerCount = async guildCount => {
   const botId = "710486805836988507";
 
-  const { body: topggResponse } = await got.post(`https://top.gg/api/bots/${botId}/stats`, {
+  const topggResponse = await fetch(`https://top.gg/api/bots/${botId}/stats`, {
+    method: "POST",
     headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
       Authorization: config.topggAPIkey,
     },
-    json: {
-      server_count: guildCount,
-    },
-  });
+    body: JSON.stringify({ server_count: guildCount }),
+  }).then(res => res.json());
 
-  const { body: discordBotsggResponse } = await got.post(
-    `https://discord.bots.gg/api/v1/bots/${botId}/stats`,
-    {
-      headers: {
-        Authorization: config.discordBotsggAPIkey,
-      },
-      json: {
-        guildCount,
-      },
-    }
-  );
+  const discordBotsggResponse = await fetch(`https://discord.bots.gg/api/v1/bots/${botId}/stats`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: config.discordBotsggAPIkey,
+    },
+    body: JSON.stringify({ guildCount }),
+  }).then(res => res.json());
 
   return [topggResponse, discordBotsggResponse];
 };
