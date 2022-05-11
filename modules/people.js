@@ -1,15 +1,11 @@
-export const helpers = ["Pr€d∆†๏r™", "Loco Musician", "Zetas2", "Pocket", "Dotydogg"];
+// Retired: Dotydogg
+export const helpers = ["Pr€d∆†๏r™", "Loco Musician", "Zetas2", "Pocket", "LemonAidan"];
 
 export const awesomeBackers = [
   {
-    name: "UnchainedQue Streaming",
-    link: "https://www.twitch.tv/unchainedque",
-    discord: "UnchainedQue Streaming",
-  },
-  {
-    name: "Michael Bushby",
-    link: "https://www.patreon.com/user/creators?u=50210336",
-    discord: "DMLiquidity",
+    name: "Asharian",
+    link: "https://www.patreon.com/user/creators?u=39771954",
+    discord: "Asharian",
   },
   {
     name: "Alicia Gonzalez",
@@ -17,14 +13,14 @@ export const awesomeBackers = [
     discord: "BluPitty",
   },
   {
-    name: "Scott Smith",
-    link: "https://www.patreon.com/user?u=68787555",
-    discord: "smitsmit ((scott))",
+    name: "Michael Bushby",
+    link: "https://www.patreon.com/user/creators?u=50210336",
+    discord: "DMLiquidity",
   },
   {
-    name: "Asharian",
-    link: "https://www.patreon.com/user/creators?u=39771954",
-    discord: "Asharian",
+    name: "UnchainedQue Streaming",
+    link: "https://www.twitch.tv/unchainedque",
+    discord: "UnchainedQue Streaming",
   },
 ];
 
@@ -35,9 +31,9 @@ export const backers = [
     discord: "TFalcon",
   },
   {
-    name: "Jing Wen",
-    link: "https://www.patreon.com/user/creators?u=48641240",
-    discord: "seebist",
+    name: "Scott Smith",
+    link: "https://www.patreon.com/user?u=68787555",
+    discord: "smitsmit ((scott))",
   },
   {
     name: "Aidan",
@@ -45,20 +41,19 @@ export const backers = [
     discord: "LemonAidan",
   },
   {
+    name: "Jing Wen",
+    link: "https://www.patreon.com/user/creators?u=48641240",
+    discord: "seebist",
+  },
+  {
     name: "shane wells",
     link: "https://www.patreon.com/user/creators?u=32068018",
     discord: "campmods",
   },
-  { name: "Nishii", link: "https://www.patreon.com/user/creators?u=68894753", discord: "Nishii" },
   {
-    name: "TheyCallMePhoenix",
-    link: "https://www.patreon.com/user/creators?u=7641661",
-    discord: "TheyCallMePhoenix",
-  },
-  {
-    name: "Richard Cherek",
-    link: "https://www.patreon.com/user/creators?u=68962965",
-    discord: "Bonesaw🇺🇸[🪓WOODMAN🪓]",
+    name: "Paul Alexander",
+    link: "https://www.patreon.com/user/creators?u=69263925",
+    discord: "Scottish-Tish",
   },
   {
     name: "Simon Templar",
@@ -71,18 +66,23 @@ export const backers = [
     discord: "dP | HGC",
   },
   {
-    name: "Paul Alexander",
-    link: "https://www.patreon.com/user/creators?u=69263925",
-    discord: "Scottish-Tish",
-  },
-  {
     name: "Mikhaela Ysabel Ong",
     link: "https://www.patreon.com/user/creators?u=69341986",
     discord: "Y S Λ E 笨蛋",
   },
   {
-    name: "Joshua Chan",
-    link: "https://www.patreon.com/user/creators?u=69452762",
-    discord: "valarmorghulis",
+    name: "Richard Cherek",
+    link: "https://www.patreon.com/user/creators?u=68962965",
+    discord: "Bonesaw🇺🇸[🪓WOODMAN🪓]",
+  },
+  {
+    name: "Sean Schneyer",
+    link: "https://www.patreon.com/user/creators?u=72676500",
+    discord: "Linux Box",
+  },
+  {
+    name: "Thanasin Phumiphak",
+    link: "https://www.patreon.com/user/creators?u=73576799",
+    discord: "OneSoul",
   },
 ];
