@@ -9,6 +9,11 @@ const manager = new Cluster.Manager("./modules/bot.js", {
   shardsPerClusters: 5,
   mode: "process",
   token: config.token,
+  keepalive: {
+    interval: 60000,
+    maxMissedHeartbeats: 5,
+    maxClusterRestarts: 1,
+  },
 });
 
 manager.on("clusterCreate", cluster => console.log(`Launched cluster ${cluster.id}`));
