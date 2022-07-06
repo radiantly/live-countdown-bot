@@ -234,6 +234,24 @@ const languages = {
     inlineNoMinutes: "بدون دقیقه",
     countingDown: "شمارش معکوس",
   },
+  it: {
+    longStrings: {
+      lessThanAMinute: "meno di un Minuto",
+      minute: "Minuto",
+      minutes: "Minuti",
+      hour: "Ora",
+      hours: "Ore",
+      day: "Giorno",
+      days: "Giorni",
+      week: "Settimana",
+      weeks: "Settimane",
+      and: "e",
+    },
+    timeLeft: "Tempo rimanente",
+    countdownDone: "Tempo scaduto",
+    inlineNoMinutes: "0 minuti",
+    countingDown: "Conto alla rovescia",
+  },
 };
 
 export const availableLanguages = Object.keys(languages);
