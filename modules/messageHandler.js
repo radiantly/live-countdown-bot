@@ -128,13 +128,15 @@ export const messageHandler = async message => {
       if (timer.ephemeral) {
         const { timeEnd, lang, tag } = timer.ephemeral;
         const timeLeft = Math.abs(Date.now() - timeEnd);
-	const origMessageText = message.cleanContent;
+        const origMessageText = message.cleanContent;
         deleteMessage(message);
         if (timeLeft > 2000) send(`${t("countingDown", lang)} ..`);
         return setTimeout(
           () =>
             send({
-		    content: `${t("countdownDone", lang)}! ${tag || ""} Original message: ${origMessageText}`,
+              content: `${t("countdownDone", lang)}! ${
+                tag || ""
+              } Original message: ${origMessageText}`,
               failIfNotExists: false,
             }),
           timeLeft
