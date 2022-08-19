@@ -53,9 +53,11 @@ export const updateCountdowns = async (client, clientId) => {
         .map(timerIndex => timers[timerIndex].tag)
         .filter(Boolean)
         .join(" ");
+      const channel = await client.channels.fetch(channel_id);
       if (tags) {
-        const channel = await client.channels.fetch(channel_id);
-        channel.send(`${t("countdownDone", timers[finishedTimers[0]].lang)}! ${tags}`);
+        channel.send(`${t("countdownDone", timers[finishedTimers[0]].lang)}! ${tags} - Original Message: ${assembledMessage}`);
+      } else {
+	channel.send(`${t("countdownDone", timers[finishedTimers[0]].lang)} - Original Message: ${assembledMessage}`);
       }
 
       // Remove finished timers backwards
@@ -89,6 +91,7 @@ export const updateCountdowns = async (client, clientId) => {
     const timeEnd = new Date(timers[0].timeEnd);
     const timeLeft = timeEnd - Date.now();
     const timeElapsed = timers[0].timeStart ? Date.now() - new Date(timers[0].timeStart) : Infinity;
+    const origMessage = replyMsgId.cleanConent;
 
     let editText;
 
