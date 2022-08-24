@@ -53,21 +53,9 @@ export const updateCountdowns = async (client, clientId) => {
         .map(timerIndex => timers[timerIndex].tag)
         .filter(Boolean)
         .join(" ");
-      const channel = await client.channels.fetch(channel_id);
       if (tags) {
-        channel.send(
-          `${t(
-            "countdownDone",
-            timers[finishedTimers[0]].lang
-          )}! ${tags} - Original Message: ${assembledMessage}`
-        );
-      } else {
-        channel.send(
-          `${t(
-            "countdownDone",
-            timers[finishedTimers[0]].lang
-          )} - Original Message: ${assembledMessage}`
-        );
+        const channel = await client.channels.fetch(channel_id);
+        channel.send(`${t("countdownDone", timers[finishedTimers[0]].lang)}! ${tags}`);
       }
 
       // Remove finished timers backwards
