@@ -1,15 +1,12 @@
 {
   "name": "live-countdown-bot",
-  "version": "2.0.5",
+  "version": "3.0.0",
   "description": "A discord bot that counts down to an event.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node cluster.js",
-    "check-formatting": "prettier --check \"**/*.js\"",
-    "register-guild": "node registerInteractions.js",
-    "register-global": "node registerInteractions.js --global",
-    "test": "NODE_ENV=test jest"
+    "check-formatting": "prettier --check \"**/*.js\""
   },
   "repository": {
     "type": "git",
@@ -23,22 +20,17 @@
   },
   "homepage": "https://github.com/radiantly/live-countdown-bot#readme",
   "dependencies": {
-    "@discordjs/builders": "^0.12.0",
-    "@discordjs/rest": "^0.3.0",
-    "better-sqlite3": "^7.5.3",
-    "chrono-node": "^2.3.8",
-    "discord-api-types": "^0.27.3",
-    "discord-hybrid-sharding": "^1.5.5",
-    "discord.js": "^13.8.0"
+    "@discordjs/rest": "^1.1.0",
+    "better-sqlite3": "^7.6.2",
+    "discord-hybrid-sharding": "^1.7.2",
+    "discord.js": "^14.3.0",
+    "object-hash": "^3.0.0"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "arrowParens": "avoid"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.5",
-    "@babel/preset-env": "^7.18.2",
-    "babel-jest": "^27.5.1",
-    "jest": "^28.1.1",
-    "prettier": "2.1.2"
-  },
-  "jest": {
-    "testEnvironment": "node"
+    "prettier": "^2.7.1"
   }
 }

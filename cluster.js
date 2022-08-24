@@ -1,23 +1,24 @@
-import Cluster from "discord-hybrid-sharding";
-import config from "./config.js";
-import { updateClusterInfo, getClusterStats } from "./modules/sqlite3.js";
-import { postServerCount } from "./modules/post.js";
+import { Manager } from "discord-hybrid-sharding";
+import { config } from "./config.js";
 
-updateClusterInfo(-1, 0, process.memoryUsage().rss);
+import { botstatsCommand } from "./modules/commands.js";
+import { registerCommands } from "./modules/register.js";
 
-const manager = new Cluster.Manager("./modules/bot.js", {
-  shardsPerClusters: 5,
+const commandList = [
+  {
+    config: "dev",
+    guildId: "725326756546084954",
+    commands: [botstatsCommand],
+  },
+];
+
+await registerCommands(commandList);
+
+const manager = new Manager(`bot.js`, {
+  shardsPerClusters: 7,
   mode: "process",
   token: config.token,
-  keepalive: {
-    interval: 60000,
-    maxMissedHeartbeats: 5,
-    maxClusterRestarts: 1,
-  },
 });
 
-manager.on("clusterCreate", cluster => console.log(`Launched cluster ${cluster.id}`));
+manager.on("clusterCreate", cluster => console.log(`Launched Cluster ${cluster.id}`));
 manager.spawn({ timeout: -1 });
-
-// Post server counts to bot lists hourly.
-setInterval(() => postServerCount(getClusterStats()["TOTAL(GuildCount)"]), 60 * 60 * 1000);
