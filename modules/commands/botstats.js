@@ -3,8 +3,8 @@ import { SlashCommandBuilder } from "discord.js";
 
 import { loadavg, cpus } from "os";
 
-import { getClusterDataSum, version as sqliteVersion } from "./sqlite3.js";
-import { toMB } from "./utils.js";
+import { getClusterDataSum, version as sqliteVersion } from "../sqlite3.js";
+import { toMB } from "../utils.js";
 
 export const botstatsCommand = new SlashCommandBuilder()
   .setName("botstats")
