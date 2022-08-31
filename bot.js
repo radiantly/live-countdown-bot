@@ -1,10 +1,11 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import Cluster from "discord-hybrid-sharding";
-import { MINUTES } from "./modules/utils.js";
+import { MILLISECONDS, MINUTES } from "./modules/utils.js";
 
 import { config } from "./config.js";
 import { patchClusterData, removeGuild, setGuildRunId, setGuildsRunId } from "./modules/sqlite3.js";
 import { interactionCreateHandler } from "./modules/commands.js";
+import { performUpdates } from "./modules/updates.js";
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -40,7 +41,8 @@ client.once("ready", () => {
   initializeCluster();
   setGuildsRunId(client.guilds.cache, client.runId);
   console.info(`${client.user.tag} (${client.cluster.id}:${client.runId}) ready for business!`);
-  setTimeout(() => patchClusterData(client.cluster.id, client.runId, clusterStats()), 5 * MINUTES);
+  setInterval(() => patchClusterData(client.cluster.id, client.runId, clusterStats()), 5 * MINUTES);
+  setInterval(performUpdates, 100 * MILLISECONDS, client);
 });
 
 client.on("guildCreate", guild => {

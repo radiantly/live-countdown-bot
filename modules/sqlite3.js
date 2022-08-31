@@ -44,6 +44,22 @@ db.prepare(
   `
 ).run();
 
+db.prepare(
+  `
+  CREATE TABLE IF NOT EXISTS countdowns (
+    guild TEXT,
+    channel TEXT,
+    author TEXT,
+    updateTime INTEGER,
+    priority INTEGER,
+    data TEXT,
+    FOREIGN KEY (guild)
+      REFERENCES guilds (id)
+        ON DELETE CASCADE
+  ) STRICT
+  `
+).run();
+
 /// Key-Value Load & Store
 const getValueStmt = db.prepare("SELECT value from kv WHERE key = @key").pluck();
 const setValueStmt = db.prepare(
@@ -93,3 +109,32 @@ export const setGuildsRunId = db.transaction((guildCollection, runId) => {
 
 const removeGuildStmt = db.prepare("DELETE FROM guilds WHERE id = @guildId");
 export const removeGuild = guildId => removeGuildStmt.run({ guildId });
+
+// Countdowns table
+const insertCountdownStmt = db.prepare(`
+  INSERT INTO countdowns (guild, channel, author, updateTime, priority, data)
+  VALUES (@guildId, @channelId, @authorId, @updateTime, @priority, json(@data))
+`);
+export const insertCountdown = (guildId, channelId, authorId, updateTime, data, priority = 42) =>
+  insertCountdownStmt.run({
+    guildId,
+    channelId,
+    authorId,
+    updateTime,
+    priority,
+    data: JSON.stringify(data),
+  });
+
+const selectNextCountdownStmt = db.prepare(`
+  DELETE FROM countdowns
+  WHERE updateTime < unixepoch() * 1000
+  AND rowid IN (
+    SELECT countdowns.rowid FROM countdowns 
+    JOIN guilds ON countdowns.guild = guilds.id
+    WHERE runId = @runId
+    ORDER BY updatetime, priority
+    LIMIT 1
+  )
+  RETURNING *
+`);
+export const getNextCountDown = runId => selectNextCountdownStmt.get({ runId });
