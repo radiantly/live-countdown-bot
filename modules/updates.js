@@ -14,14 +14,15 @@ export const performUpdates = async client => {
   if (!channel) return;
 
   if (data.type === "timer") {
-    const { replyTo, reason } = data;
+    const { replyTo, reason, mention, allowedMentions } = data;
     let start = reason ? `**${reason}** *Timer complete!*` : "*Timer complete!*";
     channel.send({
-      content: `${start} ${userMention(authorId)}`,
+      content: `${start} ${mention || ""}\nSet by ${userMention(authorId)}`,
       reply: {
         messageReference: replyTo,
         failIfNotExists: false,
       },
+      allowedMentions,
     });
   }
 };

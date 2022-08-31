@@ -1,5 +1,5 @@
-import { cleanContent } from "discord.js";
 import { SlashCommandBuilder } from "discord.js";
+import { extractRolesFromString, generateAllowedMentions } from "../helpers.js";
 import { insertCountdown } from "../sqlite3.js";
 import { DAYS, HOURS, MINUTES, SECONDS, toSecs } from "../utils.js";
 
@@ -9,6 +9,7 @@ const options = {
   hours: "hours",
   days: "days",
   reason: "reason",
+  mention: "mention",
 };
 
 export const timerCommand = new SlashCommandBuilder()
@@ -26,15 +27,18 @@ export const timerCommand = new SlashCommandBuilder()
   .addIntegerOption(option =>
     option.setName(options.days).setDescription("Number of days to set the timer for")
   )
-  .addStringOption(option => option.setName(options.reason).setDescription("Description"));
+  .addStringOption(option => option.setName(options.reason).setDescription("Description"))
+  .addMentionableOption(option =>
+    option.setName(options.mention).setDescription("Mention someone once the timer is done")
+  );
 
 export const timerHandler = async interaction => {
   const seconds = interaction.options.getInteger(options.seconds) ?? 0;
   const minutes = interaction.options.getInteger(options.minutes) ?? 0;
   const hours = interaction.options.getInteger(options.hours) ?? 0;
   const days = interaction.options.getInteger(options.days) ?? 0;
-  const reasonRaw = interaction.options.getString(options.reason) ?? "";
-  const reason = cleanContent(reasonRaw, interaction.channel);
+  const reason = interaction.options.getString(options.reason) ?? "";
+  const mention = interaction.options.getMentionable(options.mention) ?? null;
 
   const duration = seconds * SECONDS + minutes * MINUTES + hours * HOURS + days * DAYS;
   const timestamp = duration + Date.now();
@@ -46,10 +50,15 @@ export const timerHandler = async interaction => {
 
   if (duration < 5 * SECONDS) return;
 
+  const allMentions = extractRolesFromString(interaction.guild, reason);
+  allMentions.push(mention);
+
   const timerData = {
     type: "timer",
     replyTo: message.id,
     reason,
+    mention,
+    allowedMentions: generateAllowedMentions(interaction.member, interaction.channel, allMentions),
   };
 
   insertCountdown(

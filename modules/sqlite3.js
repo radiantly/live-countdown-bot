@@ -44,6 +44,15 @@ db.prepare(
   `
 ).run();
 
+// covering index
+db.prepare(
+  `
+  CREATE INDEX IF NOT EXISTS guildRunIdIndex ON guilds (
+    id, runId
+  )
+`
+).run();
+
 db.prepare(
   `
   CREATE TABLE IF NOT EXISTS countdowns (
@@ -58,6 +67,14 @@ db.prepare(
         ON DELETE CASCADE
   ) STRICT
   `
+).run();
+
+db.prepare(
+  `
+  CREATE INDEX IF NOT EXISTS nextCountdownIndex ON countdowns (
+    updateTime, priority
+  )
+`
 ).run();
 
 /// Key-Value Load & Store

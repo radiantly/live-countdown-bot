@@ -22,6 +22,11 @@ const requiredPermissions = [
     "With this permission I can send cool embeds :sunglasses:",
   ],
   [
+    PermissionsBitField.Flags.MentionEveryone,
+    "Mention @everyone, @here, and All Roles",
+    "How can you mention everyone with your countdown if you don't give me this permission?",
+  ],
+  [
     PermissionsBitField.Flags.ManageMessages,
     "Manage Messages",
     "To delete messages I need this permission",
@@ -36,6 +41,7 @@ export const permcheckCommand = new SlashCommandBuilder()
       .setName("permissions")
       .setDescription("Check if the Live Countdown bot has been granted permissions correctly")
   )
+  .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles)
   .setDMPermission(false);
 
 export const permcheckHandler = async interaction => {

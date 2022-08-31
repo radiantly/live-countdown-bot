@@ -10,3 +10,5 @@ export const toGB = bytes => toMB(bytes) / 1024;
 
 // javascript timestamps are in milliseconds
 export const toSecs = timestamp => Math.floor(timestamp / 1000);
+
+export const ROLES_REGEX = /<@&(\d+)>/g;
