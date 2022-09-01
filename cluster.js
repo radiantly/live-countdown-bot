@@ -1,14 +1,23 @@
 import { Manager } from "discord-hybrid-sharding";
 import { config } from "./config.js";
 
-import { botstatsCommand, permcheckCommand, timerCommand } from "./modules/commands.js";
+import {
+  botstatsCommand,
+  countdownCommand,
+  permcheckCommand,
+  timerCommand,
+} from "./modules/commands.js";
 import { registerCommands } from "./modules/register.js";
 
 const commandList = [
   {
     config: "dev",
     guildId: "725326756546084954",
-    commands: [botstatsCommand, permcheckCommand, timerCommand],
+    commands: [botstatsCommand, permcheckCommand, timerCommand, countdownCommand],
+  },
+  {
+    config: "dev",
+    commands: [],
   },
 ];
 

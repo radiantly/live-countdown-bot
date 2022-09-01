@@ -1,3 +1,8 @@
+# pdm
+__pypackages__
+__pycache__
+.pdm.toml
+
 # Config file
 config.js
 config.json

@@ -1,0 +1,19 @@
+[project]
+name = "live-countdown-bot"
+version = "3.0.0"
+description = ""
+authors = [
+    {name = "radiantly", email = "buildingsomethingfun@gmail.com"},
+]
+dependencies = [
+    "flask>=2.2.2",
+    "dateparser>=1.1.1",
+]
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[tool.pdm]
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"

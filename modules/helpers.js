@@ -1,6 +1,6 @@
 import { PermissionsBitField } from "discord.js";
 import { Role } from "discord.js";
-import { ROLES_REGEX } from "./utils.js";
+import { MAX_ROLES_IN_ALLOWEDMENTIONS, ROLES_REGEX } from "./utils.js";
 
 export const extractRolesFromString = (guild, text) => {
   if (!guild) return [];
@@ -27,6 +27,6 @@ export const generateAllowedMentions = (member, channel, mentions) => {
     roles: mentions
       .filter(mention => mention instanceof Role && mention.mentionable)
       .map(role => role.id)
-      .slice(0, 100), // limit of 100 (API v10)
+      .slice(0, MAX_ROLES_IN_ALLOWEDMENTIONS),
   };
 };
