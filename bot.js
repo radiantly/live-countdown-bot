@@ -8,6 +8,10 @@ import { interactionCreateHandler } from "./modules/commands.js";
 import { performUpdates } from "./modules/updates.js";
 
 const client = new Client({
+  presence: {
+    status: "dnd",
+    activities: [{ type: "WATCHING", name: "maintenance" }],
+  },
   intents: [GatewayIntentBits.Guilds],
   shards: Cluster.data.SHARD_LIST,
   shardCount: Cluster.data.TOTAL_SHARDS,

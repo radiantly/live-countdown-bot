@@ -6,6 +6,7 @@ import {
   countdownCommand,
   permcheckCommand,
   timerCommand,
+  timestampCommand,
 } from "./modules/commands.js";
 import { registerCommands } from "./modules/register.js";
 
@@ -13,11 +14,15 @@ const commandList = [
   {
     config: "dev",
     guildId: "725326756546084954",
-    commands: [botstatsCommand, permcheckCommand, timerCommand, countdownCommand],
+    commands: [botstatsCommand, permcheckCommand, timerCommand, countdownCommand, timestampCommand],
   },
   {
     config: "dev",
     commands: [],
+  },
+  {
+    config: "production",
+    commands: [botstatsCommand],
   },
 ];
 

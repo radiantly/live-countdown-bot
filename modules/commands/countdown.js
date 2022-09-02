@@ -7,23 +7,28 @@ import { DateTime } from "luxon";
 const availableTimeZones = Intl.supportedValuesOf("timeZone");
 const fuse = new Fuse(availableTimeZones);
 
+export const OptionName = Object.freeze({
+  datetime: "datetime",
+  timezone: "timezone",
+});
+
 export const countdownCommand = new SlashCommandBuilder()
   .setName("countdown")
   .setDescription("Set a countdown")
   .addStringOption(option =>
     option
-      .setName("datetime")
+      .setName(OptionName.datetime)
       .setDescription("The date/time you want to countdown to")
       .setRequired(true)
       .setAutocomplete(true)
   )
   .addStringOption(option =>
-    option.setName("timezone").setDescription("Current timezone").setAutocomplete(true)
+    option.setName(OptionName.timezone).setDescription("Current timezone").setAutocomplete(true)
   );
 
 export const countdownHandler = async interaction => {
-  const datetimeText = interaction.options.getString("datetime");
-  const timezoneInput = interaction.options.getString("timezone") ?? null;
+  const datetimeText = interaction.options.getString(OptionName.datetime);
+  const timezoneInput = interaction.options.getString(OptionName.timezone) ?? null;
 
   console.log("cdH", datetimeText, timezoneInput);
   const {
@@ -41,56 +46,52 @@ export const countdownHandler = async interaction => {
   return interaction.reply(`Countdown ends <t:${timestampSec}:R>`);
 };
 
+const autocompleteOptionHandlers = {};
+
+autocompleteOptionHandlers[OptionName.timezone] = async (_, value) => {
+  const choices = fuse
+    .search(value, { limit: MAX_AUTOCOMPLETE_CHOICES })
+    .map(result => ({ name: result.item, value: result.item }));
+
+  if (choices.length) return choices;
+
+  const sliced = value.slice(0, MAX_LENGTH_STRING_CHOICE) || "UTC";
+  return [{ name: sliced, value: sliced }];
+};
+
+autocompleteOptionHandlers[OptionName.datetime] = async (interaction, value) => {
+  if (!value) return [];
+
+  const timezoneInput = interaction.options.getString(OptionName.timezone) ?? null;
+
+  const {
+    error,
+    timestamp: timestampSec,
+    timezone,
+    utcoffset,
+  } = await parseTimeString(value, timezoneInput);
+
+  console.log(error, timestampSec, timezone, utcoffset);
+
+  if (error) return [];
+
+  // Now, this is a sort of hack to get what we want.
+  // the timezone returned by parseTimeString might be one that luxon does
+  // not support. So for the datetime we'll strictly be working with the UTC
+  // offset for the localized string generation
+
+  const dt = DateTime.fromSeconds(timestampSec + utcoffset, {
+    locale: interaction.locale,
+    zone: "utc",
+  });
+
+  const humanTime = `${dt.toLocaleString(DateTime.DATETIME_MED)} ${timezone}`;
+
+  return [{ name: humanTime, value }];
+};
+
 export const countdownAutocomplete = async interaction => {
   const { name, value } = interaction.options.getFocused(true);
 
-  if (name === "timezone") {
-    const choices = fuse
-      .search(value, { limit: MAX_AUTOCOMPLETE_CHOICES })
-      .map(result => ({ name: result.item, value: result.item }));
-
-    if (choices.length === 0) {
-      const sliced = value.slice(0, MAX_LENGTH_STRING_CHOICE) || "UTC";
-      return interaction.respond([
-        {
-          name: sliced,
-          value: sliced,
-        },
-      ]);
-    }
-
-    await interaction.respond(choices);
-  } else if (name === "datetime") {
-    if (!value) return interaction.respond([]);
-    const timezoneInput = interaction.options.getString("timezone") ?? null;
-    const {
-      error,
-      timestamp: timestampSec,
-      timezone,
-      utcoffset,
-    } = await parseTimeString(value, timezoneInput);
-
-    console.log(error, timestampSec, timezone, utcoffset);
-
-    if (error) return interaction.respond([]);
-
-    // Now, this is a sort of hack to get what we want.
-    // the timezone returned by parseTimeString might be one that luxon does
-    // not support. So for the datetime we'll strictly be working with the UTC
-    // offset for the localized string generation
-
-    const dt = DateTime.fromSeconds(timestampSec + utcoffset, {
-      locale: interaction.locale,
-      zone: "utc",
-    });
-
-    const humanTime = `${dt.toLocaleString(DateTime.DATETIME_MED)} ${timezone}`;
-
-    return interaction.respond([
-      {
-        name: humanTime,
-        value,
-      },
-    ]);
-  }
+  interaction.respond((await autocompleteOptionHandlers[name](interaction, value)) || []);
 };
