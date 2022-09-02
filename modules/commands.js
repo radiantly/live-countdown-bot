@@ -4,6 +4,7 @@ import { timerCommand, timerHandler } from "./commands/timer.js";
 import { helpCommand, helpHandler } from "./commands/help.js";
 import { countdownCommand, countdownHandler, countdownAutocomplete } from "./commands/countdown.js";
 import { timestampCommand, timestampHandler, timestampAutocomplete } from "./commands/timestamp.js";
+import { respawnCommand, respawnHandler } from "./commands/respawn.js";
 
 export const interactionCreateHandler = async interaction => {
   if (interaction.isChatInputCommand()) {
@@ -16,6 +17,8 @@ export const interactionCreateHandler = async interaction => {
       return await countdownHandler(interaction);
     else if (interaction.commandName === timestampCommand.name)
       return await timestampHandler(interaction);
+    else if (interaction.commandName === respawnCommand.name)
+      return await respawnHandler(interaction);
   } else if (interaction.isAutocomplete()) {
     if (interaction.commandName === countdownCommand.name)
       return await countdownAutocomplete(interaction);
@@ -33,4 +36,5 @@ export {
   helpCommand,
   countdownCommand,
   timestampCommand,
+  respawnCommand,
 };
