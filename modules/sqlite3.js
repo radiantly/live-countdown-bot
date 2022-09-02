@@ -145,7 +145,10 @@ const insertUserDataStmt = db.prepare(`
 export const setUserData = (userId, dataObj) =>
   insertUserDataStmt.run({ userId, data: JSON.stringify(dataObj) });
 const getUserDataStmt = db.prepare("SELECT data FROM users WHERE id = @userId").pluck();
-export const getUserData = userId => JSON.parse(getUserDataStmt.get({ userId }));
+export const getUserData = userId => {
+  const result = getUserDataStmt.get({ userId });
+  return result ? JSON.parse(result) : null;
+};
 
 /// Countdowns table
 const insertCountdownStmt = db.prepare(`
