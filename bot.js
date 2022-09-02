@@ -64,4 +64,7 @@ client.on("guildDelete", guild => {
 
 client.on("interactionCreate", interactionCreateHandler);
 
+// TODO: handle errors
+process.on("unhandledRejection", console.error);
+
 client.login(config.token);
