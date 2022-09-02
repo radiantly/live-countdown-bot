@@ -35,7 +35,7 @@ export const botstatsHandler = async interaction => {
       },
       {
         name: ":red_circle: Latency",
-        value: `**${interaction.client.ws.ping}ms**`,
+        value: `**${Math.ceil(interaction.client.ws.ping)}ms**`,
         inline: true,
       },
       {

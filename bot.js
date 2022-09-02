@@ -53,7 +53,7 @@ client.on("guildCreate", guild => {
   setGuildRunId(guild.id, client.runId);
   console.info(`Added to ${guild.name} (${guild.id})`);
   guild?.systemChannel
-    .send("**Glad to be a part of your server** :heart:\nYou're probably looking for `/help`")
+    ?.send("**Glad to be a part of your server** :heart:\nYou're probably looking for `/help`")
     .catch(() => {});
 });
 
