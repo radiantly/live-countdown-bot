@@ -1,6 +1,6 @@
 import { EmbedBuilder, inlineCode, SlashCommandBuilder } from "discord.js";
 import { countdownAutocomplete, OptionName as countdownOptionName } from "./countdown.js";
-import { parseTimeString } from "../dateparser.js";
+import { parseUserTimeString } from "../dateparser.js";
 
 const OptionName = Object.freeze({
   format: "format",
@@ -44,15 +44,15 @@ export const timestampAutocomplete = countdownAutocomplete;
 
 export const timestampHandler = async interaction => {
   const datetimeText = interaction.options.getString(OptionName.datetime);
-  const timezoneInput = interaction.options.getString(OptionName.timezone) ?? null;
-  const formatType = interaction.options.getString(OptionName.format) || "all";
+  const timezoneInput = interaction.options.getString(OptionName.timezone);
+  const formatType = interaction.options.getString(OptionName.format) ?? "all";
 
   console.log("cdT", datetimeText, timezoneInput);
   const {
     error,
     timestamp: timestampSec,
     timezone,
-  } = await parseTimeString(datetimeText, timezoneInput);
+  } = await parseUserTimeString(interaction.user, datetimeText, timezoneInput, true);
   if (error)
     return interaction.reply({
       content: error,

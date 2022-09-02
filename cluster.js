@@ -35,7 +35,7 @@ const commandList = [
   {
     config: "production",
     guildId: "719541990580289557",
-    commands: [respawnCommand],
+    commands: [respawnCommand, timestampCommand],
   },
 ];
 

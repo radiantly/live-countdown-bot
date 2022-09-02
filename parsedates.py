@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 import dateparser
 from flask import Flask, request
 
@@ -14,6 +16,7 @@ def hello_world():
     text, timezone = req["text"], req["timezone"]
 
     dt = None
+    successfullyParsed = lambda: dt and dt.tzinfo and dt.tzinfo.utcoffset(dt)
 
     if timezone:
         try:
@@ -23,8 +26,20 @@ def hello_world():
         except:
             return {"error": "Invalid Timezone"}
     else:
-        dt = dateparser.parse(text, settings=defaults)
-        if not dt or dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
+        with suppress(Exception):
+            dt = dateparser.parse(text, settings=defaults)
+
+        if not successfullyParsed():
+            dt = dt = dateparser.parse(
+                text,
+                settings={
+                    **defaults,
+                    "TIMEZONE": req["default_timezone"],
+                    "RETURN_AS_TIMEZONE_AWARE": True,
+                },
+            )
+
+        if not successfullyParsed():
             dt = dt = dateparser.parse(
                 text, settings={**defaults, "TIMEZONE": "UTC", "RETURN_AS_TIMEZONE_AWARE": True}
             )

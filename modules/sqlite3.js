@@ -55,6 +55,15 @@ db.prepare(
 
 db.prepare(
   `
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY NOT NULL,
+    data TEXT
+  ) STRICT
+  `
+).run();
+
+db.prepare(
+  `
   CREATE TABLE IF NOT EXISTS countdowns (
     guild TEXT,
     channel TEXT,
@@ -127,7 +136,18 @@ export const setGuildsRunId = db.transaction((guildCollection, runId) => {
 const removeGuildStmt = db.prepare("DELETE FROM guilds WHERE id = @guildId");
 export const removeGuild = guildId => removeGuildStmt.run({ guildId });
 
-// Countdowns table
+/// Users table
+const insertUserDataStmt = db.prepare(`
+  INSERT INTO users (id, data) VALUES (@userId, json(@data))
+  ON CONFLICT(id) DO UPDATE SET
+    data = json_patch(users.data, excluded.data);
+`);
+export const setUserData = (userId, dataObj) =>
+  insertUserDataStmt.run({ userId, data: JSON.stringify(dataObj) });
+const getUserDataStmt = db.prepare("SELECT data FROM users WHERE id = @userId").pluck();
+export const getUserData = userId => JSON.parse(getUserDataStmt.get({ userId }));
+
+/// Countdowns table
 const insertCountdownStmt = db.prepare(`
   INSERT INTO countdowns (guild, channel, author, updateTime, priority, data)
   VALUES (@guildId, @channelId, @authorId, @updateTime, @priority, json(@data))

@@ -1,8 +1,19 @@
 import { SlashCommandBuilder } from "discord.js";
 import Fuse from "fuse.js";
-import { parseTimeString } from "../dateparser.js";
+import { parseUserTimeString } from "../dateparser.js";
 import { MAX_AUTOCOMPLETE_CHOICES, MAX_LENGTH_STRING_CHOICE } from "../utils.js";
 import { DateTime } from "luxon";
+
+const examples = [
+  "10 minutes",
+  "25th December",
+  "18:30 4 Oct CEST",
+  "7 am tomorrow",
+  "14th Nov 12:15PM GMT+0530",
+  "2pm monday",
+  "January 12, 2012 10:00 PM EST",
+  "4 hours 56 mins",
+];
 
 const availableTimeZones = Intl.supportedValuesOf("timeZone");
 const fuse = new Fuse(availableTimeZones);
@@ -28,14 +39,14 @@ export const countdownCommand = new SlashCommandBuilder()
 
 export const countdownHandler = async interaction => {
   const datetimeText = interaction.options.getString(OptionName.datetime);
-  const timezoneInput = interaction.options.getString(OptionName.timezone) ?? null;
+  const timezoneInput = interaction.options.getString(OptionName.timezone);
 
   console.log("cdH", datetimeText, timezoneInput);
   const {
     error,
     timestamp: timestampSec,
     timezone,
-  } = await parseTimeString(datetimeText, timezoneInput);
+  } = await parseUserTimeString(interaction.user, datetimeText, timezoneInput, true);
   if (error)
     return interaction.reply({
       content: error,
@@ -60,7 +71,7 @@ autocompleteOptionHandlers[OptionName.timezone] = async (_, value) => {
 };
 
 autocompleteOptionHandlers[OptionName.datetime] = async (interaction, value) => {
-  if (!value) return [];
+  if (!value) return examples.map(example => ({ name: example, value: example }));
 
   const timezoneInput = interaction.options.getString(OptionName.timezone) ?? null;
 
@@ -69,15 +80,15 @@ autocompleteOptionHandlers[OptionName.datetime] = async (interaction, value) => 
     timestamp: timestampSec,
     timezone,
     utcoffset,
-  } = await parseTimeString(value, timezoneInput);
+  } = await parseUserTimeString(interaction.user, value, timezoneInput);
 
   console.log(error, timestampSec, timezone, utcoffset);
 
   if (error) return [];
 
   // Now, this is a sort of hack to get what we want.
-  // the timezone returned by parseTimeString might be one that luxon does
-  // not support. So for the datetime we'll strictly be working with the UTC
+  // the timezone returned  might be one that luxon does not support
+  // So, for the datetime we'll strictly be working with the UTC
   // offset for the localized string generation
 
   const dt = DateTime.fromSeconds(timestampSec + utcoffset, {
