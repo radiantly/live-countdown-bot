@@ -4,6 +4,7 @@ import { config } from "./config.js";
 import {
   botstatsCommand,
   countdownCommand,
+  deleteCommand,
   permcheckCommand,
   respawnCommand,
   timerCommand,
@@ -22,6 +23,7 @@ const commandList = [
       countdownCommand,
       timestampCommand,
       respawnCommand,
+      deleteCommand,
     ],
   },
   {

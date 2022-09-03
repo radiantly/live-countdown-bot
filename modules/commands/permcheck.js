@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionsBitField } from "discord.js";
+import { SlashCommandBuilder, PermissionsBitField, ChatInputCommandInteraction } from "discord.js";
 
 const requiredPermissions = [
   [
@@ -44,6 +44,10 @@ export const permcheckCommand = new SlashCommandBuilder()
   .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles)
   .setDMPermission(false);
 
+/**
+ * Handler for the command above
+ * @param {ChatInputCommandInteraction} interaction
+ */
 export const permcheckHandler = async interaction => {
   if (!interaction.channel || !interaction.guild?.available || !interaction.guild.members.me)
     return interaction.reply({

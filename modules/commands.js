@@ -5,21 +5,23 @@ import { helpCommand, helpHandler } from "./commands/help.js";
 import { countdownCommand, countdownHandler, countdownAutocomplete } from "./commands/countdown.js";
 import { timestampCommand, timestampHandler, timestampAutocomplete } from "./commands/timestamp.js";
 import { respawnCommand, respawnHandler } from "./commands/respawn.js";
+import { deleteCommand, deleteHandler } from "./commands/delete.js";
 
 export const interactionCreateHandler = async interaction => {
   if (interaction.isChatInputCommand()) {
     if (interaction.commandName === botstatsCommand.name) return await botstatsHandler(interaction);
-    else if (interaction.commandName === permcheckCommand.name)
+    if (interaction.commandName === timerCommand.name) return await timerHandler(interaction);
+    if (interaction.commandName === helpCommand.name) return await helpHandler(interaction);
+    if (interaction.commandName === respawnCommand.name) return await respawnHandler(interaction);
+    if (interaction.commandName === deleteCommand.name) return await deleteHandler(interaction);
+    if (interaction.commandName === permcheckCommand.name)
       return await permcheckHandler(interaction);
-    else if (interaction.commandName === timerCommand.name) return await timerHandler(interaction);
-    else if (interaction.commandName === helpCommand.name) return await helpHandler(interaction);
-    else if (interaction.commandName === countdownCommand.name)
+    if (interaction.commandName === countdownCommand.name)
       return await countdownHandler(interaction);
-    else if (interaction.commandName === timestampCommand.name)
+    if (interaction.commandName === timestampCommand.name)
       return await timestampHandler(interaction);
-    else if (interaction.commandName === respawnCommand.name)
-      return await respawnHandler(interaction);
-  } else if (interaction.isAutocomplete()) {
+  }
+  if (interaction.isAutocomplete()) {
     if (interaction.commandName === countdownCommand.name)
       return await countdownAutocomplete(interaction);
 
@@ -37,4 +39,5 @@ export {
   countdownCommand,
   timestampCommand,
   respawnCommand,
+  deleteCommand,
 };

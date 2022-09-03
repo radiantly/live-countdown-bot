@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { config } from "../../config.js";
 
 export const respawnCommand = new SlashCommandBuilder()
@@ -6,6 +6,10 @@ export const respawnCommand = new SlashCommandBuilder()
   .setDescription("Respawn all bot clusters")
   .setDefaultMemberPermissions(0);
 
+/**
+ * Handler for the command above
+ * @param {ChatInputCommandInteraction} interaction
+ */
 export const respawnHandler = async interaction => {
   if (interaction.user.id !== config.ownerId) {
     console.error(`Unauthorized respawn by user ${interaction.user.id}`);

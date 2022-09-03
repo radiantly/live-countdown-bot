@@ -1,5 +1,5 @@
 import { EmbedBuilder, version as djsVersion } from "discord.js";
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 
 import { loadavg, cpus } from "os";
 
@@ -10,6 +10,10 @@ export const botstatsCommand = new SlashCommandBuilder()
   .setName("botstats")
   .setDescription("Check bot statistics");
 
+/**
+ * Handler for the command above
+ * @param {ChatInputCommandInteraction} interaction
+ */
 export const botstatsHandler = async interaction => {
   const cpuUsage = (loadavg()[0] / cpus().length).toFixed(2);
   const memUsage = Math.floor(toMB(process.memoryUsage().rss));

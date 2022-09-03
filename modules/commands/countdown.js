@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import Fuse from "fuse.js";
 import { parseUserTimeString } from "../dateparser.js";
 import { MAX_AUTOCOMPLETE_CHOICES, MAX_LENGTH_STRING_CHOICE } from "../utils.js";
@@ -37,6 +37,10 @@ export const countdownCommand = new SlashCommandBuilder()
     option.setName(OptionName.timezone).setDescription("Current timezone").setAutocomplete(true)
   );
 
+/**
+ * Handler for the command above
+ * @param {ChatInputCommandInteraction} interaction
+ */
 export const countdownHandler = async interaction => {
   const datetimeText = interaction.options.getString(OptionName.datetime);
   const timezoneInput = interaction.options.getString(OptionName.timezone);

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { extractRolesFromString, generateAllowedMentions } from "../helpers.js";
 import { insertCountdown } from "../sqlite3.js";
 import { DAYS, HOURS, MINUTES, SECONDS, toSecs } from "../utils.js";
@@ -32,6 +32,10 @@ export const timerCommand = new SlashCommandBuilder()
     option.setName(options.mention).setDescription("Mention someone once the timer is done")
   );
 
+/**
+ * Handler for the command above
+ * @param {ChatInputCommandInteraction} interaction
+ */
 export const timerHandler = async interaction => {
   const seconds = interaction.options.getInteger(options.seconds) ?? 0;
   const minutes = interaction.options.getInteger(options.minutes) ?? 0;

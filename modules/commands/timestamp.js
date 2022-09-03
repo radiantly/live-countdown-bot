@@ -1,4 +1,9 @@
-import { EmbedBuilder, inlineCode, SlashCommandBuilder } from "discord.js";
+import {
+  EmbedBuilder,
+  inlineCode,
+  SlashCommandBuilder,
+  ChatInputCommandInteraction,
+} from "discord.js";
 import { countdownAutocomplete, OptionName as countdownOptionName } from "./countdown.js";
 import { parseUserTimeString } from "../dateparser.js";
 
@@ -42,6 +47,10 @@ export const timestampCommand = new SlashCommandBuilder()
 
 export const timestampAutocomplete = countdownAutocomplete;
 
+/**
+ * Handler for the command above
+ * @param {ChatInputCommandInteraction} interaction
+ */
 export const timestampHandler = async interaction => {
   const datetimeText = interaction.options.getString(OptionName.datetime);
   const timezoneInput = interaction.options.getString(OptionName.timezone);
