@@ -5,6 +5,7 @@ import {
   botstatsCommand,
   countdownCommand,
   deleteCommand,
+  helpCommand,
   permcheckCommand,
   respawnCommand,
   timerCommand,
@@ -24,6 +25,7 @@ const commandList = [
       timestampCommand,
       respawnCommand,
       deleteCommand,
+      helpCommand,
     ],
   },
   {
@@ -32,12 +34,12 @@ const commandList = [
   },
   {
     config: "production",
-    commands: [botstatsCommand],
+    commands: [botstatsCommand, helpCommand, timestampCommand],
   },
   {
     config: "production",
     guildId: "719541990580289557",
-    commands: [respawnCommand, timestampCommand],
+    commands: [respawnCommand],
   },
 ];
 
