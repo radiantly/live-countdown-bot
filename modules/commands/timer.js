@@ -36,7 +36,7 @@ export const timerCommand = new SlashCommandBuilder()
  * Handler for the command above
  * @param {ChatInputCommandInteraction} interaction
  */
-export const timerHandler = async interaction => {
+const chatInputHandler = async interaction => {
   const seconds = interaction.options.getInteger(options.seconds) ?? 0;
   const minutes = interaction.options.getInteger(options.minutes) ?? 0;
   const hours = interaction.options.getInteger(options.hours) ?? 0;
@@ -63,6 +63,7 @@ export const timerHandler = async interaction => {
     reason,
     mention,
     allowedMentions: generateAllowedMentions(interaction.member, interaction.channel, allMentions),
+    createdAt: Date.now(),
   };
 
   insertCountdown(
@@ -72,4 +73,9 @@ export const timerHandler = async interaction => {
     timestamp - 1 * SECONDS, // processing time
     timerData
   );
+};
+
+export const timerHandlers = {
+  command: timerCommand,
+  chatInput: chatInputHandler,
 };

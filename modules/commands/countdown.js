@@ -41,7 +41,7 @@ export const countdownCommand = new SlashCommandBuilder()
  * Handler for the command above
  * @param {ChatInputCommandInteraction} interaction
  */
-export const countdownHandler = async interaction => {
+const chatInputHandler = async interaction => {
   const datetimeText = interaction.options.getString(OptionName.datetime);
   const timezoneInput = interaction.options.getString(OptionName.timezone);
 
@@ -105,8 +105,14 @@ autocompleteOptionHandlers[OptionName.datetime] = async (interaction, value) => 
   return [{ name: humanTime, value }];
 };
 
-export const countdownAutocomplete = async interaction => {
+const autocompleteHandler = async interaction => {
   const { name, value } = interaction.options.getFocused(true);
 
   interaction.respond((await autocompleteOptionHandlers[name](interaction, value)) || []);
+};
+
+export const countdownHandlers = {
+  command: countdownCommand,
+  chatInput: chatInputHandler,
+  autocomplete: autocompleteHandler,
 };

@@ -48,7 +48,7 @@ export const permcheckCommand = new SlashCommandBuilder()
  * Handler for the command above
  * @param {ChatInputCommandInteraction} interaction
  */
-export const permcheckHandler = async interaction => {
+const chatInputHandler = async interaction => {
   if (!interaction.channel || !interaction.guild?.available || !interaction.guild.members.me)
     return interaction.reply({
       content: "Unknown error. Please report this at the support server.",
@@ -65,4 +65,9 @@ export const permcheckHandler = async interaction => {
       .join("\n"),
     ephemeral: true,
   });
+};
+
+export const permcheckHandlers = {
+  command: permcheckCommand,
+  chatInput: chatInputHandler,
 };

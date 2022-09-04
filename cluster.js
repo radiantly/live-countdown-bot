@@ -1,16 +1,14 @@
 import { Manager } from "discord-hybrid-sharding";
 import { config } from "./config.js";
-
-import {
-  botstatsCommand,
-  countdownCommand,
-  deleteCommand,
-  helpCommand,
-  permcheckCommand,
-  respawnCommand,
-  timerCommand,
-  timestampCommand,
-} from "./modules/commands.js";
+import { botstatsCommand } from "./modules/commands/botstats.js";
+import { countdownCommand } from "./modules/commands/countdown.js";
+import { deleteCommand } from "./modules/commands/delete.js";
+import { helpCommand } from "./modules/commands/help.js";
+import { listCommand } from "./modules/commands/list.js";
+import { permcheckCommand } from "./modules/commands/permcheck.js";
+import { respawnCommand } from "./modules/commands/respawn.js";
+import { timerCommand } from "./modules/commands/timer.js";
+import { timestampCommand } from "./modules/commands/timestamp.js";
 import { registerCommands } from "./modules/register.js";
 
 const commandList = [
@@ -19,13 +17,14 @@ const commandList = [
     guildId: "725326756546084954",
     commands: [
       botstatsCommand,
-      permcheckCommand,
-      timerCommand,
       countdownCommand,
-      timestampCommand,
-      respawnCommand,
       deleteCommand,
       helpCommand,
+      listCommand,
+      permcheckCommand,
+      respawnCommand,
+      timerCommand,
+      timestampCommand,
     ],
   },
   {

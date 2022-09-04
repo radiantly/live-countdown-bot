@@ -8,7 +8,7 @@ export const helpCommand = new SlashCommandBuilder()
  * Handler for the command above
  * @param {ChatInputCommandInteraction} interaction
  */
-export const helpHandler = async interaction => {
+const chatInputHandler = async interaction => {
   const embed = new EmbedBuilder()
     .setColor("#f26522")
     .setTitle("Live Countdown bot Help Menu")
@@ -21,9 +21,14 @@ export const helpHandler = async interaction => {
       {
         name: "All is good though!",
         value:
-          "Not to worry - The bot should be functional in a few days once the team has completed migration and deployed the new version of the bot.",
+          "Not to worry - The bot should be functional in around a week once the team has completed migration and deployed the new version of the bot.",
       }
     );
 
   interaction.reply({ embeds: [embed], ephemeral: true });
+};
+
+export const helpHandlers = {
+  command: helpCommand,
+  chatInput: chatInputHandler,
 };

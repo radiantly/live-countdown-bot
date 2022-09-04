@@ -147,7 +147,7 @@ export const setUserData = (userId, dataObj) =>
 const getUserDataStmt = db.prepare("SELECT data FROM users WHERE id = @userId").pluck();
 export const getUserData = userId => {
   const result = getUserDataStmt.get({ userId });
-  return result ? JSON.parse(result) : null;
+  return result ? JSON.parse(result) : {};
 };
 
 /// Countdowns table
@@ -178,3 +178,25 @@ const selectNextCountdownStmt = db.prepare(`
   RETURNING *
 `);
 export const getNextCountDown = runId => selectNextCountdownStmt.get({ runId });
+
+const getGuildCountdownsStmt = db.prepare(`
+  SELECT rowid, * FROM countdowns
+  WHERE guild = @guildId
+`);
+export const getGuildCountdowns = ({ guildId }) =>
+  getGuildCountdownsStmt.all({ guildId }).map(row => {
+    row.data = row.data ? JSON.parse(row.data) : {};
+    return row;
+  });
+
+const getCountdownStmt = db.prepare(`
+  SELECT * FROM countdowns
+  WHERE rowid = @rowid
+`);
+export const getCountdown = rowid => getCountdownStmt.get({ rowid });
+
+const deleteCountdownStmt = db.prepare(`
+DELETE FROM countdowns
+WHERE rowid = @rowid
+`);
+export const deleteCountdown = rowid => deleteCountdownStmt.run({ rowid });

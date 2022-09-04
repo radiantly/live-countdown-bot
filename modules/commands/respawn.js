@@ -10,7 +10,7 @@ export const respawnCommand = new SlashCommandBuilder()
  * Handler for the command above
  * @param {ChatInputCommandInteraction} interaction
  */
-export const respawnHandler = async interaction => {
+const chatInputHandler = async interaction => {
   if (interaction.user.id !== config.ownerId) {
     console.error(`Unauthorized respawn by user ${interaction.user.id}`);
     return interaction.reply({
@@ -22,4 +22,9 @@ export const respawnHandler = async interaction => {
 
   await interaction.reply({ content: "Authorization success. Queuing respawn.", ephemeral: true });
   interaction.client.cluster.respawnAll();
+};
+
+export const respawnHandlers = {
+  command: respawnCommand,
+  chatInput: chatInputHandler,
 };

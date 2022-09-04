@@ -14,7 +14,7 @@ export const botstatsCommand = new SlashCommandBuilder()
  * Handler for the command above
  * @param {ChatInputCommandInteraction} interaction
  */
-export const botstatsHandler = async interaction => {
+const chatInputHandler = async interaction => {
   const cpuUsage = (loadavg()[0] / cpus().length).toFixed(2);
   const memUsage = Math.floor(toMB(process.memoryUsage().rss));
   const memUsageTotal = Math.floor(toMB(getClusterDataSum("rss")));
@@ -65,4 +65,9 @@ export const botstatsHandler = async interaction => {
     )
     .setTimestamp();
   interaction.reply({ embeds: [embed], ephemeral: true });
+};
+
+export const botstatsHandlers = {
+  command: botstatsCommand,
+  chatInput: chatInputHandler,
 };
