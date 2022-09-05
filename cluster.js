@@ -33,7 +33,7 @@ const commandList = [
   },
   {
     config: "production",
-    commands: [botstatsCommand, helpCommand, timestampCommand],
+    commands: [botstatsCommand, deleteCommand, helpCommand, timerCommand, timestampCommand],
   },
   {
     config: "production",
