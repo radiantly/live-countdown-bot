@@ -1,8 +1,10 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import Fuse from "fuse.js";
 import { parseUserTimeString } from "../dateparser.js";
-import { MAX_AUTOCOMPLETE_CHOICES, MAX_LENGTH_STRING_CHOICE } from "../utils.js";
+import { MAX_AUTOCOMPLETE_CHOICES, MAX_LENGTH_STRING_CHOICE, SECONDS } from "../utils.js";
 import { DateTime } from "luxon";
+import { extractRolesFromString, generateAllowedMentions } from "../helpers.js";
+import { insertCountdown } from "../sqlite3.js";
 
 const examples = [
   "10 minutes",
@@ -21,6 +23,8 @@ const fuse = new Fuse(availableTimeZones);
 export const OptionName = Object.freeze({
   datetime: "datetime",
   timezone: "timezone",
+  reason: "reason",
+  mention: "mention",
 });
 
 export const countdownCommand = new SlashCommandBuilder()
@@ -35,7 +39,12 @@ export const countdownCommand = new SlashCommandBuilder()
   )
   .addStringOption(option =>
     option.setName(OptionName.timezone).setDescription("Current timezone").setAutocomplete(true)
-  );
+  )
+  .addStringOption(option => option.setName(OptionName.reason).setDescription("Description"))
+  .addMentionableOption(option =>
+    option.setName(OptionName.mention).setDescription("Mention someone once the timer is done")
+  )
+  .setDMPermission(false);
 
 /**
  * Handler for the command above
@@ -44,6 +53,8 @@ export const countdownCommand = new SlashCommandBuilder()
 const chatInputHandler = async interaction => {
   const datetimeText = interaction.options.getString(OptionName.datetime);
   const timezoneInput = interaction.options.getString(OptionName.timezone);
+  const reason = interaction.options.getString(OptionName.reason) ?? "";
+  const mention = interaction.options.getMentionable(OptionName.mention) ?? null;
 
   console.log("cdH", datetimeText, timezoneInput);
   const {
@@ -58,7 +69,35 @@ const chatInputHandler = async interaction => {
     });
 
   console.log(timezone);
-  return interaction.reply(`Countdown ends <t:${timestampSec}:R>`);
+  const message = await interaction.reply({
+    content: `**${reason || "Countdown ends"} <t:${timestampSec}:R>**`,
+    fetchReply: true,
+  });
+
+  const duration = timestampSec * 1000 - Date.now();
+  if (duration < 5 * SECONDS) return;
+
+  const allMentions = extractRolesFromString(interaction.guild, reason);
+  allMentions.push(mention);
+
+  const countdownData = {
+    type: "countdown",
+    replyTo: message.id,
+    reason,
+    mention,
+    allowedMentions: generateAllowedMentions(interaction.member, interaction.channel, allMentions),
+    createdAt: Date.now(),
+    authorTag: interaction.user.tag,
+    channelName: interaction.channel.name,
+  };
+
+  insertCountdown(
+    interaction.guildId,
+    interaction.channelId,
+    interaction.user.id,
+    (timestampSec - 1) * 1000,
+    countdownData
+  );
 };
 
 const autocompleteOptionHandlers = {};

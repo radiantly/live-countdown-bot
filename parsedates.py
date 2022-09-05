@@ -1,4 +1,5 @@
 from contextlib import suppress
+from datetime import datetime
 
 import dateparser
 from flask import Flask, request
@@ -9,6 +10,11 @@ app = Flask(__name__)
 defaults = {"PREFER_DATES_FROM": "future"}
 
 
+def is_timezone_aware(dt: datetime | None) -> bool:
+    """Checks if dt is a timezone-aware datetime object"""
+    return dt and dt.tzinfo and dt.tzinfo.utcoffset(dt)
+
+
 @app.route("/", methods=["POST"])
 def hello_world():
     req = request.json
@@ -16,7 +22,6 @@ def hello_world():
     text, timezone = req["text"], req["timezone"]
 
     dt = None
-    successfullyParsed = lambda: dt and dt.tzinfo and dt.tzinfo.utcoffset(dt)
 
     if timezone:
         try:
@@ -29,8 +34,8 @@ def hello_world():
         with suppress(Exception):
             dt = dateparser.parse(text, settings=defaults)
 
-        if not successfullyParsed():
-            dt = dt = dateparser.parse(
+        if not is_timezone_aware(dt):
+            dt = dateparser.parse(
                 text,
                 settings={
                     **defaults,
@@ -39,8 +44,8 @@ def hello_world():
                 },
             )
 
-        if not successfullyParsed():
-            dt = dt = dateparser.parse(
+        if not is_timezone_aware(dt):
+            dt = dateparser.parse(
                 text, settings={**defaults, "TIMEZONE": "UTC", "RETURN_AS_TIMEZONE_AWARE": True}
             )
 

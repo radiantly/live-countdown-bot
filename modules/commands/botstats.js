@@ -2,8 +2,9 @@ import { EmbedBuilder, version as djsVersion } from "discord.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 
 import { loadavg, cpus } from "os";
+import { authorizedUsers } from "../people.js";
 
-import { getClusterDataSum, version as sqliteVersion } from "../sqlite3.js";
+import { getClusterDataSum, kv, version as sqliteVersion } from "../sqlite3.js";
 import { toMB } from "../utils.js";
 
 export const botstatsCommand = new SlashCommandBuilder()
@@ -64,7 +65,23 @@ const chatInputHandler = async interaction => {
       }
     )
     .setTimestamp();
-  interaction.reply({ embeds: [embed], ephemeral: true });
+
+  const embeds = [embed];
+
+  // Additional embed for authorized users
+  if (authorizedUsers.has(interaction.user.id)) {
+    const additionalEmbed = new EmbedBuilder()
+      .setTitle("Additional Information")
+      .setDescription(`Authorization check succeeded for user ${interaction.user}`)
+      .addFields({
+        name: ":cloud_lightning: unhandledRejections",
+        value: `**${kv.unhandledRejectionCount ?? 0}**`,
+        inline: true,
+      });
+    embeds.push(additionalEmbed);
+  }
+
+  interaction.reply({ embeds, ephemeral: true });
 };
 
 export const botstatsHandlers = {

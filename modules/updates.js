@@ -1,4 +1,4 @@
-import { userMention } from "discord.js";
+import { userMention, bold, italic } from "discord.js";
 import { getNextCountDown } from "./sqlite3.js";
 
 export const performUpdates = async client => {
@@ -10,19 +10,19 @@ export const performUpdates = async client => {
   const guild = client.guilds.cache.get(guildId);
   if (!guild) return;
 
-  const channel = await guild.channels.fetch(channelId).catch(() => {});
+  const channel = await guild.channels.fetch(channelId).catch(() => null);
   if (!channel) return;
 
-  if (data.type === "timer") {
-    const { replyTo, reason, mention, allowedMentions } = data;
-    let start = reason ? `**${reason}** *Timer complete!*` : "*Timer complete!*";
-    channel.send({
-      content: `${start} ${mention || ""}\nSet by ${userMention(authorId)}`,
-      reply: {
-        messageReference: replyTo,
-        failIfNotExists: false,
-      },
-      allowedMentions,
-    });
-  }
+  const { type, replyTo, reason, mention, allowedMentions } = data;
+  let start = italic(`${type === "timer" ? "Timer" : "Countdown"} complete!`);
+  if (reason) start = `${bold(reason)} ${start}`;
+
+  channel.send({
+    content: `${start} ${mention || ""}\nSet by ${userMention(authorId)}`,
+    reply: {
+      messageReference: replyTo,
+      failIfNotExists: false,
+    },
+    allowedMentions,
+  });
 };

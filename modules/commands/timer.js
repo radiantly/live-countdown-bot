@@ -30,7 +30,8 @@ export const timerCommand = new SlashCommandBuilder()
   .addStringOption(option => option.setName(options.reason).setDescription("Description"))
   .addMentionableOption(option =>
     option.setName(options.mention).setDescription("Mention someone once the timer is done")
-  );
+  )
+  .setDMPermission(false);
 
 /**
  * Handler for the command above
@@ -64,6 +65,8 @@ const chatInputHandler = async interaction => {
     mention,
     allowedMentions: generateAllowedMentions(interaction.member, interaction.channel, allMentions),
     createdAt: Date.now(),
+    authorTag: interaction.user.tag,
+    channelName: interaction.channel.name,
   };
 
   insertCountdown(

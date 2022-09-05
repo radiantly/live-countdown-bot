@@ -3,7 +3,13 @@ import Cluster from "discord-hybrid-sharding";
 import { MILLISECONDS, MINUTES } from "./modules/utils.js";
 
 import { config } from "./config.js";
-import { patchClusterData, removeGuild, setGuildRunId, setGuildsRunId } from "./modules/sqlite3.js";
+import {
+  kv,
+  patchClusterData,
+  removeGuild,
+  setGuildRunId,
+  setGuildsRunId,
+} from "./modules/sqlite3.js";
 import { interactionCreateHandler } from "./modules/commands.js";
 import { performUpdates } from "./modules/updates.js";
 
@@ -65,6 +71,9 @@ client.on("guildDelete", guild => {
 client.on("interactionCreate", interactionCreateHandler);
 
 // TODO: handle errors
-process.on("unhandledRejection", console.error);
+process.on("unhandledRejection", err => {
+  console.error(err);
+  kv.unhandledRejectionCount = (kv.unhandledRejectionCount ?? 0) + 1;
+});
 
 client.login(config.token);

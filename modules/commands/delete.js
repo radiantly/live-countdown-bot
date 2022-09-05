@@ -1,3 +1,4 @@
+import { SelectMenuOptionBuilder } from "discord.js";
 import {
   SelectMenuBuilder,
   ActionRowBuilder,
@@ -28,17 +29,24 @@ const generateMessage = ({ guildId, locale }) => {
       .setCustomId("delete_select")
       .setPlaceholder("What would you like to delete?")
       .addOptions(
-        ...all.map(({ rowid, data: { createdAt } }) => {
+        ...all.map(({ rowid, updateTime, data: { type, createdAt, authorTag, channelName } }) => {
           const createdRel = DateTime.fromMillis(createdAt, {
             locale,
             zone: "utc",
           }).toRelative();
 
-          return {
-            label: "Created <t:0> <@713331783214825522>",
-            description: `Created ${createdRel}`,
-            value: rowid.toString(),
-          };
+          const toRel = DateTime.fromMillis(updateTime, {
+            locale,
+            zone: "utc",
+          }).toRelative();
+
+          return new SelectMenuOptionBuilder()
+            .setLabel(`Completes ${toRel} (${authorTag} in #${channelName})`)
+            .setDescription(`Created ${createdRel}`)
+            .setValue(rowid.toString())
+            .setEmoji({
+              name: type === "timer" ? "⏲️" : "🕑",
+            });
         })
       )
       .setMaxValues(all.length)

@@ -24,7 +24,7 @@ const requiredPermissions = [
   [
     PermissionsBitField.Flags.MentionEveryone,
     "Mention @everyone, @here, and All Roles",
-    "How can you mention everyone with your countdown if you don't give me this permission?",
+    "How can I tag everyone with your countdown if you don't give me this permission?",
   ],
   [
     PermissionsBitField.Flags.ManageMessages,
