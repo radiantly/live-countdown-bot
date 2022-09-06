@@ -4,6 +4,7 @@ import { countdownHandlers } from "./commands/countdown.js";
 import { deleteHandlers } from "./commands/delete.js";
 import { helpHandlers } from "./commands/help.js";
 import { listHandlers } from "./commands/list.js";
+import { newsitemHandlers } from "./commands/newsitem.js";
 import { permcheckHandlers } from "./commands/permcheck.js";
 import { respawnHandlers } from "./commands/respawn.js";
 import { timerHandlers } from "./commands/timer.js";
@@ -15,6 +16,7 @@ const allHandlers = [
   deleteHandlers,
   helpHandlers,
   listHandlers,
+  newsitemHandlers,
   permcheckHandlers,
   respawnHandlers,
   timerHandlers,
@@ -43,10 +45,11 @@ const selectMenuHandlers = allHandlers.reduce((obj, handlers) => {
  * @returns
  */
 export const interactionCreateHandler = async interaction => {
-  if (interaction.isChatInputCommand())
-    return await chatInputHandlers[interaction.commandName](interaction);
-  if (interaction.isAutocomplete())
-    return await autocompleteHandlers[interaction.commandName](interaction);
-  if (interaction.isSelectMenu())
-    return await selectMenuHandlers[interaction.customId](interaction);
+  if (interaction.isChatInputCommand()) {
+    await chatInputHandlers[interaction.commandName](interaction);
+  } else if (interaction.isAutocomplete()) {
+    await autocompleteHandlers[interaction.commandName](interaction);
+  } else if (interaction.isSelectMenu()) {
+    await selectMenuHandlers[interaction.customId](interaction);
+  }
 };

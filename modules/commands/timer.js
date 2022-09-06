@@ -62,7 +62,7 @@ const chatInputHandler = async interaction => {
     type: "timer",
     replyTo: message.id,
     reason,
-    mention,
+    mention: mention?.toString(),
     allowedMentions: generateAllowedMentions(interaction.member, interaction.channel, allMentions),
     createdAt: Date.now(),
     authorTag: interaction.user.tag,

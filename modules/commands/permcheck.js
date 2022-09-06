@@ -14,7 +14,7 @@ const requiredPermissions = [
   [
     PermissionsBitField.Flags.ReadMessageHistory,
     "Read Message History",
-    "Some things stop working without this permission :raised_hands:",
+    "I can't reply to messages without this permission :raised_hands:",
   ],
   [
     PermissionsBitField.Flags.EmbedLinks,

@@ -5,6 +5,7 @@ import { countdownCommand } from "./modules/commands/countdown.js";
 import { deleteCommand } from "./modules/commands/delete.js";
 import { helpCommand } from "./modules/commands/help.js";
 import { listCommand } from "./modules/commands/list.js";
+import { newsitemCommand } from "./modules/commands/newsitem.js";
 import { permcheckCommand } from "./modules/commands/permcheck.js";
 import { respawnCommand } from "./modules/commands/respawn.js";
 import { timerCommand } from "./modules/commands/timer.js";
@@ -21,6 +22,7 @@ const commandList = [
       deleteCommand,
       helpCommand,
       listCommand,
+      newsitemCommand,
       permcheckCommand,
       respawnCommand,
       timerCommand,
@@ -33,19 +35,26 @@ const commandList = [
   },
   {
     config: "production",
-    commands: [botstatsCommand, deleteCommand, helpCommand, timerCommand, timestampCommand],
+    commands: [
+      botstatsCommand,
+      countdownCommand,
+      deleteCommand,
+      helpCommand,
+      timerCommand,
+      timestampCommand,
+    ],
   },
   {
     config: "production",
     guildId: "719541990580289557",
-    commands: [respawnCommand],
+    commands: [newsitemCommand, respawnCommand],
   },
 ];
 
 await registerCommands(commandList);
 
 const manager = new Manager(`bot.js`, {
-  shardsPerClusters: 7,
+  shardsPerClusters: 5,
   mode: "process",
   token: config.token,
 });

@@ -1,5 +1,6 @@
 import { PermissionsBitField } from "discord.js";
 import { Role } from "discord.js";
+import { config } from "../config.js";
 import { MAX_ROLES_IN_ALLOWEDMENTIONS, ROLES_REGEX } from "./utils.js";
 
 export const extractRolesFromString = (guild, text) => {
@@ -29,4 +30,12 @@ export const generateAllowedMentions = (member, channel, mentions) => {
       .map(role => role.id)
       .slice(0, MAX_ROLES_IN_ALLOWEDMENTIONS),
   };
+};
+
+/**
+ *
+ * @param {string} userId
+ */
+export const isOwner = userId => {
+  return userId === config.ownerId;
 };

@@ -5,7 +5,7 @@ import { loadavg, cpus } from "os";
 import { authorizedUsers } from "../people.js";
 
 import { getClusterDataSum, kv, version as sqliteVersion } from "../sqlite3.js";
-import { toMB } from "../utils.js";
+import { toMB, toSecs } from "../utils.js";
 
 export const botstatsCommand = new SlashCommandBuilder()
   .setName("botstats")
@@ -16,12 +16,30 @@ export const botstatsCommand = new SlashCommandBuilder()
  * @param {ChatInputCommandInteraction} interaction
  */
 const chatInputHandler = async interaction => {
+  const embeds = [];
+
+  /// Stats Embed
   const cpuUsage = (loadavg()[0] / cpus().length).toFixed(2);
   const memUsage = Math.floor(toMB(process.memoryUsage().rss));
   const memUsageTotal = Math.floor(toMB(getClusterDataSum("rss")));
-  const embed = new EmbedBuilder()
-    .setColor("#f26522")
-    .setTitle("Stats")
+  const statsEmbed = new EmbedBuilder().setColor("#f26522").setTitle("Stats");
+
+  // if there are any news items to display
+  const news = kv.news;
+  if (news) {
+    const newsitems = JSON.parse(news)
+      .slice(-3)
+      .reverse()
+      .map(({ time, text }) => `<t:${toSecs(time)}:f> ${text}`)
+      .join("\n");
+
+    statsEmbed.addFields({
+      name: ":newspaper: News",
+      value: newsitems,
+    });
+  }
+
+  statsEmbed
     .addFields(
       {
         name: ":fire: CPU usage",
@@ -66,15 +84,15 @@ const chatInputHandler = async interaction => {
     )
     .setTimestamp();
 
-  const embeds = [embed];
+  embeds.push(statsEmbed);
 
-  // Additional embed for authorized users
+  /// Additional Embed (Authorized users only!)
   if (authorizedUsers.has(interaction.user.id)) {
     const additionalEmbed = new EmbedBuilder()
       .setTitle("Additional Information")
       .setDescription(`Authorization check succeeded for user ${interaction.user}`)
       .addFields({
-        name: ":cloud_lightning: unhandledRejections",
+        name: ":cloud_lightning: Unhandled Rejections",
         value: `**${kv.unhandledRejectionCount ?? 0}**`,
         inline: true,
       });
