@@ -91,11 +91,18 @@ const chatInputHandler = async interaction => {
     const additionalEmbed = new EmbedBuilder()
       .setTitle("Additional Information")
       .setDescription(`Authorization check succeeded for user ${interaction.user}`)
-      .addFields({
-        name: ":cloud_lightning: Unhandled Rejections",
-        value: `**${kv.unhandledRejectionCount ?? 0}**`,
-        inline: true,
-      });
+      .addFields(
+        {
+          name: ":cloud_lightning: Unhandled Rejections",
+          value: `**${kv.unhandledRejectionCount ?? 0}**`,
+          inline: true,
+        },
+        {
+          name: ":x: Uncaught Exceptions",
+          value: `**${kv.uncaughtExceptionCount ?? 0}**`,
+          inline: true,
+        }
+      );
     embeds.push(additionalEmbed);
   }
 

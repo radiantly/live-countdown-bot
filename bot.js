@@ -71,6 +71,10 @@ client.on("guildDelete", guild => {
 client.on("interactionCreate", interactionCreateHandler);
 
 // TODO: handle errors
+process.on("uncaughtException", err => {
+  console.error(err);
+  kv.uncaughtExceptionCount = (kv.uncaughtExceptionCount ?? 0) + 1;
+});
 process.on("unhandledRejection", err => {
   console.error(err);
   kv.unhandledRejectionCount = (kv.unhandledRejectionCount ?? 0) + 1;
