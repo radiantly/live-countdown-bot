@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { extractRolesFromString, generateAllowedMentions } from "../helpers.js";
-import { insertCountdown } from "../sqlite3.js";
+import { getUserData, insertCountdown, setUserData } from "../sqlite3.js";
 import { DAYS, HOURS, MINUTES, SECONDS, toSecs } from "../utils.js";
 
 const options = {
@@ -45,7 +45,26 @@ const chatInputHandler = async interaction => {
   const reason = interaction.options.getString(options.reason) ?? "";
   const mention = interaction.options.getMentionable(options.mention) ?? null;
 
-  const duration = seconds * SECONDS + minutes * MINUTES + hours * HOURS + days * DAYS;
+  let duration = seconds * SECONDS + minutes * MINUTES + hours * HOURS + days * DAYS;
+
+  // If the user has run /timer without arguments
+  if (duration === 0) {
+    // then retrieve the duration of the last timer set
+    duration = getUserData(interaction.user.id)?.lastTimerDuration;
+
+    // if that does not exist, soft exit
+    if (!duration)
+      return interaction.reply({
+        content:
+          "This is the timer command! Pass in the number of seconds, minutes, hours or days to set a timer :timer:",
+        ephemeral: true,
+      });
+  } else if (duration > 0) {
+    setUserData(interaction.user.id, {
+      lastTimerDuration: duration,
+    });
+  }
+
   const timestamp = duration + Date.now();
 
   const message = await interaction.reply({
