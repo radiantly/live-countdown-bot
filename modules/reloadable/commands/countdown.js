@@ -150,7 +150,7 @@ const autocompleteHandler = async interaction => {
   interaction.respond((await autocompleteOptionHandlers[name](interaction, value)) || []);
 };
 
-export const countdownHandlers = {
+export const handlers = {
   command: countdownCommand,
   chatInput: chatInputHandler,
   autocomplete: autocompleteHandler,

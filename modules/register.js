@@ -1,7 +1,7 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord.js";
 import { config } from "../config.js";
-import { kv } from "./sqlite3.js";
+import { kv } from "./reloadable/sqlite3.js";
 import hash from "object-hash";
 
 export const registerCommands = async commandList => {

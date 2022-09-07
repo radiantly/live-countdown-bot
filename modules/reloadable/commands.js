@@ -1,27 +1,20 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { BaseInteraction } from "discord.js";
-import { botstatsHandlers } from "./commands/botstats.js";
-import { countdownHandlers } from "./commands/countdown.js";
-import { deleteHandlers } from "./commands/delete.js";
-import { helpHandlers } from "./commands/help.js";
-import { listHandlers } from "./commands/list.js";
-import { newsitemHandlers } from "./commands/newsitem.js";
-import { permcheckHandlers } from "./commands/permcheck.js";
-import { respawnHandlers } from "./commands/respawn.js";
-import { timerHandlers } from "./commands/timer.js";
-import { timestampHandlers } from "./commands/timestamp.js";
 
-const allHandlers = [
-  botstatsHandlers,
-  countdownHandlers,
-  deleteHandlers,
-  helpHandlers,
-  listHandlers,
-  newsitemHandlers,
-  permcheckHandlers,
-  respawnHandlers,
-  timerHandlers,
-  timestampHandlers,
-];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const commandsPath = path.join(__dirname, "commands");
+
+const allHandlers = (
+  await Promise.all(
+    fs
+      .readdirSync(commandsPath)
+      .filter(file => file.endsWith(".js"))
+      .map(filePath => import(path.resolve(commandsPath, filePath)))
+  )
+).map(commandFileModule => commandFileModule.handlers);
 
 const chatInputHandlers = allHandlers.reduce((obj, handlers) => {
   if (handlers.chatInput) obj[handlers.command.name] = handlers.chatInput;

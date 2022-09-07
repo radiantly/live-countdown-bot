@@ -4,7 +4,7 @@ import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
 } from "discord.js";
-import { countdownHandlers, OptionName as countdownOptionName } from "./countdown.js";
+import { handlers as countdownHandlers, OptionName as countdownOptionName } from "./countdown.js";
 import { parseUserTimeString } from "../dateparser.js";
 
 const OptionName = Object.freeze({
@@ -91,7 +91,7 @@ const chatInputHandler = async interaction => {
   });
 };
 
-export const timestampHandlers = {
+export const handlers = {
   command: timestampCommand,
   chatInput: chatInputHandler,
   autocomplete: countdownHandlers.autocomplete,

@@ -1,6 +1,5 @@
-import { PermissionsBitField } from "discord.js";
-import { Role } from "discord.js";
-import { config } from "../config.js";
+import { PermissionsBitField, Role } from "discord.js";
+import { config } from "../../config.js";
 import { MAX_ROLES_IN_ALLOWEDMENTIONS, ROLES_REGEX } from "./utils.js";
 
 export const extractRolesFromString = (guild, text) => {

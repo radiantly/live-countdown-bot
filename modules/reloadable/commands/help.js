@@ -28,7 +28,7 @@ const chatInputHandler = async interaction => {
   interaction.reply({ embeds: [embed], ephemeral: true });
 };
 
-export const helpHandlers = {
+export const handlers = {
   command: helpCommand,
   chatInput: chatInputHandler,
 };

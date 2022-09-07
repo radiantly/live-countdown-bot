@@ -25,7 +25,7 @@ const chatInputHandler = async interaction => {
   interaction.client.cluster.respawnAll();
 };
 
-export const respawnHandlers = {
+export const handlers = {
   command: respawnCommand,
   chatInput: chatInputHandler,
 };

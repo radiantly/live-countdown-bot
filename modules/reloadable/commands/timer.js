@@ -97,7 +97,7 @@ const chatInputHandler = async interaction => {
   );
 };
 
-export const timerHandlers = {
+export const handlers = {
   command: timerCommand,
   chatInput: chatInputHandler,
 };

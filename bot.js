@@ -1,17 +1,16 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import Cluster from "discord-hybrid-sharding";
-import { MILLISECONDS, MINUTES } from "./modules/utils.js";
-
 import { config } from "./config.js";
+
+// The items imported below are NON RELOADABLE
+import { MILLISECONDS, MINUTES } from "./modules/reloadable/utils.js";
 import {
   kv,
   patchClusterData,
   removeGuild,
   setGuildRunId,
   setGuildsRunId,
-} from "./modules/sqlite3.js";
-import { interactionCreateHandler } from "./modules/commands.js";
-import { performUpdates } from "./modules/updates.js";
+} from "./modules/reloadable/sqlite3.js";
 
 const client = new Client({
   presence: {
@@ -24,6 +23,18 @@ const client = new Client({
 });
 
 client.cluster = new Cluster.Client(client);
+
+// Only items from the reloadables module are reloadable
+let loadId = 0;
+let reloadables;
+const loadReloadables = async () =>
+  (reloadables = await import(`./modules/reloadable/index.js?loadId=${++loadId}`));
+
+await loadReloadables();
+client.reloadReloadables = loadReloadables;
+
+export const broadcastReload = () =>
+  client.cluster.broadcastEval("this.reloadReloadables()", { timeout: 10000 });
 
 const clusterStats = () => ({
   rss: process.memoryUsage().rss,
@@ -52,7 +63,7 @@ client.once("ready", () => {
   setGuildsRunId(client.guilds.cache, client.runId);
   console.info(`${client.user.tag} (${client.cluster.id}:${client.runId}) ready for business!`);
   setInterval(() => patchClusterData(client.cluster.id, client.runId, clusterStats()), 5 * MINUTES);
-  setInterval(performUpdates, 100 * MILLISECONDS, client);
+  setInterval(() => reloadables.performUpdates(client), 100 * MILLISECONDS);
 });
 
 client.on("guildCreate", guild => {
@@ -68,7 +79,7 @@ client.on("guildDelete", guild => {
   console.info(`Removed from ${guild.name || "guild"} (${guild.id})`);
 });
 
-client.on("interactionCreate", interactionCreateHandler);
+client.on("interactionCreate", interaction => reloadables.interactionCreateHandler(interaction));
 
 // TODO: handle errors
 process.on("uncaughtException", err => {

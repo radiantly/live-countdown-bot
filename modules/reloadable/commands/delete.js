@@ -84,7 +84,7 @@ const deleteSelectHandler = async interaction => {
   interaction.update(generateMessage(interaction));
 };
 
-export const deleteHandlers = {
+export const handlers = {
   command: deleteCommand,
   chatInput: deleteHandler,
   selectMenu: [

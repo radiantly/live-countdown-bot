@@ -58,7 +58,7 @@ const chatInputHandler = async interaction => {
   });
 };
 
-export const listHandlers = {
+export const handlers = {
   command: listCommand,
   chatInput: chatInputHandler,
 };

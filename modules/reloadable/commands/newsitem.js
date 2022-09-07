@@ -46,7 +46,7 @@ const chatInputHandler = async interaction => {
   });
 };
 
-export const newsitemHandlers = {
+export const handlers = {
   command: newsitemCommand,
   chatInput: chatInputHandler,
 };

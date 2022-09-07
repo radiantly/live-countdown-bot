@@ -67,7 +67,7 @@ const chatInputHandler = async interaction => {
   });
 };
 
-export const permcheckHandlers = {
+export const handlers = {
   command: permcheckCommand,
   chatInput: chatInputHandler,
 };

@@ -109,7 +109,7 @@ const chatInputHandler = async interaction => {
   interaction.reply({ embeds, ephemeral: true });
 };
 
-export const botstatsHandlers = {
+export const handlers = {
   command: botstatsCommand,
   chatInput: chatInputHandler,
 };
