@@ -36,6 +36,7 @@ export const countdownCommand = new SlashCommandBuilder()
       .setDescription("The date/time you want to countdown to")
       .setRequired(true)
       .setAutocomplete(true)
+      .setMaxLength(MAX_LENGTH_STRING_CHOICE)
   )
   .addStringOption(option =>
     option.setName(OptionName.timezone).setDescription("Current timezone").setAutocomplete(true)
@@ -127,7 +128,9 @@ autocompleteOptionHandlers[OptionName.datetime] = async (interaction, value) => 
 
   console.log(error, timestampSec, timezone, utcoffset);
 
-  if (error) return [];
+  value = value.substring(0, MAX_LENGTH_STRING_CHOICE);
+
+  if (error) return [{ name: value, value }];
 
   // Now, this is a sort of hack to get what we want.
   // the timezone returned  might be one that luxon does not support
@@ -139,9 +142,10 @@ autocompleteOptionHandlers[OptionName.datetime] = async (interaction, value) => 
     zone: "utc",
   });
 
-  const humanTime = `${dt.toLocaleString(DateTime.DATETIME_MED)} ${timezone}`;
-
-  return [{ name: humanTime, value }];
+  const suggestion = `${value.substring(50)} (${dt.toLocaleString(
+    DateTime.DATETIME_MED
+  )} ${timezone})`;
+  return [{ name: suggestion, value }];
 };
 
 const autocompleteHandler = async interaction => {
