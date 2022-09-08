@@ -3,13 +3,13 @@ import { getUserData, setUserData } from "./sqlite3.js";
 
 // Parses timestring but also saves and retrieves user's history/preference
 export const parseUserTimeString = async (user, text, timezone, store = false) => {
-  const default_timezone = getUserData(user.id)?.lastTimezone || "UTC";
+  const default_timezone = getUserData(user.id)?.lastCountdownTimezone || "UTC";
 
   const result = await parseTimeString(text, timezone, default_timezone);
   if (store && result?.timezone) {
     setUserData(user.id, {
-      lastTimestamp: text,
-      lastText: result.timezone,
+      lastCountdownText: text,
+      lastCountdownTimezone: result.timezone,
     });
   }
 

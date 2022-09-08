@@ -4,7 +4,11 @@ import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
 } from "discord.js";
-import { handlers as countdownHandlers, OptionName as countdownOptionName } from "./countdown.js";
+import {
+  handlers as countdownHandlers,
+  OptionName as countdownOptionName,
+  INVALID_VALUE,
+} from "./countdown.js";
 import { parseUserTimeString } from "../dateparser.js";
 
 const OptionName = Object.freeze({
@@ -53,6 +57,12 @@ const chatInputHandler = async interaction => {
   const datetimeText = interaction.options.getString(OptionName.datetime);
   const timezoneInput = interaction.options.getString(OptionName.timezone);
   const formatType = interaction.options.getString(OptionName.format) ?? "all";
+
+  if (datetimeText === INVALID_VALUE) {
+    return interaction.reply({
+      content: `Hey ${interaction.user}! This option isn't valid, try entering a date or time to generate a timestamp tag.`,
+    });
+  }
 
   console.log("cdT", datetimeText, timezoneInput);
   const {

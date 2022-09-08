@@ -45,10 +45,14 @@ const clusterStats = () => ({
 const initializeCluster = () => {
   while (true) {
     client.runId = Math.floor(Math.random() * 1000000009);
+
     // if runId already exists, then SQLite will throw a unique constraint error
     // in that case, we regenerate a new one
     try {
-      patchClusterData(client.cluster.id, client.runId, clusterStats());
+      patchClusterData(client.cluster.id, client.runId, {
+        readyAt: Date.now(),
+        guildCount: client.guilds.cache.size,
+      });
       break;
     } catch (ex) {
       console.log("regenerating runId", ex);
