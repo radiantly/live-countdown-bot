@@ -1,7 +1,7 @@
 import { EmbedBuilder, version as djsVersion } from "discord.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 
-import { loadavg, cpus } from "os";
+import { loadavg, cpus, freemem, totalmem } from "os";
 import { authorizedUsers } from "../people.js";
 
 import { getClusterDataSum, kv, version as sqliteVersion } from "../sqlite3.js";
@@ -21,7 +21,7 @@ const chatInputHandler = async interaction => {
   /// Stats Embed
   const cpuUsage = (loadavg()[0] / cpus().length).toFixed(2);
   const memUsage = Math.floor(toMB(process.memoryUsage().rss));
-  const memUsageTotal = Math.floor(toMB(getClusterDataSum("rss")));
+  const memUsageTotal = Math.floor(toMB(totalmem() - freemem()));
   const statsEmbed = new EmbedBuilder().setColor("#f26522").setTitle("Stats");
 
   // if there are any news items to display
