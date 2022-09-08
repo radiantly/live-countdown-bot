@@ -142,7 +142,7 @@ autocompleteOptionHandlers[OptionName.datetime] = async (interaction, value) => 
     zone: "utc",
   });
 
-  const suggestion = `${value.substring(50)} (${dt.toLocaleString(
+  const suggestion = `${value.substring(0, 50)} (${dt.toLocaleString(
     DateTime.DATETIME_MED
   )} ${timezone})`;
   return [{ name: suggestion, value }];
