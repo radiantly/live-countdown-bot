@@ -1,15 +1,25 @@
-import { EmbedBuilder, version as djsVersion } from "discord.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import child_process from "child_process";
+import util from "util";
+import {
+  EmbedBuilder,
+  version as djsVersion,
+  SlashCommandBuilder,
+  ChatInputCommandInteraction,
+  bold,
+} from "discord.js";
 
 import { loadavg, cpus, freemem, totalmem } from "os";
 import { authorizedUsers } from "../people.js";
 
-import { getClusterDataSum, kv, version as sqliteVersion } from "../sqlite3.js";
+import { getAllClusterData, getClusterDataSum, kv, version as sqliteVersion } from "../sqlite3.js";
 import { toMB, toSecs } from "../utils.js";
+import { dbPath } from "../../db.js";
 
 export const botstatsCommand = new SlashCommandBuilder()
   .setName("botstats")
   .setDescription("Check bot statistics");
+
+const exec = util.promisify(child_process.exec);
 
 /**
  * Handler for the command above
@@ -28,7 +38,7 @@ const chatInputHandler = async interaction => {
   const news = kv.news;
   if (news) {
     const newsitems = JSON.parse(news)
-      .slice(-3)
+      .slice(-5)
       .reverse()
       .map(({ time, text }) => `<t:${toSecs(time)}:f> ${text}`)
       .join("\n");
@@ -88,6 +98,9 @@ const chatInputHandler = async interaction => {
 
   /// Additional Embed (Authorized users only!)
   if (authorizedUsers.has(interaction.user.id)) {
+    const { stdout: stdoutLsof } = await exec(`lsof -t "${dbPath}"`);
+    const openConnections = stdoutLsof.trim().split("\n").length;
+
     const additionalEmbed = new EmbedBuilder()
       .setTitle("Additional Information")
       .setDescription(`Authorization check succeeded for user ${interaction.user}`)
@@ -100,6 +113,21 @@ const chatInputHandler = async interaction => {
         {
           name: ":x: Uncaught Exceptions",
           value: `**${kv.uncaughtExceptionCount ?? 0}**`,
+          inline: true,
+        },
+        {
+          name: ":open_file_folder: SQLite Connections",
+          value: bold(openConnections.toString()),
+          inline: true,
+        },
+        {
+          name: ":control_knobs: Clusters",
+          value: getAllClusterData()
+            .map(({ id, data }) => {
+              const { readyAt, guildCount } = JSON.parse(data);
+              return bold(`<t:${toSecs(readyAt)}:R> / ${guildCount} / ${id}`);
+            })
+            .join("\n"),
           inline: true,
         }
       );

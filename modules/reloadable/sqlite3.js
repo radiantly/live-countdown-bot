@@ -99,6 +99,9 @@ export const kv = new Proxy(
 );
 
 /// Cluster Table
+const deleteAllClusterDataStmt = db.prepare("DELETE FROM clusters");
+export const clearClusterData = () => deleteAllClusterDataStmt.run();
+
 const patchClusterDataStmt = db.prepare(
   `
   INSERT INTO clusters (id, runId, data) VALUES (@clusterId, @runId, json(@data))
@@ -111,6 +114,9 @@ export const patchClusterData = (clusterId, runId, dataObj) =>
   patchClusterDataStmt.run({ clusterId, runId, data: JSON.stringify(dataObj) });
 const getClusterDataSumStmt = db.prepare("SELECT SUM(data->>?) FROM clusters").pluck();
 export const getClusterDataSum = key => getClusterDataSumStmt.get(key);
+
+const getAllClusterDataStmt = db.prepare("SELECT * FROM clusters");
+export const getAllClusterData = () => getAllClusterDataStmt.all();
 
 /// Guilds Table
 const upsertGuildStmt = db.prepare(`

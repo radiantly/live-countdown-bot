@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { ActivityType, Client, GatewayIntentBits } from "discord.js";
 import Cluster from "discord-hybrid-sharding";
 import { config } from "./config.js";
 
@@ -14,8 +14,17 @@ import {
 
 const client = new Client({
   presence: {
-    status: "dnd",
-    activities: [{ type: "WATCHING", name: "maintenance" }],
+    status: "online",
+    activities: [
+      { type: ActivityType.Playing, name: "with time" },
+      { type: ActivityType.Playing, name: "with 100 seconds" },
+      { type: ActivityType.Watching, name: "times change" },
+      { type: ActivityType.Watching, name: "for /countdown" },
+      { type: ActivityType.Watching, name: "the time fly by" },
+      { type: ActivityType.Watching, name: "the migration to slash commands" },
+      { type: ActivityType.Listening, name: "the clock tick" },
+      { type: ActivityType.Competing, name: "the race for time" },
+    ],
   },
   intents: [GatewayIntentBits.Guilds],
   shards: Cluster.data.SHARD_LIST,

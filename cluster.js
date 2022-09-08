@@ -1,6 +1,7 @@
 import { Manager } from "discord-hybrid-sharding";
 import { config } from "./config.js";
 import { registerCommands } from "./modules/register.js";
+import { clearClusterData } from "./modules/reloadable/sqlite3.js";
 
 import { botstatsCommand } from "./modules/reloadable/commands/botstats.js";
 import { countdownCommand } from "./modules/reloadable/commands/countdown.js";
@@ -55,6 +56,8 @@ const commandList = [
 ];
 
 await registerCommands(commandList);
+
+clearClusterData();
 
 const manager = new Manager(`bot.js`, {
   shardsPerClusters: 5,
