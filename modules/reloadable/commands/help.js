@@ -1,4 +1,12 @@
-import { EmbedBuilder, SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  Colors,
+  EmbedBuilder,
+  GuildMember,
+  PermissionsBitField,
+  SlashCommandBuilder,
+} from "discord.js";
+import { getPermissionsSummary } from "../permcheck.js";
 
 export const helpCommand = new SlashCommandBuilder()
   .setName("help")
@@ -9,8 +17,25 @@ export const helpCommand = new SlashCommandBuilder()
  * @param {ChatInputCommandInteraction} interaction
  */
 const chatInputHandler = async interaction => {
-  const embed = new EmbedBuilder()
-    .setColor("#f26522")
+  const embeds = [];
+
+  // if the current user has the manage roles permission, show them missing permissions
+  if (
+    interaction.member instanceof GuildMember &&
+    interaction.member.permissionsIn(interaction.channel).has(PermissionsBitField.Flags.ManageRoles)
+  ) {
+    const missingPermissions = getPermissionsSummary(interaction);
+    if (missingPermissions) {
+      const permsEmbed = new EmbedBuilder()
+        .setColor(Colors.Red)
+        .setTitle("Missing Permissions!")
+        .setDescription(missingPermissions);
+      embeds.push(permsEmbed);
+    }
+  }
+
+  const helpEmbed = new EmbedBuilder()
+    .setColor(Colors.Orange)
     .setTitle("Live Countdown bot Help Menu")
     .addFields(
       {
@@ -24,8 +49,9 @@ const chatInputHandler = async interaction => {
           "Not to worry - The bot should be functional in around a week once the team has completed migration and deployed the new version of the bot.",
       }
     );
+  embeds.push(helpEmbed);
 
-  interaction.reply({ embeds: [embed], ephemeral: true });
+  interaction.reply({ embeds, ephemeral: true });
 };
 
 export const handlers = {

@@ -1,11 +1,12 @@
 import child_process from "child_process";
 import util from "util";
 import {
-  EmbedBuilder,
-  version as djsVersion,
-  SlashCommandBuilder,
-  ChatInputCommandInteraction,
   bold,
+  version as djsVersion,
+  ChatInputCommandInteraction,
+  Colors,
+  EmbedBuilder,
+  SlashCommandBuilder,
 } from "discord.js";
 
 import { loadavg, cpus, freemem, totalmem } from "os";
@@ -32,7 +33,7 @@ const chatInputHandler = async interaction => {
   const cpuUsage = (loadavg()[0] / cpus().length).toFixed(2);
   const memUsage = Math.floor(toMB(process.memoryUsage().rss));
   const memUsageTotal = Math.floor(toMB(totalmem() - freemem()));
-  const statsEmbed = new EmbedBuilder().setColor("#f26522").setTitle("Stats");
+  const statsEmbed = new EmbedBuilder().setColor(Colors.Orange).setTitle("Stats");
 
   // if there are any news items to display
   const news = kv.news;
