@@ -99,7 +99,7 @@ const chatInputHandler = async interaction => {
 
   /// Additional Embed (Authorized users only!)
   if (authorizedUsers.has(interaction.user.id)) {
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
     const { stdout: stdoutLsof } = await exec(`lsof -t "${dbPath}"`);
     const openConnections = stdoutLsof.trim().split("\n").length;
 
@@ -109,7 +109,20 @@ const chatInputHandler = async interaction => {
 
     const additionalEmbed = new EmbedBuilder()
       .setTitle("Additional Information")
-      .setDescription(`Authorization check succeeded for user ${interaction.user}`)
+      .setDescription(
+        `Authorization check succeeded for user ${interaction.user}\n` +
+          "**Started / #Guilds / ShardId / Last Interaction**\n" +
+          getAllClusterData()
+            .map(({ id, data }) => {
+              const { readyAt, guildCount } = JSON.parse(data);
+              return bold(
+                `<t:${toSecs(readyAt)}:R> / ${guildCount} / ${id} / <t:${toSecs(
+                  lastInteraction[id]
+                )}:R>`
+              );
+            })
+            .join("\n")
+      )
       .addFields(
         {
           name: ":cloud_lightning: Unhandled Rejections",
@@ -124,22 +137,6 @@ const chatInputHandler = async interaction => {
         {
           name: ":open_file_folder: SQLite Connections",
           value: bold(openConnections.toString()),
-          inline: true,
-        },
-        {
-          name: ":control_knobs: Shards",
-          value:
-            "**Started / #Guilds / ShardId / Last Interaction**\n" +
-            getAllClusterData()
-              .map(({ id, data }) => {
-                const { readyAt, guildCount } = JSON.parse(data);
-                return bold(
-                  `<t:${toSecs(readyAt)}:R> / ${guildCount} / ${id} / <t:${toSecs(
-                    lastInteraction[id]
-                  )}:R>`
-                );
-              })
-              .join("\n"),
           inline: true,
         }
       );
