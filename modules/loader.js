@@ -5,7 +5,6 @@ let loadId = "0";
 export const resolve = async (specifier, context, defaultResolve) => {
   const result = await defaultResolve(specifier, context, defaultResolve);
 
-  // return result;
   const child = new URL(result.url);
 
   if (

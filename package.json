@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node cluster.js",
+    "start": "node shard.js",
     "check-formatting": "prettier --check \"**/*.js\""
   },
   "repository": {
@@ -22,7 +22,6 @@
   "dependencies": {
     "@discordjs/rest": "^1.1.0",
     "better-sqlite3": "^7.6.2",
-    "discord-hybrid-sharding": "^1.7.4",
     "discord.js": "^14.3.0",
     "fuse.js": "^6.6.2",
     "got": "^12.4.1",

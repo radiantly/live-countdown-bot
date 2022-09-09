@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "bot",
-      script: "./cluster.js",
+      script: "./shard.js",
       env_production: {
         NODE_ENV: "production",
       },

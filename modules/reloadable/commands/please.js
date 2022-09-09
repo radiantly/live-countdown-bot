@@ -51,7 +51,7 @@ const chatInputHandler = async interaction => {
     registerCommands((await import("../command_list.js")).commandList);
   } else if (subcommand === "reload") {
     await interaction.reply({ content: "Authorization success. Queuing reload.", ephemeral: true });
-    (await import("../../../bot.js")).broadcastReload();
+    interaction.client.shard.broadcastEval(client => client.reloadReloadables());
   }
 };
 

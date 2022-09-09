@@ -1,5 +1,4 @@
 import { ActivityType, Client, GatewayIntentBits } from "discord.js";
-import Cluster from "discord-hybrid-sharding";
 import { config } from "./config.js";
 
 // The items imported below are NON RELOADABLE
@@ -27,11 +26,7 @@ const client = new Client({
     ],
   },
   intents: [GatewayIntentBits.Guilds],
-  shards: Cluster.data.SHARD_LIST,
-  shardCount: Cluster.data.TOTAL_SHARDS,
 });
-
-client.cluster = new Cluster.Client(client);
 
 // Only items from the reloadables module are reloadable
 let loadId = 0;
@@ -41,9 +36,6 @@ const loadReloadables = async () =>
 
 await loadReloadables();
 client.reloadReloadables = loadReloadables;
-
-export const broadcastReload = () =>
-  client.cluster.broadcastEval("this.reloadReloadables()", { timeout: 10000 });
 
 const clusterStats = () => ({
   rss: process.memoryUsage().rss,
@@ -58,7 +50,7 @@ const initializeCluster = () => {
     // if runId already exists, then SQLite will throw a unique constraint error
     // in that case, we regenerate a new one
     try {
-      patchClusterData(client.cluster.id, client.runId, {
+      patchClusterData(client.shard.ids[0], client.runId, {
         readyAt: Date.now(),
         guildCount: client.guilds.cache.size,
       });
@@ -74,8 +66,11 @@ client.once("ready", () => {
 
   initializeCluster();
   setGuildsRunId(client.guilds.cache, client.runId);
-  console.info(`${client.user.tag} (${client.cluster.id}:${client.runId}) ready for business!`);
-  setInterval(() => patchClusterData(client.cluster.id, client.runId, clusterStats()), 5 * MINUTES);
+  console.info(`${client.user.tag} (${client.shard.ids}:${client.runId}) ready for business!`);
+  setInterval(
+    () => patchClusterData(client.shard.ids[0], client.runId, clusterStats()),
+    5 * MINUTES
+  );
   setInterval(() => reloadables.performUpdates(client), 100 * MILLISECONDS);
 });
 
@@ -92,7 +87,10 @@ client.on("guildDelete", guild => {
   console.info(`Removed from ${guild.name || "guild"} (${guild.id})`);
 });
 
-client.on("interactionCreate", interaction => reloadables.interactionCreateHandler(interaction));
+client.on("interactionCreate", interaction => {
+  client.lastInteraction = Date.now();
+  reloadables.interactionCreateHandler(interaction);
+});
 
 // TODO: handle errors
 process.on("uncaughtException", err => {

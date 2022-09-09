@@ -99,8 +99,13 @@ const chatInputHandler = async interaction => {
 
   /// Additional Embed (Authorized users only!)
   if (authorizedUsers.has(interaction.user.id)) {
+    await interaction.deferReply();
     const { stdout: stdoutLsof } = await exec(`lsof -t "${dbPath}"`);
     const openConnections = stdoutLsof.trim().split("\n").length;
+
+    const lastInteraction = await interaction.client.shard
+      .broadcastEval(client => client.lastInteraction)
+      .catch(() => []);
 
     const additionalEmbed = new EmbedBuilder()
       .setTitle("Additional Information")
@@ -122,20 +127,27 @@ const chatInputHandler = async interaction => {
           inline: true,
         },
         {
-          name: ":control_knobs: Clusters",
-          value: getAllClusterData()
-            .map(({ id, data }) => {
-              const { readyAt, guildCount } = JSON.parse(data);
-              return bold(`<t:${toSecs(readyAt)}:R> / ${guildCount} / ${id}`);
-            })
-            .join("\n"),
+          name: ":control_knobs: Shards",
+          value:
+            "**Started / #Guilds / ShardId / Last Interaction**\n" +
+            getAllClusterData()
+              .map(({ id, data }) => {
+                const { readyAt, guildCount } = JSON.parse(data);
+                return bold(
+                  `<t:${toSecs(readyAt)}:R> / ${guildCount} / ${id} / <t:${toSecs(
+                    lastInteraction[id]
+                  )}:R>`
+                );
+              })
+              .join("\n"),
           inline: true,
         }
       );
     embeds.push(additionalEmbed);
+    interaction.editReply({ embeds, ephemeral: true });
+  } else {
+    interaction.reply({ embeds, ephemeral: true });
   }
-
-  interaction.reply({ embeds, ephemeral: true });
 };
 
 export const handlers = {
