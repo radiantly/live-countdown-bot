@@ -1,2 +1,2 @@
-export { interactionCreateHandler } from "./commands.js";
+export { interactionCreateHandler } from "./command_handler.js";
 export { performUpdates } from "./updates.js";
