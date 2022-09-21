@@ -1,8 +1,15 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import {
+  codeBlock,
+  ChatInputCommandInteraction,
+  SlashCommandBuilder,
+  EmbedBuilder,
+} from "discord.js";
 import { postServerCount } from "../../post.js";
 import { isOwner } from "../helpers.js";
 import { registerCommands } from "../register.js";
 import { getClusterDataSum } from "../sqlite3.js";
+import { inspect } from "node:util";
+import { MAX_EMBED_DESCRIPTION_LEN } from "../utils.js";
 
 export const pleaseCommand = new SlashCommandBuilder()
   .setName("please")
@@ -16,7 +23,18 @@ export const pleaseCommand = new SlashCommandBuilder()
   )
   .addSubcommand(subcommand => subcommand.setName("register").setDescription("Register commands"))
   .addSubcommand(subcommand =>
-    subcommand.setName("reload").setDescription("Reload code without a restart")
+    subcommand.setName("reload").setDescription("Reload code without a restart (Zero downtime)")
+  )
+  .addSubcommand(subcommand =>
+    subcommand.setName("respawn").setDescription("Respawn all shards one by one")
+  )
+  .addSubcommand(subcommand =>
+    subcommand
+      .setName("run")
+      .setDescription("Evaluate code on the bot")
+      .addStringOption(option =>
+        option.setName("code").setDescription("Code to be evaluated").setRequired(true)
+      )
   );
 
 /**
@@ -52,6 +70,37 @@ const chatInputHandler = async interaction => {
   } else if (subcommand === "reload") {
     await interaction.reply({ content: "Authorization success. Queuing reload.", ephemeral: true });
     interaction.client.shard.broadcastEval(client => client.reloadReloadables());
+  } else if (subcommand === "respawn") {
+    await interaction.reply({
+      content: "Authorization success. Respawning all shards.",
+      ephemeral: true,
+    });
+    interaction.client.shard.respawnAll();
+  } else if (subcommand === "run") {
+    await interaction.deferReply({ ephemeral: true });
+    const code = interaction.options.getString("code", true);
+    const { client } = interaction; // easy access from eval
+    let result;
+    try {
+      result = await eval(code);
+    } catch (ex) {
+      result = ex;
+    }
+    if (typeof result !== "string") result = inspect(result);
+
+    // wrap result in code blocks
+    let formattedResult = codeBlock(result);
+
+    // if larger than result, truncate
+    if (formattedResult.length > MAX_EMBED_DESCRIPTION_LEN)
+      formattedResult = codeBlock(result.slice(0, MAX_EMBED_DESCRIPTION_LEN - 42) + "\n...");
+
+    const resultEmbed = new EmbedBuilder().setTitle("Result").setDescription(formattedResult);
+
+    await interaction.editReply({
+      embeds: [resultEmbed],
+      ephemeral: true,
+    });
   }
 };
 

@@ -21,3 +21,6 @@ export const MAX_AUTOCOMPLETE_CHOICES = 25;
 
 // https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
 export const MAX_LENGTH_STRING_CHOICE = 100;
+
+// https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
+export const MAX_EMBED_DESCRIPTION_LEN = 4096;

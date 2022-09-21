@@ -92,6 +92,8 @@ client.on("interactionCreate", interaction => {
   reloadables.interactionCreateHandler(interaction);
 });
 
+client.on("warn", console.error);
+
 // TODO: handle errors
 process.on("uncaughtException", err => {
   console.error(err);
