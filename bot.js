@@ -10,6 +10,7 @@ import {
   setGuildRunId,
   setGuildsRunId,
 } from "./modules/reloadable/sqlite3.js";
+import { updateQueue } from "./modules/update_queue.js";
 
 const client = new Client({
   presence: {
@@ -42,40 +43,32 @@ const clusterStats = () => ({
   guildCount: client.guilds.cache.size,
 });
 
-// Initialize cluster with random runId
 const initializeCluster = () => {
-  while (true) {
-    client.runId = Math.floor(Math.random() * 1000000009);
+  const runId = client.shard.ids[0];
+  patchClusterData(client.shard.ids[0], runId, {
+    readyAt: Date.now(),
+    guildCount: client.guilds.cache.size,
+  });
 
-    // if runId already exists, then SQLite will throw a unique constraint error
-    // in that case, we regenerate a new one
-    try {
-      patchClusterData(client.shard.ids[0], client.runId, {
-        readyAt: Date.now(),
-        guildCount: client.guilds.cache.size,
-      });
-      break;
-    } catch (ex) {
-      console.log("regenerating runId", ex);
-    }
-  }
+  // update connected guilds to given shardId
+  setGuildsRunId(client.guilds.cache, runId);
+  updateQueue.load(runId);
 };
 
 client.once("ready", () => {
   console.assert(config.botId === client.user.id);
 
   initializeCluster();
-  setGuildsRunId(client.guilds.cache, client.runId);
-  console.info(`${client.user.tag} (${client.shard.ids}:${client.runId}) ready for business!`);
+  console.info(`${client.user.tag} (${client.shard.ids}) ready for business!`);
   setInterval(
-    () => patchClusterData(client.shard.ids[0], client.runId, clusterStats()),
+    () => patchClusterData(client.shard.ids[0], client.shard.ids[0], clusterStats()),
     5 * MINUTES
   );
   setInterval(() => reloadables.performUpdates(client), 100 * MILLISECONDS);
 });
 
 client.on("guildCreate", guild => {
-  setGuildRunId(guild.id, client.runId);
+  setGuildRunId(guild.id, client.shard.ids[0]);
   console.info(`Added to ${guild.name} (${guild.id})`);
   guild?.systemChannel
     ?.send("**Glad to be a part of your server** :heart:\nYou're probably looking for `/help`")

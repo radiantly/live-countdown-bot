@@ -4,7 +4,8 @@ import { parseUserTimeString } from "../dateparser.js";
 import { MAX_AUTOCOMPLETE_CHOICES, MAX_LENGTH_STRING_CHOICE, SECONDS } from "../utils.js";
 import { DateTime } from "luxon";
 import { extractRolesFromString, generateAllowedMentions } from "../helpers.js";
-import { getUserData, insertCountdown } from "../sqlite3.js";
+import { getUserData } from "../sqlite3.js";
+import { updateQueue } from "../../update_queue.js";
 
 const examples = [
   "10 minutes",
@@ -100,13 +101,13 @@ const chatInputHandler = async interaction => {
     channelName: interaction.channel.name,
   };
 
-  insertCountdown(
-    interaction.guildId,
-    interaction.channelId,
-    interaction.user.id,
-    (timestampSec - 1) * 1000,
-    countdownData
-  );
+  updateQueue.insert({
+    guildId: interaction.guildId,
+    channelId: interaction.channelId,
+    authorId: interaction.user.id,
+    updateTime: (timestampSec - 1) * SECONDS, // processing time
+    data: countdownData,
+  });
 };
 
 const autocompleteOptionHandlers = {};

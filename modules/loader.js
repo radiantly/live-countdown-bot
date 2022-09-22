@@ -17,8 +17,8 @@ export const resolve = async (specifier, context, defaultResolve) => {
   }
 
   if (child.pathname.includes("/reloadable/index.js")) {
-    console.log(`Setting loadId to ${loadId}`);
     loadId = child.searchParams.get("loadId");
+    console.log(`Setting loadId to ${loadId}`);
   }
 
   child.searchParams.set("loadId", loadId);

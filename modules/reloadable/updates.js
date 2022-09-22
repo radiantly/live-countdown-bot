@@ -1,8 +1,8 @@
 import { userMention, bold, italic } from "discord.js";
-import { getNextCountDown } from "./sqlite3.js";
+import { updateQueue } from "../update_queue.js";
 
 export const performUpdates = async client => {
-  const result = getNextCountDown(client.runId);
+  const result = updateQueue.next();
   if (!result) return;
   const { guild: guildId, channel: channelId, author: authorId, data: dataStr } = result;
   const data = JSON.parse(dataStr);

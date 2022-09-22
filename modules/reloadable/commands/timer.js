@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import { updateQueue } from "../../update_queue.js";
 import { extractRolesFromString, generateAllowedMentions } from "../helpers.js";
-import { getUserData, insertCountdown, setUserData } from "../sqlite3.js";
+import { getUserData, setUserData } from "../sqlite3.js";
 import { DAYS, HOURS, MINUTES, SECONDS, toSecs } from "../utils.js";
 
 const options = {
@@ -88,13 +89,13 @@ const chatInputHandler = async interaction => {
     channelName: interaction.channel.name,
   };
 
-  insertCountdown(
-    interaction.guildId,
-    interaction.channelId,
-    interaction.user.id,
-    timestamp - 1 * SECONDS, // processing time
-    timerData
-  );
+  updateQueue.insert({
+    guildId: interaction.guildId,
+    channelId: interaction.channelId,
+    authorId: interaction.user.id,
+    updateTime: timestamp - 1 * SECONDS, // processing time
+    data: timerData,
+  });
 };
 
 export const handlers = {

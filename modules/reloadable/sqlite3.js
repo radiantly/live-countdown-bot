@@ -149,12 +149,16 @@ export const getUserData = userId => {
 };
 
 /// Countdowns table
-const insertCountdownStmt = db.prepare(`
+const insertCountdownStmt = db.prepare(
+  `
   INSERT INTO countdowns (guild, channel, author, updateTime, priority, data)
   VALUES (@guildId, @channelId, @authorId, @updateTime, @priority, json(@data))
-`);
+  RETURNING rowid, *
+  `
+);
+
 export const insertCountdown = (guildId, channelId, authorId, updateTime, data, priority = 42) =>
-  insertCountdownStmt.run({
+  insertCountdownStmt.get({
     guildId,
     channelId,
     authorId,
@@ -163,19 +167,13 @@ export const insertCountdown = (guildId, channelId, authorId, updateTime, data, 
     data: JSON.stringify(data),
   });
 
-const selectNextCountdownStmt = db.prepare(`
-  DELETE FROM countdowns
-  WHERE updateTime < unixepoch() * 1000
-  AND rowid IN (
-    SELECT countdowns.rowid FROM countdowns 
-    JOIN guilds ON countdowns.guild = guilds.id
-    WHERE runId = @runId
-    ORDER BY updatetime, priority
-    LIMIT 1
-  )
-  RETURNING *
+const getAllCountdownsStmt = db.prepare(`
+  SELECT countdowns.rowid, countdowns.* FROM countdowns
+  JOIN guilds ON countdowns.guild = guilds.id
+  WHERE guilds.runId = @runId
 `);
-export const getNextCountDown = runId => selectNextCountdownStmt.get({ runId });
+
+export const getAllCountdowns = runId => getAllCountdownsStmt.all({ runId });
 
 const getGuildCountdownsStmt = db.prepare(`
   SELECT rowid, * FROM countdowns

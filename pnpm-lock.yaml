@@ -4,6 +4,7 @@ specifiers:
   '@discordjs/rest': ^1.1.0
   better-sqlite3: ^7.6.2
   discord.js: ^14.3.0
+  flatqueue: ^2.0.3
   fuse.js: ^6.6.2
   got: ^12.4.1
   luxon: ^3.0.3
@@ -14,6 +15,7 @@ dependencies:
   '@discordjs/rest': 1.1.0
   better-sqlite3: 7.6.2
   discord.js: 14.3.0
+  flatqueue: 2.0.3
   fuse.js: 6.6.2
   got: 12.4.1
   luxon: 3.0.3
@@ -256,6 +258,11 @@ packages:
 
   /file-uri-to-path/1.0.0:
     resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
+    dev: false
+
+  /flatqueue/2.0.3:
+    resolution: {integrity: sha512-RZCWZNkmxzUOh8jqEcEGZCycb3B8KAfpPwg3H//cURasunYxsg1eIvE+QDSjX+ZPHTIVfINfK1aLTrVKKO0i4g==}
+    engines: {node: '>= 12.17.0'}
     dev: false
 
   /form-data-encoder/2.1.2:
